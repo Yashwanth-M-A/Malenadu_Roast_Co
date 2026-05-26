@@ -4241,6 +4241,52 @@ const App = () => {
             </div>
           </div>
 
+          {/* —— Popular Searches & SEO Directory —— */}
+          <div style={{ 
+            marginTop: '4rem', 
+            borderTop: '1px solid rgba(255,255,255,0.03)', 
+            paddingTop: '3rem', 
+            maxWidth: '1150px', 
+            margin: '4rem auto 0',
+            textAlign: 'left'
+          }}>
+            <h5 style={{ 
+              color: 'rgba(200,147,90,0.5)', 
+              fontSize: '0.85rem', 
+              fontFamily: 'Inter, sans-serif', 
+              marginBottom: '1rem', 
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              Popular Searches & Index
+            </h5>
+            <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: '12px 18px', 
+              fontSize: '0.78rem', 
+              lineHeight: '1.6', 
+              color: 'rgba(255,255,255,0.25)' 
+            }}>
+              {[
+                "Malenadu Roast Co", "malenadu", "chikmagalur", "chickamagaluru", "coffee", "pepper", "spices", "estate coffee", "chikmagalur coffee", "malenadu coffee", "fresh coffee powder", "premium coffee", "buy coffee online India", "estate grown coffee", "western ghats coffee", "karnataka coffee", "south indian filter coffee", "coffee powder", "roasted coffee", "coffee beans", "arabica coffee", "robusta coffee", "chicory blend", "strong coffee", "rich aroma coffee", "farm to cup coffee", "direct from estate", "no middlemen", "authentic coffee", "natural coffee", "handpicked beans", "plantation coffee", "hill coffee",
+                "black pepper", "malenadu pepper", "chikmagalur pepper", "premium black pepper", "fresh pepper", "pepper powder", "spices India", "natural spices", "farm fresh spices", "estate grown pepper", "authentic Karnataka spices",
+                "chikmagalur hills", "malenadu region", "western ghats plantations", "chikmagalur estates", "karnataka plantations", "south india coffee", "hill grown coffee", "estate fresh products",
+                "buy coffee online", "order coffee online", "best coffee powder India", "fresh coffee delivery", "premium coffee delivered", "buy pepper online", "spices online India", "doorstep delivery coffee", "fast delivery India",
+                "best coffee powder from chikmagalur online", "where to buy malenadu coffee", "fresh roasted coffee delivery India", "authentic black pepper from karnataka", "estate grown coffee beans India", "premium coffee and spices from malenadu",
+                "organic", "quality", "direct"
+              ].map((tag, i) => (
+                <span key={i} style={{ cursor: 'default', transition: 'color 0.2s' }} 
+                  onMouseEnter={e => e.target.style.color = '#C8935A'}
+                  onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.25)'}
+                >
+                  {tag} {i < 58 ? '•' : ''}
+                </span>
+              ))}
+            </div>
+          </div>
+
           {/* Copyright */}
           <div style={{ marginTop: '5rem', textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2rem' }}>
             <div style={{ margin: '0 auto 1.2rem', width: 'fit-content' }}>
