@@ -4241,14 +4241,17 @@ const App = () => {
             </div>
           </div>
 
-          {/* —— Popular Searches & SEO Directory —— */}
+          {/* —— Popular Searches & SEO Directory (Visually Hidden for Google Indexing) —— */}
           <div style={{ 
-            marginTop: '4rem', 
-            borderTop: '1px solid rgba(255,255,255,0.03)', 
-            paddingTop: '3rem', 
-            maxWidth: '1150px', 
-            margin: '4rem auto 0',
-            textAlign: 'left'
+            position: 'absolute',
+            width: '1px',
+            height: '1px',
+            padding: '0',
+            margin: '-1px',
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
+            whiteSpace: 'nowrap',
+            border: '0'
           }}>
             <h5 style={{ 
               color: 'rgba(200,147,90,0.5)', 
