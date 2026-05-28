@@ -3493,7 +3493,7 @@ const App = () => {
                     </svg>
                   ),
                   title: 'Estate-Grown Quality',
-                  desc: 'Freshly harvested Arabica & Robusta coffee and premium black pepper sourced directly from our Malenadu plantations.'
+                  desc: 'Buy premium coffee online sourced directly from Chikmagalur estates. Handpicked Arabica & Robusta beans and authentic Malenadu black pepper delivered fresh across India.'
                 },
                 {
                   icon: (
@@ -3987,7 +3987,12 @@ const App = () => {
             transition={{ duration: 0.6 }}
           >
             <h2>Born in the Hills of Malenadu</h2>
-            <p>Our products are sourced from one of India's richest coffee and spice regions. Every bean and every peppercorn reflects purity, freshness, and heritage.</p>
+            <p style={{ lineHeight: '1.8', marginBottom: '1.5rem', color: 'rgba(255,255,255,0.85)' }}>
+              Buy premium coffee online in India from Malenadu Roast Co, offering the best filter coffee powder online made from fresh roasted coffee beans sourced directly from Chikmagalur estates. Experience authentic Malenadu coffee powder with rich aroma and strong flavor, crafted for true coffee lovers. We provide premium coffee brands in India with farm-to-cup freshness, ensuring high quality in every sip.
+            </p>
+            <p style={{ lineHeight: '1.8', color: 'rgba(255,255,255,0.85)' }}>
+              Looking to buy coffee directly from estate? We deliver fresh roasted coffee powder across India with fast and reliable service. For businesses, we also offer wholesale coffee suppliers options, bulk coffee powder at competitive prices, and premium instant coffee wholesale deals. Choose Malenadu Roast Co for authentic Chikmagalur coffee online premium quality and elevate your coffee experience.
+            </p>
           </motion.div>
           <Tilt className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
             <motion.div 
