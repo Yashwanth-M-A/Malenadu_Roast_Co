@@ -3987,27 +3987,7 @@ const App = () => {
             transition={{ duration: 0.6 }}
           >
             <h2>Born in the Hills of Malenadu</h2>
-            <p style={{ lineHeight: '1.8', marginBottom: '1.5rem', color: 'rgba(255,255,255,0.85)', fontSize: '0.98rem' }}>
-              Buy premium coffee online in India from Malenadu Roast Co, offering the best filter coffee powder online made from fresh roasted coffee beans sourced directly from Chikmagalur estates. Experience authentic Malenadu coffee powder with rich aroma and strong flavor, crafted for true coffee lovers. We provide premium coffee brands in India with farm-to-cup freshness, ensuring high quality in every sip. Looking to buy coffee directly from estate? We deliver fresh roasted coffee powder across India with fast and reliable service. For businesses, we also offer wholesale coffee suppliers options, bulk coffee powder at competitive prices, and premium instant coffee wholesale deals. Choose Malenadu Roast Co for authentic Chikmagalur coffee online premium quality and elevate your coffee experience.
-            </p>
-            <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem', textAlign: 'left' }}>
-              <h4 style={{ color: '#C8935A', fontSize: '0.9rem', marginBottom: '1rem', fontFamily: 'Inter, sans-serif', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Explore Spices & Coffee Index</h4>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', lineHeight: '1.7', margin: 0 }}>
-                chikmagalore coffee, chickamagaluru coffee, chikmagalore pepper, chickamagaluru pepper, malenadu coffee, malenadu pepper, malenadu spices, chikmagalur coffee estates, chikmagalur coffee online, malenadu coffee powder, chikmagalur filter coffee, fresh coffee powder chikmagalur, estate coffee chikmagalur, western ghats coffee, karnataka coffee, south indian filter coffee, arabica coffee chikmagalur, robusta coffee chikmagalur, plantation coffee india, hill grown coffee, farm fresh coffee, direct from estate coffee, farm to cup coffee, fresh roasted coffee india, premium coffee powder india, best filter coffee powder, strong coffee powder india, rich aroma coffee, authentic coffee india, coffee beans chikmagalur, coffee powder online india, buy coffee online india, order coffee online, premium coffee brands india, best coffee in india, fresh coffee delivery india.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', lineHeight: '1.7', marginTop: '1rem', marginBottom: 0 }}>
-                black pepper chikmagalur, malenadu black pepper, premium black pepper india, fresh pepper chikmagalur, whole black pepper india, pepper powder india, estate grown pepper, farm fresh spices, natural spices india, authentic spices karnataka, malenadu spices online, chikmagalur spices, buy pepper online india.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', lineHeight: '1.7', marginTop: '1rem', marginBottom: 0 }}>
-                mullayanagiri coffee, baba budangiri coffee, chikmagalur hills coffee, western ghats plantations, malenadu region products, karnataka plantations coffee, chikmagalur estate products, hill station coffee india.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', lineHeight: '1.7', marginTop: '1rem', marginBottom: 0 }}>
-                buy premium coffee online india, best coffee powder online, fresh roasted coffee powder india, buy coffee directly from estate india, wholesale coffee suppliers india, bulk coffee powder price india, premium instant coffee wholesale india, coffee wholesale india, coffee suppliers chikmagalur, bulk coffee suppliers karnataka, coffee business india suppliers.
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', lineHeight: '1.7', marginTop: '1rem', marginBottom: 0 }}>
-                fresh coffee, premium coffee, natural coffee, authentic coffee, estate coffee, plantation coffee, organic style coffee, handpicked coffee beans, carefully processed coffee, high quality coffee, strong flavor coffee, smooth coffee taste, traditional filter coffee, south indian coffee taste.
-              </p>
-            </div>
+            <p>Our products are sourced from one of India's richest coffee and spice regions. Every bean and every peppercorn reflects purity, freshness, and heritage.</p>
           </motion.div>
           <Tilt className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
             <motion.div 
