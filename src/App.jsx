@@ -606,6 +606,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants ? product.variants[0] : null
   );
+  const [showDetails, setShowDetails] = useState(false);
 
   const handleNext = () => {
     if (!product.images) return;
@@ -620,21 +621,36 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
   useEffect(() => {
     setSelectedVariant(product.variants ? product.variants[0] : null);
     setImgIndex(0);
+    setShowDetails(false);
   }, [product]);
 
-  const currentImage = product.images && product.images.length > 0
-    ? (product.images[imgIndex] || product.images[0])
-    : product.image;
+  useEffect(() => {
+    if (selectedVariant && selectedVariant.image && product.images) {
+      const idx = product.images.indexOf(selectedVariant.image);
+      if (idx !== -1) {
+        setImgIndex(idx);
+      }
+    }
+  }, [selectedVariant, product.images]);
+
+  const isVariantImageMode = product.variants && product.variants.some(v => v.image);
+  const showSlider = !isVariantImageMode && product.images && product.images.length > 1;
+
+  const currentImage = isVariantImageMode && selectedVariant && selectedVariant.image
+    ? selectedVariant.image
+    : (product.images && product.images.length > 0 ? (product.images[imgIndex] || product.images[0]) : product.image);
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
   const currentWeight = selectedVariant ? selectedVariant.weight : product.weight;
+  const anchorPrice = Math.round(Number(currentPrice) * 1.30);
 
   const handlePurchase = (e) => {
     if (e) e.stopPropagation();
     const finalProduct = {
       ...product,
       price: currentPrice,
-      weight: currentWeight
+      weight: currentWeight,
+      image: selectedVariant && selectedVariant.image ? selectedVariant.image : product.image
     };
     if (onAddToCart) {
       onAddToCart(finalProduct);
@@ -656,7 +672,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
           {product.badge && <span className="badge">{product.badge}</span>}
 
           <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {product.images && product.images.length > 1 && (
+            {showSlider && (
               <button className="img-nav-btn left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}><ChevronLeft size={20}/></button>
             )}
             
@@ -670,16 +686,21 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
                 transition={{ duration: 0.3 }}
-                style={{ position: 'absolute' }}
+                style={{ 
+                  position: 'absolute',
+                  maxHeight: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'contain'
+                }}
               />
             </AnimatePresence>
 
-            {product.images && product.images.length > 1 && (
+            {showSlider && (
               <button className="img-nav-btn right" onClick={(e) => { e.stopPropagation(); handleNext(); }}><ChevronRight size={20}/></button>
             )}
           </div>
           
-          {product.images && product.images.length > 1 && (
+          {showSlider && (
              <div className="img-dots">
                {product.images.map((_, idx) => (
                  <span key={idx} className={`img-dot ${idx === imgIndex ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); setImgIndex(idx); }}></span>
@@ -687,10 +708,74 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
              </div>
           )}
         </div>
-        <div className="product-info" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 240px)', justifyContent: 'space-between' }}>
+        <div className="product-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
           <div>
             <h4 className="product-name">{product.name}</h4>
-            <p className="product-desc">{product.description}</p>
+            <p className="product-desc" style={{ flex: 'none', marginBottom: '0.5rem' }}>{product.description}</p>
+
+            {product.details && (
+              <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetails(!showDetails);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: '4px 0',
+                    color: '#C8935A',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontFamily: 'Inter, sans-serif',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.color = '#b3844f'}
+                  onMouseLeave={(e) => e.target.style.color = '#C8935A'}
+                >
+                  <span>{showDetails ? 'Hide Details' : 'View Details'}</span>
+                  <motion.span
+                    animate={{ rotate: showDetails ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    <ChevronDown size={14} />
+                  </motion.span>
+                </button>
+                
+                <AnimatePresence initial={false}>
+                  {showDetails && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                      animate={{ height: 'auto', opacity: 1, marginTop: 8 }}
+                      exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <p style={{
+                        fontSize: '0.82rem',
+                        color: '#4e3621',
+                        lineHeight: '1.65',
+                        background: '#fcfaf7',
+                        borderLeft: '3px solid #C8935A',
+                        padding: '10px 12px',
+                        borderRadius: '0 4px 4px 0',
+                        margin: 0,
+                        fontFamily: 'Inter, sans-serif'
+                      }}>
+                        {product.details}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
             
             {product.variants && (
               <div className="variant-dropdown-wrap" style={{ marginTop: '1rem', position: 'relative' }}>
@@ -747,13 +832,23 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
             )}
           </div>
 
-          <div className="product-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.2rem' }}>
-            <span className="price" style={{ margin: 0, color: '#8c6239', fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 800, fontSize: '1.4rem', display: 'inline-flex', alignItems: 'baseline' }}>
-              ₹{currentPrice}
-              <span style={{ fontSize: '0.8rem', color: '#b3844f', fontWeight: '600', marginLeft: '6px', fontFamily: 'Inter, sans-serif', textTransform: 'lowercase' }}>
-                / {currentWeight}
+          <div className="product-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '1.2rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.9rem', color: '#999', textDecoration: 'line-through', fontFamily: 'Inter, sans-serif' }}>
+                  ₹{anchorPrice}
+                </span>
+                <span style={{ color: '#00a368', fontSize: '0.85rem', fontWeight: 700, fontFamily: 'Inter, sans-serif', padding: '2px 6px', background: 'rgba(0,163,104,0.1)', borderRadius: '4px' }}>
+                  30% OFF
+                </span>
+              </div>
+              <span className="price" style={{ margin: 0, color: '#8c6239', fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 800, fontSize: '1.4rem', display: 'inline-flex', alignItems: 'baseline' }}>
+                ₹{currentPrice}
+                <span style={{ fontSize: '0.8rem', color: '#b3844f', fontWeight: '600', marginLeft: '6px', fontFamily: 'Inter, sans-serif', textTransform: 'lowercase' }}>
+                  / {currentWeight}
+                </span>
               </span>
-            </span>
+            </div>
             {!hideBuyNow && (
               <button 
                 onClick={handlePurchase} 
@@ -2358,6 +2453,248 @@ const CheckoutModal = ({ isOpen, onClose, cart, currentUser, onRequireLogin }) =
   );
 };
 
+const PromotionalCarousel = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const slides = [
+    {
+      id: 1,
+      tag: "Limited Time Offer",
+      icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "30% OFF All Varieties",
+      desc: "Stock up on Malenadu's finest! Enjoy an exclusive flat 30% discount on all our premium coffee and pepper sizes. Grab yours before it's gone.",
+      bgImage: "url('/assets/images/promo_sale_bg.png')",
+      bgPosition: "center",
+      overlay: "linear-gradient(135deg, rgba(26,18,11,0.65) 0%, rgba(60,42,33,0.85) 100%)",
+      link: "#products"
+    },
+    {
+      id: 2,
+      tag: "Perfect Pairings",
+      icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "Unlock the Perfect Pairing",
+      desc: "Experience the true essence of Malenadu. Discover our curated coffee and spice combos crafted for the perfect cup.",
+      bgImage: "url('/assets/images/combo_pairing_bg.png')",
+      bgPosition: "center 85%",
+      overlay: "linear-gradient(135deg, rgba(26,18,11,0.6) 0%, rgba(60,42,33,0.7) 100%)",
+      link: "#combos",
+      btnText: "Shop Combos"
+    },
+    {
+      id: 3,
+      tag: "B2B & Wholesale",
+      icon: <Package size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "Partner with Malenadu",
+      desc: "Elevate your cafe or business with our premium wholesale offerings. Exclusive pricing for bulk orders.",
+      bgImage: "url('/assets/images/coffee_raw_2.png')",
+      bgPosition: "center",
+      overlay: "linear-gradient(135deg, rgba(17,10,7,0.9) 0%, rgba(46,31,21,0.95) 100%)",
+      link: "#bulk-orders",
+      btnText: "Enquire Now"
+    },
+    {
+      id: 4,
+      tag: "Gifting Made Special",
+      icon: <Heart size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "Premium Gift Packs Delivered",
+      desc: "We are now delivering beautifully crafted premium gift packs for your loved ones right to their doorstep. 💕 Share the joy of authentic Malenadu flavors.",
+      bgImage: "url('/assets/images/promo_gift_bg.png')",
+      bgPosition: "center 60%",
+      overlay: "linear-gradient(135deg, rgba(50,20,20,0.6) 0%, rgba(30,10,10,0.8) 100%)",
+      link: "#combos",
+      btnText: "Gift Now"
+    }
+  ];
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [slides.length, currentSlide]);
+
+  return (
+    <div className="promo-carousel-wrapper">
+      <style>{`
+        .promo-carousel-wrapper {
+          padding: 3rem 1rem 1rem;
+          background: #fcfaf7;
+          overflow: hidden;
+        }
+        .promo-slide {
+          position: relative;
+          border-radius: 24px;
+          padding: 4rem 2rem;
+          color: #fff;
+          text-align: center;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+          border: 1px solid rgba(200,147,90,0.3);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 380px;
+          background-size: cover;
+          overflow: hidden;
+        }
+        .promo-slide-glow {
+          position: absolute;
+          inset: 0;
+          border-radius: 24px;
+          box-shadow: inset 0 0 40px rgba(200,147,90,0.1);
+          pointer-events: none;
+        }
+        .promo-dots-container {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 2rem;
+        }
+        .promo-nav-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(26, 18, 11, 0.45);
+          border: 1px solid rgba(200,147,90,0.3);
+          color: #fff;
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10;
+          transition: all 0.3s;
+          backdrop-filter: blur(8px);
+        }
+        .promo-nav-btn:hover {
+          background: rgba(200,147,90,0.85);
+          color: #1a1a1a;
+          transform: translateY(-50%) scale(1.08);
+        }
+        .promo-nav-left { left: -1.5rem; }
+        .promo-nav-right { right: -1.5rem; }
+
+        @media (max-width: 768px) {
+          .promo-carousel-wrapper {
+            padding: 1.5rem 1rem 1rem;
+          }
+          .promo-slide {
+            padding: 2.5rem 1.5rem;
+            min-height: 340px;
+            border-radius: 20px;
+            border-left: 1px solid rgba(200,147,90,0.3);
+            border-right: 1px solid rgba(200,147,90,0.3);
+          }
+          .promo-slide-glow {
+            border-radius: 20px;
+          }
+          .promo-dots-container {
+            margin-top: 1.5rem;
+          }
+          .promo-nav-btn {
+            width: 38px;
+            height: 38px;
+          }
+          .promo-nav-left { left: 0.5rem; }
+          .promo-nav-right { right: 0.5rem; }
+        }
+      `}</style>
+      <div className="container" style={{ maxWidth: '1050px', margin: '0 auto', position: 'relative' }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            className="promo-slide"
+            initial={{ opacity: 0, scale: 0.98, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 1.02, x: -20 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            style={{
+              backgroundImage: `${slides[currentSlide].overlay}, ${slides[currentSlide].bgImage}`,
+              backgroundPosition: slides[currentSlide].bgPosition
+            }}
+          >
+            {/* Subtle inner glow */}
+            <div className="promo-slide-glow" />
+
+            <motion.span 
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+              style={{ 
+                background: 'rgba(200,147,90,0.2)', color: '#E8CA80', padding: '6px 18px', 
+                borderRadius: '30px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(200,147,90,0.4)',
+                textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center',
+                backdropFilter: 'blur(5px)'
+            }}>
+              {slides[currentSlide].icon}
+              {slides[currentSlide].tag}
+            </motion.span>
+            
+            <motion.h3 
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+              style={{ fontFamily: '"Georgia", serif', fontSize: 'clamp(2rem, 5vw, 3rem)', margin: '0 0 1rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>
+              {slides[currentSlide].title}
+            </motion.h3>
+            
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+              style={{ fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto 2.5rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.7, fontFamily: 'Inter, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+              {slides[currentSlide].desc}
+            </motion.p>
+            
+            {slides[currentSlide].btnText && (
+              <motion.a 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+                href={slides[currentSlide].link} 
+                style={{
+                  background: 'linear-gradient(135deg, #C8935A, #E8CA80)', color: '#1a1a1a', padding: '1rem 2.8rem', 
+                  borderRadius: '40px', textDecoration: 'none', fontWeight: 800, 
+                  fontSize: '0.95rem', transition: 'all 0.3s', display: 'inline-block',
+                  boxShadow: '0 10px 25px rgba(200,147,90,0.4)', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '1px'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 15px 30px rgba(200,147,90,0.6)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(200,147,90,0.4)'; }}
+              >
+                {slides[currentSlide].btnText}
+              </motion.a>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Navigation Arrows */}
+        <button className="promo-nav-btn promo-nav-left" onClick={prevSlide} aria-label="Previous slide">
+          <ChevronLeft size={24} />
+        </button>
+        <button className="promo-nav-btn promo-nav-right" onClick={nextSlide} aria-label="Next slide">
+          <ChevronRight size={24} />
+        </button>
+
+        {/* Custom Navigation Dots */}
+        <div className="promo-dots-container">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              style={{
+                width: currentSlide === idx ? '35px' : '12px',
+                height: '6px',
+                borderRadius: '10px',
+                background: currentSlide === idx ? '#C8935A' : '#d1c4b7',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.4s ease'
+              }}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
   const [expandedSection, setExpandedSection] = useState(null);
@@ -2696,75 +3033,100 @@ const App = () => {
   const coffeeProducts = [
     {
       id: 1,
-      name: '100% Arabica',
-      description: 'Smooth. Aromatic. Pure Arabica Elegance.',
+      name: 'Malenadu Estate Reserve',
+      description: 'Rooted in Tradition, Crafted for Today',
+      details: 'A smooth and balanced filter coffee crafted from carefully selected estate-grown beans from Chikmagaluru. Perfect for those who enjoy authentic coffee with a rich aroma and satisfying finish.',
       rating: 4.8,
       reviews: 124,
-      image: TOKENS.images.coffeePack,
-      images: [TOKENS.images.coffeePack, TOKENS.images.coffeeBack],
-      badge: 'Premium Pure',
+      image: '/assets/images/estate_reserve_1kg.jpg',
+      images: [
+        '/assets/images/estate_reserve_1kg.jpg',
+        '/assets/images/estate_reserve_500g.jpg',
+        '/assets/images/estate_reserve_250g.jpg'
+      ],
       variants: [
-        { weight: '1kg', price: '999' },
-        { weight: '500g', price: '499' },
-        { weight: '250g', price: '279' }
+        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.jpg' },
+        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.jpg' },
+        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.jpg' }
       ]
     },
     {
       id: 2,
-      name: '100% Robusta',
-      description: 'Bold Strength. Intense Kick.',
+      name: 'Highland Signature Reserve',
+      description: 'Born in the Highlands, Roasted to Perfection',
+      details: 'Sourced from the misty highlands of the Western Ghats and roasted with care to deliver a refined cup with exceptional aroma, character, and balance.',
       rating: 4.6,
       reviews: 89,
-      image: TOKENS.images.coffeePack,
-      images: [TOKENS.images.coffeePack, TOKENS.images.coffeeBack],
+      image: '/assets/images/highland_signature_1kg.jpg',
+      images: [
+        '/assets/images/highland_signature_1kg.jpg',
+        '/assets/images/highland_signature_500g.jpg',
+        '/assets/images/highland_signature_250g.jpg'
+      ],
       variants: [
-        { weight: '1kg', price: '899' },
-        { weight: '500g', price: '479' },
-        { weight: '250g', price: '269' }
+        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.jpg' },
+        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.jpg' },
+        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.jpg' }
       ]
     },
     {
       id: 12,
-      name: '90% Arabica + 10% Chicory',
-      description: 'Rich Aroma with a Smooth Finish.',
+      name: 'Imperial Heritage Reserve',
+      description: 'An Heirloom of Flavor and Craftsmanship',
+      details: 'A premium reserve crafted from select coffee beans, offering a rich and memorable coffee experience inspired by generations of coffee-growing tradition.',
       rating: 4.7,
       reviews: 96,
-      image: TOKENS.images.coffeePack,
-      images: [TOKENS.images.coffeePack, TOKENS.images.coffeeBack],
+      image: '/assets/images/imperial_heritage_1kg.jpg',
+      images: [
+        '/assets/images/imperial_heritage_1kg.jpg',
+        '/assets/images/imperial_heritage_500g.jpg',
+        '/assets/images/imperial_heritage_250g.jpg'
+      ],
       badge: 'Best Seller',
       variants: [
-        { weight: '1kg', price: '969' },
-        { weight: '500g', price: '509' },
-        { weight: '250g', price: '289' }
+        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.jpg' },
+        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.jpg' },
+        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.jpg' }
       ]
     },
     {
       id: 14,
-      name: '90% Robusta + 10% Chicory',
-      description: 'Deep Flavor. Powerful Start.',
+      name: 'Peaberry Grand Cru Royale',
+      description: 'Rare. Refined. Remarkable.',
+      details: 'Our flagship peaberry coffee, carefully selected and expertly roasted to showcase exceptional quality, depth, and elegance in every cup.',
       rating: 4.6,
       reviews: 82,
-      image: TOKENS.images.coffeePack,
-      images: [TOKENS.images.coffeePack, TOKENS.images.coffeeBack],
+      image: '/assets/images/peaberry_grand_cru_1kg.jpg',
+      images: [
+        '/assets/images/peaberry_grand_cru_1kg.jpg',
+        '/assets/images/peaberry_grand_cru_500g.jpg',
+        '/assets/images/peaberry_grand_cru_250g.jpg'
+      ],
+      badge: 'Premium Pure',
       variants: [
-        { weight: '1kg', price: '889' },
-        { weight: '500g', price: '469' },
-        { weight: '250g', price: '269' }
+        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.jpg' },
+        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.jpg' },
+        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.jpg' }
       ]
     },
     {
       id: 16,
-      name: 'Malenadu Aroma Reserve',
-      description: 'Crafted for Connoisseurs. Rich Beyond Ordinary.',
+      name: 'Malenadu Signature Beans',
+      description: 'Freshly roasted for the perfect grind',
+      details: 'Whole roasted coffee beans crafted for coffee lovers who prefer grinding fresh. Ideal for espresso, pour-over, French press, and traditional filter brewing.',
       rating: 5.0,
       reviews: 180,
-      image: TOKENS.images.coffeePack,
-      images: [TOKENS.images.coffeePack, TOKENS.images.coffeeBack],
+      image: '/assets/images/signature_beans_1kg.jpg',
+      images: [
+        '/assets/images/signature_beans_1kg.jpg',
+        '/assets/images/signature_beans_500g.jpg',
+        '/assets/images/signature_beans_250g.jpg'
+      ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1199' },
-        { weight: '500g', price: '649' },
-        { weight: '250g', price: '349' }
+        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.jpg' },
+        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.jpg' },
+        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.jpg' }
       ]
     }
   ];
@@ -2772,45 +3134,22 @@ const App = () => {
   const pepperProducts = [
     {
       id: 4,
-      name: 'Medium Grade Pepper',
-      description: 'Everyday Spice with Natural Freshness.',
-      rating: 4.8,
-      reviews: 95,
-      image: TOKENS.images.pepperPack,
-      images: [TOKENS.images.pepperPack, TOKENS.images.pepperBack],
-      variants: [
-        { weight: '1kg', price: '999' },
-        { weight: '500g', price: '520' },
-        { weight: '250g', price: '269' }
-      ]
-    },
-    {
-      id: 5,
-      name: 'Premium Grade Pepper',
+      name: 'Malenadu Pepper Reserve',
       description: 'Bold, Sharp, and Naturally Superior.',
+      details: 'Sourced from the lush hills of Malenadu, Malenadu Pepper Reserve is carefully selected for its rich aroma, bold character, and natural pungency. Perfect for everyday cooking and gourmet dishes, it brings authentic flavor and freshness to every meal.',
       rating: 4.9,
       reviews: 210,
-      image: TOKENS.images.pepperPack,
-      images: [TOKENS.images.pepperPack, TOKENS.images.pepperBack],
-      badge: 'Export Grade',
+      image: '/assets/images/pepper_reserve_1kg.jpg',
+      images: [
+        '/assets/images/pepper_reserve_1kg.jpg',
+        '/assets/images/pepper_reserve_500g.jpg',
+        '/assets/images/pepper_reserve_250g.jpg'
+      ],
+      badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1099' },
-        { weight: '500g', price: '579' },
-        { weight: '250g', price: '319' }
-      ]
-    },
-    {
-      id: 17,
-      name: 'Pepper Powder',
-      description: 'Pure Spice. Freshly Ground Flavor.',
-      rating: 4.7,
-      reviews: 82,
-      image: TOKENS.images.pepperPack,
-      images: [TOKENS.images.pepperPack, TOKENS.images.pepperBack],
-      variants: [
-        { weight: '1kg', price: '1099' },
-        { weight: '500g', price: '579' },
-        { weight: '250g', price: '319' }
+        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.jpg' },
+        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.jpg' },
+        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.jpg' }
       ]
     }
   ];
@@ -2818,26 +3157,39 @@ const App = () => {
   const comboProducts = [
     {
       id: 6,
-      name: 'Premium Combo',
-      description: '1 kg Coffee + 250 g Pepper. Premium pairing of our finest brew & spices.',
-      price: '1199',
-      weight: '1 kg Coffee + 250 g Pepper',
+      name: 'Imperial Heritage Combo',
+      description: 'Imperial Heritage Reserve + Malenadu Pepper Reserve',
+      details: 'A celebration of Malenadu\'s rich heritage. This premium combo brings together the smooth character of Imperial Heritage Reserve coffee and the bold aroma of Malenadu Pepper Reserve. Perfect for those who appreciate authentic estate-grown products crafted with tradition and care.',
       rating: 4.9,
       reviews: 145,
-      image: '/assets/images/combo_pack_final.png',
-      images: ['/assets/images/combo_pack_final.png'],
-      badge: 'Premium Pair'
+      image: '/assets/images/imperial_combo_1kg.jpg',
+      images: [
+        '/assets/images/imperial_combo_1kg.jpg',
+        '/assets/images/imperial_combo_500g.jpg'
+      ],
+      badge: 'Heritage Pair',
+      variants: [
+        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_combo_1kg.jpg' },
+        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_combo_500g.jpg' }
+      ]
     },
     {
       id: 7,
-      name: 'Mini Combo',
-      description: '500 g Coffee + 100 g Pepper. Daily essentials, perfectly portioned and paired.',
-      price: '619',
-      weight: '500 g Coffee + 100 g Pepper',
-      rating: 4.8,
+      name: 'Grand Cru Royale Combo',
+      description: 'Peaberry Grand Cru Royale + Malenadu Pepper Reserve',
+      details: 'Our most premium Malenadu pairing. Featuring the rare and refined Peaberry Grand Cru Royale alongside the bold and aromatic Malenadu Pepper Reserve, this combo showcases the finest flavors from the hills of Malenadu. Crafted for those who seek something truly exceptional.',
+      rating: 5.0,
       reviews: 89,
-      image: '/assets/images/combo_pack_final.png',
-      images: ['/assets/images/combo_pack_final.png']
+      image: '/assets/images/grand_cru_combo_1kg.jpg',
+      images: [
+        '/assets/images/grand_cru_combo_1kg.jpg',
+        '/assets/images/grand_cru_combo_500g.jpg'
+      ],
+      badge: 'Royale Pair',
+      variants: [
+        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.jpg' },
+        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.jpg' }
+      ]
     }
   ];
 
@@ -2944,6 +3296,7 @@ const App = () => {
       ) : (
       <>
       <Hero onOrderNow={() => { setCurrentPage('order'); window.scrollTo(0, 0); }} />
+      <PromotionalCarousel />
 
       <section id="coffee" className="section bg-cream section-padded">
         <div className="container">
@@ -3040,7 +3393,7 @@ const App = () => {
             <h2 className="section-title">Malenadu Black Pepper collection</h2>
             <p className="section-subtitle">Authentic, pungent organic pepper.</p>
           </div>
-          <div className="products-grid">
+          <div className="products-grid" style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2rem' }}>
             {pepperProducts.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -3186,7 +3539,7 @@ const App = () => {
         backgroundImage: `url(${TOKENS.images.hero})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center 45%',
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: 'scroll',
         overflow: 'hidden',
         borderTop: '1px solid rgba(200, 147, 90, 0.25)',
         borderBottom: '1px solid rgba(200, 147, 90, 0.25)'
@@ -3200,8 +3553,8 @@ const App = () => {
             max-width: 1200px;
             margin: 0 auto;
             background: linear-gradient(135deg, rgba(14,24,18,0.76) 0%, rgba(5,8,6,0.92) 100%);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 32px;
             padding: 6.5rem 4.5rem;
             box-shadow: 0 45px 95px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255,255,255,0.06);
@@ -3301,8 +3654,8 @@ const App = () => {
           }
           .bulk-card-premium {
             background: rgba(8, 15, 10, 0.45);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             border: 1.5px solid rgba(212, 168, 112, 0.18);
             padding: 2.2rem 2rem;
             border-radius: 24px;
@@ -3409,74 +3762,31 @@ const App = () => {
 
             {/* Section Head */}
             <div className="bulk-section-head">
-              
-              {/* Premium Category Tagline */}
               <span style={{ 
-                color: '#D4A870', 
-                fontSize: '0.85rem', 
-                fontWeight: 800, 
-                letterSpacing: '6px', 
-                textTransform: 'uppercase', 
-                fontFamily: 'Inter, sans-serif',
-                display: 'block',
-                marginBottom: '2.5rem',
-                opacity: 0.95,
-                textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+                color: '#D4A870', fontSize: '0.85rem', fontWeight: 800, letterSpacing: '6px', 
+                textTransform: 'uppercase', fontFamily: 'Inter, sans-serif', display: 'block',
+                marginBottom: '2.5rem', opacity: 0.95, textShadow: '0 2px 10px rgba(0,0,0,0.5)'
               }}>
                 WHOLESALE • CAFES • HOTELS • RETAIL • SPICES
               </span>
               
-              {/* Balanced Two-Line Luxury Heading */}
               <div style={{ maxWidth: '850px', margin: '0 auto 1.8rem' }}>
                 <h2 style={{
-                  fontFamily: '"Georgia", serif',
-                  color: '#fff',
-                  fontSize: 'clamp(2rem, 4.5vw, 2.8rem)',
-                  fontWeight: 700,
-                  lineHeight: 1.35,
-                  margin: 0,
-                  textShadow: '0 4px 20px rgba(0,0,0,0.65)'
+                  fontFamily: '"Georgia", serif', color: '#fff', fontSize: 'clamp(2rem, 4.5vw, 2.8rem)',
+                  fontWeight: 700, lineHeight: 1.35, margin: 0, textShadow: '0 4px 20px rgba(0,0,0,0.65)'
                 }}>
                   Wholesale Coffee & Pepper<br style={{ display: 'inline' }} />at Estate-Direct Prices
                 </h2>
               </div>
 
               {/* Handcrafted Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', margin: '2rem auto 2.2rem', maxWidth: '300px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', margin: '2rem auto', maxWidth: '300px' }}>
                 <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(212,168,112,0.45))' }} />
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ filter: 'drop-shadow(0 2px 6px rgba(212,168,112,0.45))' }}>
                   <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 14.5c-.8 0-1.5-.2-2.1-.5l6.7-6.7c.3.6.5 1.3.5 2.1-.1 2.8-2.3 5.1-5.1 5.1zm-2.1-7.2c-.3-.6-.5-1.3-.5-2.1 0-2.8 2.3-5.1 5.1-5.1.8 0 1.5.2 2.1.5l-6.7 6.7z" fill="#D4A870" />
                 </svg>
                 <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(212,168,112,0.45), transparent)' }} />
               </div>
-              
-              {/* Premium Slogan */}
-              <p style={{
-                color: 'rgba(255,255,255,0.85)',
-                maxWidth: '880px',
-                margin: '0 auto',
-                fontSize: '1.15rem',
-                lineHeight: '1.95',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 300,
-                textShadow: '0 2px 8px rgba(0,0,0,0.5)'
-              }}>
-                Freshly roasted Malenadu coffee and handpicked black pepper supplied directly from our estates for cafés, hotels, retailers, offices, and bulk buyers at competitive wholesale pricing.
-              </p>
-
-              {/* Emotional Storytelling Brand Line */}
-              <p style={{
-                fontFamily: '"Georgia", serif',
-                fontStyle: 'italic',
-                color: '#E8CA80',
-                fontSize: '1.12rem',
-                marginTop: '1.4rem',
-                letterSpacing: '0.5px',
-                opacity: 0.9,
-                textShadow: '0 2px 8px rgba(0,0,0,0.4)'
-              }}>
-                “Crafted in the misty hills of Malenadu and delivered fresh across India.”
-              </p>
             </div>
 
             {/* Immersive Glassmorphic Cards Grid */}
@@ -3493,7 +3803,7 @@ const App = () => {
                     </svg>
                   ),
                   title: 'Estate-Grown Quality',
-                  desc: 'Buy premium coffee online sourced directly from Chikmagalur estates. Handpicked Arabica & Robusta beans and authentic Malenadu black pepper delivered fresh across India.'
+                  desc: 'Directly sourced Arabica, Robusta & authentic spices.'
                 },
                 {
                   icon: (
@@ -3503,7 +3813,7 @@ const App = () => {
                     </svg>
                   ),
                   title: 'Custom Bulk Solutions',
-                  desc: 'Flexible roast profiles, grind types, packaging options, and bulk quantities tailored to your business needs.'
+                  desc: 'Flexible roasting, packaging, and custom grind sizes.'
                 },
                 {
                   icon: (
@@ -3514,7 +3824,7 @@ const App = () => {
                     </svg>
                   ),
                   title: 'Reliable Nationwide Supply',
-                  desc: 'Consistent inventory, secure packaging, and dependable delivery for wholesale and recurring orders across India.'
+                  desc: 'Secure packaging and dependable delivery across India.'
                 }
               ].map((benefit, i) => (
                 <div key={i} className="bulk-card-premium">
@@ -3579,7 +3889,6 @@ const App = () => {
                 }} />
                 
                 <motion.a
-                  /* DEVELOPER NOTE: Replace the link below with your actual Google Form URL */
                   href="https://forms.gle/wHLjuDn2AZLmNEcDA"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -3611,7 +3920,6 @@ const App = () => {
                     alignItems: 'center',
                     gap: '6px'
                   }}>
-                    {/* Small elegant gold checklist icon */}
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4A870" strokeWidth="3" style={{ marginRight: '2px' }}>
                       <polyline points="20 6 9 17 4 12" />
                     </svg>

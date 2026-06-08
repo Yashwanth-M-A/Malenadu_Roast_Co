@@ -108,7 +108,7 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 .hero {
   position: relative; min-height: 100vh; display: flex; align-items: center;
   background-image: url('/assets/images/coffee_hero_bg_1776575157848.png');
-  background-size: cover; background-position: center; background-attachment: fixed;
+  background-size: cover; background-position: center; background-attachment: scroll;
   color: var(--c-white); padding-top: 80px;
 }
 .hero-overlay {
@@ -134,7 +134,7 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
   position: relative; background: var(--c-ivory); border-radius: var(--radius-md);
   margin-bottom: 1.5rem; height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.product-image { max-height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform 0.5s ease; }
+.product-image { max-height: 100%; object-fit: contain; transition: transform 0.5s ease; }
 .product-card:hover .product-image { transform: scale(1.05); }
 .badge {
   position: absolute; top: 1rem; left: 1rem; background: var(--c-gold); color: var(--c-dark-brown);
@@ -196,7 +196,7 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 /* Video Process Section */
 .process-section {
   position: relative; min-height: 70vh; display: flex; align-items: center; justify-content: center;
-  background-size: cover; background-position: center; background-attachment: fixed;
+  background-size: cover; background-position: center; background-attachment: scroll;
 }
 .process-overlay {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
