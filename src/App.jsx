@@ -2510,6 +2510,17 @@ const PromotionalCarousel = () => {
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   useEffect(() => {
+    // Preload all carousel background images to prevent lag on slide change
+    slides.forEach(slide => {
+      const match = slide.bgImage.match(/url\(['"]?(.*?)['"]?\)/);
+      if (match && match[1]) {
+        const img = new Image();
+        img.src = match[1];
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
