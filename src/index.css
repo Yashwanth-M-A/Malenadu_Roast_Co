@@ -107,7 +107,7 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 /* Hero */
 .hero {
   position: relative; min-height: 100vh; display: flex; align-items: center;
-  background-image: url('/assets/images/coffee_hero_bg_1776575157848.png');
+  background-image: url('/assets/images/coffee_hero_bg_1776575157848.webp');
   background-size: cover; background-position: center; background-attachment: scroll;
   color: var(--c-white); padding-top: 80px;
 }

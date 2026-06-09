@@ -13,29 +13,29 @@ import {
 
 const TOKENS = {
   images: {
-    logo: '/assets/images/logo_final.png',
-    hero: '/assets/images/coffee_estate_sunrise.png',
-    coffeePack: '/assets/images/coffee_pack_new.jpg',
-    coffeeSide: '/assets/images/coffee_side_new.png',
-    coffeeBack: '/assets/images/coffee_back_new.jpg',
-    coffeeLeftSide: '/assets/images/coffee_left_side.png',
-    coffeeRaw1: '/assets/images/coffee_raw_1.png',
-    coffeeRaw2: '/assets/images/coffee_raw_2.png',
-    coffeeFilter1: '/assets/images/coffee_filter_1.png',
-    coffeeFilter2: '/assets/images/coffee_filter_2.png',
-    coffeeEstate1: '/assets/images/coffee_estate_sunrise.png',
-    pepperPack: '/assets/images/pepper_front.jpg',
-    pepperSide: '/assets/images/pepper_side_new.png',
-    pepperBack: '/assets/images/pepper_back.jpg',
-    pepperLeftSide: '/assets/images/pepper_left_side.png',
-    pepperRaw1: '/assets/images/pepper_raw_1.png',
-    pepperRaw2: '/assets/images/crushed_pepper_spoon.jpg',
-    pepperBundleReal: '/assets/images/spice_bundle_real.png',
-    pepperTree: '/assets/images/pepper_tree.jpg',
-    pepperStoryUpload: '/assets/images/pepper_story_upload.jpg',
-    storyBg: '/assets/images/coffee_estate_sunrise.png',
-    beansBg: '/assets/images/coffee_estate_sunrise.png',
-    pepperBg: '/assets/images/black_pepper_bg.png'
+    logo: '/assets/images/logo_final.webp',
+    hero: '/assets/images/coffee_estate_sunrise.webp',
+    coffeePack: '/assets/images/coffee_pack_new.webp',
+    coffeeSide: '/assets/images/coffee_side_new.webp',
+    coffeeBack: '/assets/images/coffee_back_new.webp',
+    coffeeLeftSide: '/assets/images/coffee_left_side.webp',
+    coffeeRaw1: '/assets/images/coffee_raw_1.webp',
+    coffeeRaw2: '/assets/images/coffee_raw_2.webp',
+    coffeeFilter1: '/assets/images/coffee_filter_1.webp',
+    coffeeFilter2: '/assets/images/coffee_filter_2.webp',
+    coffeeEstate1: '/assets/images/coffee_estate_sunrise.webp',
+    pepperPack: '/assets/images/pepper_front.webp',
+    pepperSide: '/assets/images/pepper_side_new.webp',
+    pepperBack: '/assets/images/pepper_back.webp',
+    pepperLeftSide: '/assets/images/pepper_left_side.webp',
+    pepperRaw1: '/assets/images/pepper_raw_1.webp',
+    pepperRaw2: '/assets/images/crushed_pepper_spoon.webp',
+    pepperBundleReal: '/assets/images/spice_bundle_real.webp',
+    pepperTree: '/assets/images/pepper_tree.webp',
+    pepperStoryUpload: '/assets/images/pepper_story_upload.webp',
+    storyBg: '/assets/images/coffee_estate_sunrise.webp',
+    beansBg: '/assets/images/coffee_estate_sunrise.webp',
+    pepperBg: '/assets/images/black_pepper_bg.webp'
   }
 };
 
@@ -212,7 +212,7 @@ const DroppingBeans = () => {
 
     const beanImg = new Image();
     beanImg.crossOrigin = 'anonymous';
-    beanImg.src = '/assets/images/coffee_bean_real.jpg';
+    beanImg.src = '/assets/images/coffee_bean_real.webp';
 
     beanImg.onload = () => {
       // Draw to offscreen canvas to access pixels
@@ -682,6 +682,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
                 src={currentImage} 
                 alt={product.name} 
                 className="product-image"
+                loading="lazy"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
@@ -1137,7 +1138,7 @@ const ChikkamagaluruGallery = () => {
   const [isPepperPaused, setIsPepperPaused] = useState(false);
 
   const images = [
-    { src: '/assets/images/coffee_estate_sunrise.png', title: 'Malenadu Coffee Sunrise', desc: 'A stunning sunrise over the lush valleys of Chikkamagaluru coffee estates.' },
+    { src: '/assets/images/coffee_estate_sunrise.webp', title: 'Malenadu Coffee Sunrise', desc: 'A stunning sunrise over the lush valleys of Chikkamagaluru coffee estates.' },
     { src: '/coffee_images/1 st image.jpg', title: 'Coffee Journey', desc: 'From fresh cherries to rich flavors.' },
     { src: '/coffee_images/2 nd image.png', title: 'Coffee Blossoms', desc: 'Nature’s first sign of a great harvest.' },
     { src: '/coffee_images/3 rd image.png', title: 'Blooming Estates', desc: 'White blossoms across the Malenadu hills.' },
@@ -1876,7 +1877,7 @@ const WishlistSidebar = ({ isOpen, onClose, wishlist, onRemove, onAddToCart }) =
               ) : (
                 wishlist.map(item => (
                   <div key={item.id} className="cart-item">
-                    <img src={item.image} alt={item.name} />
+                    <img src={item.image} alt={item.name} loading="lazy" />
                     <div className="cart-item-info">
                       <h4 style={{fontSize: '0.9rem', marginBottom: '0.3rem'}}>{item.name}</h4>
                       <p className="cart-item-price">₹{item.price}</p>
@@ -2052,7 +2053,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout }) => {
               ) : (
                 cart.map(item => (
                   <div key={item.id} className="cart-item">
-                    <img src={item.image} alt={item.name} />
+                    <img src={item.image} alt={item.name} loading="lazy" />
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
                       <p className="cart-item-price">₹{item.price}</p>
@@ -2463,7 +2464,7 @@ const PromotionalCarousel = () => {
       icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
       title: "30% OFF All Varieties",
       desc: "Stock up on Malenadu's finest! Enjoy an exclusive flat 30% discount on all our premium coffee and pepper sizes. Grab yours before it's gone.",
-      bgImage: "url('/assets/images/promo_sale_bg.png')",
+      bgImage: "url('/assets/images/promo_sale_bg.webp')",
       bgPosition: "center",
       overlay: "linear-gradient(135deg, rgba(26,18,11,0.65) 0%, rgba(60,42,33,0.85) 100%)",
       link: "#products"
@@ -2474,7 +2475,7 @@ const PromotionalCarousel = () => {
       icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
       title: "Unlock the Perfect Pairing",
       desc: "Experience the true essence of Malenadu. Discover our curated coffee and spice combos crafted for the perfect cup.",
-      bgImage: "url('/assets/images/combo_pairing_bg.png')",
+      bgImage: "url('/assets/images/combo_pairing_bg.webp')",
       bgPosition: "center 85%",
       overlay: "linear-gradient(135deg, rgba(26,18,11,0.6) 0%, rgba(60,42,33,0.7) 100%)",
       link: "#combos",
@@ -2486,7 +2487,7 @@ const PromotionalCarousel = () => {
       icon: <Package size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
       title: "Partner with Malenadu",
       desc: "Elevate your cafe or business with our premium wholesale offerings. Exclusive pricing for bulk orders.",
-      bgImage: "url('/assets/images/coffee_raw_2.png')",
+      bgImage: "url('/assets/images/coffee_raw_2.webp')",
       bgPosition: "center",
       overlay: "linear-gradient(135deg, rgba(17,10,7,0.9) 0%, rgba(46,31,21,0.95) 100%)",
       link: "#bulk-orders",
@@ -2498,7 +2499,7 @@ const PromotionalCarousel = () => {
       icon: <Heart size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
       title: "Premium Gift Packs Delivered",
       desc: "We are now delivering beautifully crafted premium gift packs for your loved ones right to their doorstep. 💕 Share the joy of authentic Malenadu flavors.",
-      bgImage: "url('/assets/images/promo_gift_bg.png')",
+      bgImage: "url('/assets/images/promo_gift_bg.webp')",
       bgPosition: "center 60%",
       overlay: "linear-gradient(135deg, rgba(50,20,20,0.6) 0%, rgba(30,10,10,0.8) 100%)",
       link: "#combos",
@@ -2719,21 +2720,21 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
     {
       name: 'WhatsApp',
       desc: 'Chat with us directly on WhatsApp to place your order.',
-      icon: <img src="/assets/images/whatsapp_icon.png" alt="WhatsApp" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#25D366',
       link: 'https://wa.me/918217623335',
     },
     {
       name: 'Instagram',
       desc: 'DM us on Instagram to order or explore our latest offerings.',
-      icon: <img src="/assets/images/instagram_icon.png" alt="Instagram" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#E1306C',
       link: 'https://www.instagram.com/coffee_zone_ka?igsh=MW5sdjUzdWJodmJkZg==',
     },
     {
       name: 'Product Catalog',
       desc: 'Browse our full product catalog with prices and details.',
-      icon: <img src="/assets/images/icon_drive.png" alt="Google Drive" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img src="/assets/images/icon_drive.webp" alt="Google Drive" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#4285F4',
       link: 'https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa',
     },
@@ -3049,16 +3050,16 @@ const App = () => {
       details: 'A smooth and balanced filter coffee crafted from carefully selected estate-grown beans from Chikmagaluru. Perfect for those who enjoy authentic coffee with a rich aroma and satisfying finish.',
       rating: 4.8,
       reviews: 124,
-      image: '/assets/images/estate_reserve_1kg.jpg',
+      image: '/assets/images/estate_reserve_1kg.webp',
       images: [
-        '/assets/images/estate_reserve_1kg.jpg',
-        '/assets/images/estate_reserve_500g.jpg',
-        '/assets/images/estate_reserve_250g.jpg'
+        '/assets/images/estate_reserve_1kg.webp',
+        '/assets/images/estate_reserve_500g.webp',
+        '/assets/images/estate_reserve_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.jpg' },
-        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.jpg' },
-        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.jpg' }
+        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp' },
+        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp' },
+        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp' }
       ]
     },
     {
@@ -3068,16 +3069,16 @@ const App = () => {
       details: 'Sourced from the misty highlands of the Western Ghats and roasted with care to deliver a refined cup with exceptional aroma, character, and balance.',
       rating: 4.6,
       reviews: 89,
-      image: '/assets/images/highland_signature_1kg.jpg',
+      image: '/assets/images/highland_signature_1kg.webp',
       images: [
-        '/assets/images/highland_signature_1kg.jpg',
-        '/assets/images/highland_signature_500g.jpg',
-        '/assets/images/highland_signature_250g.jpg'
+        '/assets/images/highland_signature_1kg.webp',
+        '/assets/images/highland_signature_500g.webp',
+        '/assets/images/highland_signature_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.jpg' },
-        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.jpg' },
-        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.jpg' }
+        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp' },
+        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.webp' },
+        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.webp' }
       ]
     },
     {
@@ -3087,17 +3088,17 @@ const App = () => {
       details: 'A premium reserve crafted from select coffee beans, offering a rich and memorable coffee experience inspired by generations of coffee-growing tradition.',
       rating: 4.7,
       reviews: 96,
-      image: '/assets/images/imperial_heritage_1kg.jpg',
+      image: '/assets/images/imperial_heritage_1kg.webp',
       images: [
-        '/assets/images/imperial_heritage_1kg.jpg',
-        '/assets/images/imperial_heritage_500g.jpg',
-        '/assets/images/imperial_heritage_250g.jpg'
+        '/assets/images/imperial_heritage_1kg.webp',
+        '/assets/images/imperial_heritage_500g.webp',
+        '/assets/images/imperial_heritage_250g.webp'
       ],
       badge: 'Best Seller',
       variants: [
-        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.jpg' },
-        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.jpg' },
-        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.jpg' }
+        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.webp' },
+        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.webp' },
+        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.webp' }
       ]
     },
     {
@@ -3107,17 +3108,17 @@ const App = () => {
       details: 'Our flagship peaberry coffee, carefully selected and expertly roasted to showcase exceptional quality, depth, and elegance in every cup.',
       rating: 4.6,
       reviews: 82,
-      image: '/assets/images/peaberry_grand_cru_1kg.jpg',
+      image: '/assets/images/peaberry_grand_cru_1kg.webp',
       images: [
-        '/assets/images/peaberry_grand_cru_1kg.jpg',
-        '/assets/images/peaberry_grand_cru_500g.jpg',
-        '/assets/images/peaberry_grand_cru_250g.jpg'
+        '/assets/images/peaberry_grand_cru_1kg.webp',
+        '/assets/images/peaberry_grand_cru_500g.webp',
+        '/assets/images/peaberry_grand_cru_250g.webp'
       ],
       badge: 'Premium Pure',
       variants: [
-        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.jpg' },
-        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.jpg' },
-        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.jpg' }
+        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp' },
+        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.webp' },
+        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp' }
       ]
     },
     {
@@ -3127,17 +3128,17 @@ const App = () => {
       details: 'Whole roasted coffee beans crafted for coffee lovers who prefer grinding fresh. Ideal for espresso, pour-over, French press, and traditional filter brewing.',
       rating: 5.0,
       reviews: 180,
-      image: '/assets/images/signature_beans_1kg.jpg',
+      image: '/assets/images/signature_beans_1kg.webp',
       images: [
-        '/assets/images/signature_beans_1kg.jpg',
-        '/assets/images/signature_beans_500g.jpg',
-        '/assets/images/signature_beans_250g.jpg'
+        '/assets/images/signature_beans_1kg.webp',
+        '/assets/images/signature_beans_500g.webp',
+        '/assets/images/signature_beans_250g.webp'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.jpg' },
-        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.jpg' },
-        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.jpg' }
+        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp' },
+        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.webp' },
+        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.webp' }
       ]
     }
   ];
@@ -3150,17 +3151,17 @@ const App = () => {
       details: 'Sourced from the lush hills of Malenadu, Malenadu Pepper Reserve is carefully selected for its rich aroma, bold character, and natural pungency. Perfect for everyday cooking and gourmet dishes, it brings authentic flavor and freshness to every meal.',
       rating: 4.9,
       reviews: 210,
-      image: '/assets/images/pepper_reserve_1kg.jpg',
+      image: '/assets/images/pepper_reserve_1kg.webp',
       images: [
-        '/assets/images/pepper_reserve_1kg.jpg',
-        '/assets/images/pepper_reserve_500g.jpg',
-        '/assets/images/pepper_reserve_250g.jpg'
+        '/assets/images/pepper_reserve_1kg.webp',
+        '/assets/images/pepper_reserve_500g.webp',
+        '/assets/images/pepper_reserve_250g.webp'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.jpg' },
-        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.jpg' },
-        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.jpg' }
+        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.webp' },
+        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.webp' },
+        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.webp' }
       ]
     }
   ];
@@ -3173,15 +3174,15 @@ const App = () => {
       details: 'A celebration of Malenadu\'s rich heritage. This premium combo brings together the smooth character of Imperial Heritage Reserve coffee and the bold aroma of Malenadu Pepper Reserve. Perfect for those who appreciate authentic estate-grown products crafted with tradition and care.',
       rating: 4.9,
       reviews: 145,
-      image: '/assets/images/imperial_combo_1kg.jpg',
+      image: '/assets/images/imperial_combo_1kg.webp',
       images: [
-        '/assets/images/imperial_combo_1kg.jpg',
-        '/assets/images/imperial_combo_500g.jpg'
+        '/assets/images/imperial_combo_1kg.webp',
+        '/assets/images/imperial_combo_500g.webp'
       ],
       badge: 'Heritage Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_combo_1kg.jpg' },
-        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_combo_500g.jpg' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_combo_1kg.webp' },
+        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_combo_500g.webp' }
       ]
     },
     {
@@ -3191,15 +3192,15 @@ const App = () => {
       details: 'Our most premium Malenadu pairing. Featuring the rare and refined Peaberry Grand Cru Royale alongside the bold and aromatic Malenadu Pepper Reserve, this combo showcases the finest flavors from the hills of Malenadu. Crafted for those who seek something truly exceptional.',
       rating: 5.0,
       reviews: 89,
-      image: '/assets/images/grand_cru_combo_1kg.jpg',
+      image: '/assets/images/grand_cru_combo_1kg.webp',
       images: [
-        '/assets/images/grand_cru_combo_1kg.jpg',
-        '/assets/images/grand_cru_combo_500g.jpg'
+        '/assets/images/grand_cru_combo_1kg.webp',
+        '/assets/images/grand_cru_combo_500g.webp'
       ],
       badge: 'Royale Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.jpg' },
-        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.jpg' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.webp' },
+        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.webp' }
       ]
     }
   ];
@@ -4189,7 +4190,7 @@ const App = () => {
 
                   <div className="fssai-seal-container">
                     <img 
-                      src="/assets/images/fssai_logo.png" 
+                      src="/assets/images/fssai_logo.webp" 
                       alt="FSSAI Logo" 
                       style={{ 
                         maxHeight: '92%', 
@@ -4387,7 +4388,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(37,211,102,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/whatsapp_icon.png" alt="WhatsApp" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Order via WhatsApp</h4>
@@ -4441,7 +4442,7 @@ const App = () => {
                 border: '1px solid rgba(255,255,255,0.1)',
                 padding: '6px'
               }}>
-                <img src="/assets/images/gmail_icon.png" alt="Gmail" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                <img src="/assets/images/gmail_icon.webp" alt="Gmail" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Email Us</h4>
@@ -4472,7 +4473,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(220,39,67,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/instagram_icon.png" alt="Instagram" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Follow Us</h4>
@@ -4502,7 +4503,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(24,119,242,0.4)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/facebook_icon.png" alt="Facebook" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/assets/images/facebook_icon.webp" alt="Facebook" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Facebook</h4>
