@@ -3480,27 +3480,43 @@ const App = () => {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '3rem', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => window.open('https://wa.me/918217623335', '_blank')}
-              style={{
-                background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
-                color: '#1a1a1a',
-                border: 'none',
-                padding: '1rem 2.5rem',
-                borderRadius: '4px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                fontSize: '1rem',
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <span style={{ 
+                fontSize: '0.85rem', 
+                color: '#C8935A', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                fontFamily: 'Inter, sans-serif', 
                 textTransform: 'uppercase',
-                boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
-                letterSpacing: '1px'
-              }}
-              onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            >
-              Start Your Order
-            </button>
+                borderBottom: '1.5px solid rgba(200, 147, 90, 0.4)',
+                paddingBottom: '4px',
+                marginBottom: '6px',
+                textAlign: 'center'
+              }}>
+                Facing any issues while ordering?
+              </span>
+              <button 
+                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                style={{
+                  background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
+                  color: '#1a1a1a',
+                  border: 'none',
+                  padding: '1rem 2.5rem',
+                  borderRadius: '4px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  fontSize: '1rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
+                  letterSpacing: '1px'
+                }}
+                onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                Order through whatsapp
+              </button>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
               <span style={{ 
@@ -3569,27 +3585,43 @@ const App = () => {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '3rem', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => window.open('https://wa.me/918217623335', '_blank')}
-              style={{
-                background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
-                color: '#1a1a1a',
-                border: 'none',
-                padding: '1rem 2.5rem',
-                borderRadius: '4px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                fontSize: '1rem',
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <span style={{ 
+                fontSize: '0.85rem', 
+                color: '#C8935A', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                fontFamily: 'Inter, sans-serif', 
                 textTransform: 'uppercase',
-                boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
-                letterSpacing: '1px'
-              }}
-              onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            >
-              Start Your Order
-            </button>
+                borderBottom: '1.5px solid rgba(200, 147, 90, 0.4)',
+                paddingBottom: '4px',
+                marginBottom: '6px',
+                textAlign: 'center'
+              }}>
+                Facing any issues while ordering?
+              </span>
+              <button 
+                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                style={{
+                  background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
+                  color: '#1a1a1a',
+                  border: 'none',
+                  padding: '1rem 2.5rem',
+                  borderRadius: '4px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  fontSize: '1rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
+                  letterSpacing: '1px'
+                }}
+                onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                Order through whatsapp
+              </button>
+            </div>
 
             <a 
               href="https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa"
@@ -3642,27 +3674,43 @@ const App = () => {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '3rem', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => window.open('https://wa.me/918217623335', '_blank')}
-              style={{
-                background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
-                color: '#1a1a1a',
-                border: 'none',
-                padding: '1rem 2.5rem',
-                borderRadius: '4px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                fontSize: '1rem',
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <span style={{ 
+                fontSize: '0.85rem', 
+                color: '#C8935A', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                fontFamily: 'Inter, sans-serif', 
                 textTransform: 'uppercase',
-                boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
-                letterSpacing: '1px'
-              }}
-              onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            >
-              Start Your Order
-            </button>
+                borderBottom: '1.5px solid rgba(200, 147, 90, 0.4)',
+                paddingBottom: '4px',
+                marginBottom: '6px',
+                textAlign: 'center'
+              }}>
+                Facing any issues while ordering?
+              </span>
+              <button 
+                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                style={{
+                  background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
+                  color: '#1a1a1a',
+                  border: 'none',
+                  padding: '1rem 2.5rem',
+                  borderRadius: '4px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  fontSize: '1rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '0 4px 15px rgba(200, 147, 90, 0.3)',
+                  letterSpacing: '1px'
+                }}
+                onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                Order through whatsapp
+              </button>
+            </div>
 
             <a 
               href="https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa"
