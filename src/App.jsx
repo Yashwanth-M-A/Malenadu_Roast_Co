@@ -2514,13 +2514,13 @@ const PromotionalCarousel = () => {
   const slides = [
     {
       id: 5,
-      tag: "Free Sample Offer",
-      icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
-      title: "Order Now & Get Premium Black Pepper For Free",
-      desc: "Order any Malenadu Roast Co. coffee today and receive a complimentary sample of our legendary Malenadu Pepper Reserve. Tied with a saffron ribbon, straight from the estates to you.",
+      tag: "",
+      icon: null,
+      title: "",
+      desc: "",
       bgImage: "url('/assets/images/free_pepper_promo.png')",
       bgPosition: "center",
-      overlay: "linear-gradient(135deg, rgba(20,10,5,0.75) 0%, rgba(40,20,10,0.9) 100%)",
+      overlay: "",
       link: "#products"
     },
     {
@@ -2691,36 +2691,42 @@ const PromotionalCarousel = () => {
             exit={{ opacity: 0, scale: 1.02, x: -20 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
             style={{
-              backgroundImage: `${slides[currentSlide].overlay}, ${slides[currentSlide].bgImage}`,
+              backgroundImage: slides[currentSlide].overlay ? `${slides[currentSlide].overlay}, ${slides[currentSlide].bgImage}` : slides[currentSlide].bgImage,
               backgroundPosition: slides[currentSlide].bgPosition
             }}
           >
             {/* Subtle inner glow */}
             <div className="promo-slide-glow" />
 
-            <motion.span 
-              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-              style={{ 
-                background: 'rgba(200,147,90,0.2)', color: '#E8CA80', padding: '6px 18px', 
-                borderRadius: '30px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(200,147,90,0.4)',
-                textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center',
-                backdropFilter: 'blur(5px)'
-            }}>
-              {slides[currentSlide].icon}
-              {slides[currentSlide].tag}
-            </motion.span>
+            {slides[currentSlide].tag && (
+              <motion.span 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+                style={{ 
+                  background: 'rgba(200,147,90,0.2)', color: '#E8CA80', padding: '6px 18px', 
+                  borderRadius: '30px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(200,147,90,0.4)',
+                  textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center',
+                  backdropFilter: 'blur(5px)'
+              }}>
+                {slides[currentSlide].icon}
+                {slides[currentSlide].tag}
+              </motion.span>
+            )}
             
-            <motion.h3 
-              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-              style={{ fontFamily: '"Georgia", serif', fontSize: 'clamp(2rem, 5vw, 3rem)', margin: '0 0 1rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>
-              {slides[currentSlide].title}
-            </motion.h3>
+            {slides[currentSlide].title && (
+              <motion.h3 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+                style={{ fontFamily: '"Georgia", serif', fontSize: 'clamp(2rem, 5vw, 3rem)', margin: '0 0 1rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>
+                {slides[currentSlide].title}
+              </motion.h3>
+            )}
             
-            <motion.p 
-              initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-              style={{ fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto 2.5rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.7, fontFamily: 'Inter, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
-              {slides[currentSlide].desc}
-            </motion.p>
+            {slides[currentSlide].desc && (
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+                style={{ fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto 2.5rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.7, fontFamily: 'Inter, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                {slides[currentSlide].desc}
+              </motion.p>
+            )}
             
             {slides[currentSlide].btnText && (
               <motion.a 
