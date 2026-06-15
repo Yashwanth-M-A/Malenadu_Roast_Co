@@ -2514,13 +2514,13 @@ const PromotionalCarousel = () => {
   const slides = [
     {
       id: 5,
-      tag: "",
-      icon: null,
-      title: "",
-      desc: "",
+      tag: "Free Sample Offer",
+      icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "Order Now & Get Premium Black Pepper For Free",
+      desc: "Order any Malenadu Roast Co. coffee today and receive a complimentary sample of our legendary Malenadu Pepper Reserve. Straight from the estates to you.",
       bgImage: "url('/assets/images/free_pepper_promo.png')",
       bgPosition: "center",
-      overlay: "",
+      overlay: "linear-gradient(135deg, rgba(20,10,5,0.75) 0%, rgba(40,20,10,0.9) 100%)",
       link: "#products"
     },
     {
