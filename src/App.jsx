@@ -651,7 +651,7 @@ const Hero = ({ onOrderNow }) => {
   );
 };
 
-const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
+const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick }) => {
   const [imgIndex, setImgIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants ? product.variants[0] : null
@@ -736,6 +736,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
                 alt={product.name} 
                 className="product-image"
                 loading="lazy"
+                onClick={(e) => { e.stopPropagation(); if (onImageClick) onImageClick({ images: currentImages, index: imgIndex }); }}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
@@ -744,7 +745,8 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
                   position: 'absolute',
                   maxHeight: '100%',
                   maxWidth: '100%',
-                  objectFit: 'contain'
+                  objectFit: 'contain',
+                  cursor: onImageClick ? 'zoom-in' : 'default'
                 }}
               />
             </AnimatePresence>
@@ -2779,7 +2781,7 @@ const PromotionalCarousel = () => {
   );
 };
 
-const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
+const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onImageClick }) => {
   const [expandedSection, setExpandedSection] = useState(null);
 
   const handleOrderScroll = () => {
@@ -2925,6 +2927,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
                     onBuyNow={handleBuyNow}
                     isWishlisted={false}
                     onToggleWishlist={() => {}}
+                    onImageClick={onImageClick}
                   />
                 ))}
               </div>
@@ -2949,6 +2952,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
                     onBuyNow={handleBuyNow}
                     isWishlisted={false}
                     onToggleWishlist={() => {}}
+                    onImageClick={onImageClick}
                   />
                 ))}
               </div>
@@ -3083,6 +3087,7 @@ const App = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [buyNowCart, setBuyNowCart] = useState(null); // single product for Buy Now flow
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   // Buy Now — skip cart, go straight to checkout
   const handleBuyNow = (product) => {
@@ -3368,12 +3373,87 @@ const App = () => {
         onLogout={handleLogout}
       />
 
+      <AnimatePresence>
+        {fullscreenImage && fullscreenImage.images && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setFullscreenImage(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.95)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out'
+            }}
+          >
+            <motion.button
+              onClick={() => setFullscreenImage(null)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', zIndex: 100000 }}
+            >
+              <X size={36} />
+            </motion.button>
+
+            {fullscreenImage.images.length > 1 && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFullscreenImage(prev => ({
+                    ...prev,
+                    index: prev.index === 0 ? prev.images.length - 1 : prev.index - 1
+                  }));
+                }}
+                style={{ 
+                  position: 'absolute', left: '30px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', 
+                  color: '#fff', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', 
+                  justifyContent: 'center', cursor: 'pointer', zIndex: 100000, backdropFilter: 'blur(4px)' 
+                }}
+              >
+                <ChevronLeft size={32} />
+              </button>
+            )}
+
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={fullscreenImage.index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                src={fullscreenImage.images[fullscreenImage.index]}
+                alt="Fullscreen"
+                style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </AnimatePresence>
+
+            {fullscreenImage.images.length > 1 && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFullscreenImage(prev => ({
+                    ...prev,
+                    index: prev.index === prev.images.length - 1 ? 0 : prev.index + 1
+                  }));
+                }}
+                style={{ 
+                  position: 'absolute', right: '30px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', 
+                  color: '#fff', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', 
+                  justifyContent: 'center', cursor: 'pointer', zIndex: 100000, backdropFilter: 'blur(4px)' 
+                }}
+              >
+                <ChevronRight size={32} />
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {currentPage === 'order' ? (
         <OrderPage 
           onBack={() => { setCurrentPage('home'); window.scrollTo(0, 0); }}
           coffeeProducts={coffeeProducts}
           pepperProducts={pepperProducts}
           onAddToCart={handleAddToCart}
+          onImageClick={setFullscreenImage}
         />
       ) : (
       <>
@@ -3395,6 +3475,7 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
+                onImageClick={setFullscreenImage}
               />
             ))}
           </div>
@@ -3483,6 +3564,7 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
+                onImageClick={setFullscreenImage}
               />
             ))}
           </div>
@@ -3555,6 +3637,7 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
+                onImageClick={setFullscreenImage}
               />
             ))}
           </div>
