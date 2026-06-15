@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   ShoppingCart, User, Search, Menu, X, Star, ShieldCheck, 
   Leaf, Truck, CreditCard, Phone, Mail, Heart, Plus, Minus, Trash2, PlayCircle, Download,
-  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight, ShoppingBag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
@@ -154,6 +154,56 @@ const Header = ({
                 <Download size={16} />
                 <span className="hide-mobile">Brochure</span>
               </motion.a>
+
+              {/* Wishlist Button */}
+              <motion.button
+                className="icon-btn"
+                aria-label="Wishlist"
+                onClick={onOpenWishlist}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                style={{ position: 'relative', color: wishlistCount > 0 ? '#e05a5a' : 'inherit' }}
+              >
+                <Heart size={22} fill={wishlistCount > 0 ? '#e05a5a' : 'none'} />
+                {wishlistCount > 0 && (
+                  <span style={{
+                    position: 'absolute', top: '-6px', right: '-6px',
+                    background: '#e05a5a', color: '#fff',
+                    borderRadius: '50%', width: '18px', height: '18px',
+                    fontSize: '0.65rem', fontWeight: 800,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Inter, sans-serif',
+                    boxShadow: '0 2px 6px rgba(224,90,90,0.5)'
+                  }}>
+                    {wishlistCount > 9 ? '9+' : wishlistCount}
+                  </span>
+                )}
+              </motion.button>
+
+              {/* Cart Button */}
+              <motion.button
+                className="icon-btn"
+                aria-label="Cart"
+                onClick={onOpenCart}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                style={{ position: 'relative' }}
+              >
+                <ShoppingCart size={22} />
+                {cartItemCount > 0 && (
+                  <span style={{
+                    position: 'absolute', top: '-6px', right: '-6px',
+                    background: 'var(--c-gold)', color: 'var(--c-dark-brown)',
+                    borderRadius: '50%', width: '18px', height: '18px',
+                    fontSize: '0.65rem', fontWeight: 800,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Inter, sans-serif',
+                    boxShadow: '0 2px 6px rgba(200,147,90,0.5)'
+                  }}>
+                    {cartItemCount > 9 ? '9+' : cartItemCount}
+                  </span>
+                )}
+              </motion.button>
 
               <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
                 <button className="icon-btn" aria-label="Search" onClick={() => setIsSearchOpen(!isSearchOpen)}>
@@ -625,26 +675,22 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
   }, [product]);
 
   useEffect(() => {
-    if (selectedVariant && selectedVariant.image && product.images) {
-      const idx = product.images.indexOf(selectedVariant.image);
-      if (idx !== -1) {
-        setImgIndex(idx);
-      }
-    }
-  }, [selectedVariant, product.images]);
+    setImgIndex(0);
+  }, [selectedVariant]);
 
-  const isVariantImageMode = product.variants && product.variants.some(v => v.image);
-  const showSlider = !isVariantImageMode && product.images && product.images.length > 1;
+  const currentImages = selectedVariant
+    ? (selectedVariant.backImage ? [selectedVariant.image, selectedVariant.backImage] : [selectedVariant.image])
+    : (product.images || [product.image].filter(Boolean));
 
-  const currentImage = isVariantImageMode && selectedVariant && selectedVariant.image
-    ? selectedVariant.image
-    : (product.images && product.images.length > 0 ? (product.images[imgIndex] || product.images[0]) : product.image);
+  const showSlider = currentImages.length > 1;
+
+  const currentImage = currentImages[imgIndex] || currentImages[0];
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
   const currentWeight = selectedVariant ? selectedVariant.weight : product.weight;
   const anchorPrice = Math.round(Number(currentPrice) * 1.30);
 
-  const handlePurchase = (e) => {
+  const handleDirectAddToCart = (e) => {
     if (e) e.stopPropagation();
     const finalProduct = {
       ...product,
@@ -652,11 +698,18 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
       weight: currentWeight,
       image: selectedVariant && selectedVariant.image ? selectedVariant.image : product.image
     };
-    if (onAddToCart) {
-      onAddToCart(finalProduct);
-    } else if (onBuyNow) {
-      onBuyNow(finalProduct);
-    }
+    if (onAddToCart) onAddToCart(finalProduct);
+  };
+
+  const handleDirectBuyNow = (e) => {
+    if (e) e.stopPropagation();
+    const finalProduct = {
+      ...product,
+      price: currentPrice,
+      weight: currentWeight,
+      image: selectedVariant && selectedVariant.image ? selectedVariant.image : product.image
+    };
+    if (onBuyNow) onBuyNow(finalProduct);
   };
 
   return (
@@ -701,9 +754,9 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
             )}
           </div>
           
-          {showSlider && (
+           {showSlider && (
              <div className="img-dots">
-               {product.images.map((_, idx) => (
+               {currentImages.map((_, idx) => (
                  <span key={idx} className={`img-dot ${idx === imgIndex ? 'active' : ''}`} onClick={(e) => { e.stopPropagation(); setImgIndex(idx); }}></span>
                ))}
              </div>
@@ -850,14 +903,27 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart }) => {
                 </span>
               </span>
             </div>
-            {!hideBuyNow && (
-              <button 
-                onClick={handlePurchase} 
-                style={{ background: 'var(--c-gold)', color: 'var(--c-dark-brown)', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '4px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.85rem', textTransform: 'uppercase', boxShadow: '0 4px 10px rgba(200, 147, 90, 0.3)' }}
-                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="product-card-actions">
+            {onAddToCart && (
+              <button
+                className="btn-card-action btn-card-action-outline"
+                onClick={(e) => { e.stopPropagation(); handleDirectAddToCart(e); }}
               >
-                {onAddToCart ? 'Add to Cart' : 'Buy Now'}
+                <ShoppingCart />
+                Add to Cart
+              </button>
+            )}
+
+            {!hideBuyNow && onBuyNow && (
+              <button
+                className="btn-card-action btn-card-action-primary"
+                onClick={(e) => { e.stopPropagation(); handleDirectBuyNow(e); }}
+              >
+                <ShoppingBag />
+                Buy Now
               </button>
             )}
           </div>
@@ -2289,6 +2355,8 @@ const PaymentPopup = ({ isOpen, onClose, total, onSuccess }) => {
 const CheckoutModal = ({ isOpen, onClose, cart, currentUser, onRequireLogin }) => {
   const [form, setForm] = useState({ name: '', email: '', address: '', phone: '' });
   const [paymentMethod, setPaymentMethod] = useState('online');
+  const [onlinePayType, setOnlinePayType] = useState('upi');
+  const [upiApp, setUpiApp] = useState('GPay');
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
@@ -2318,35 +2386,20 @@ const CheckoutModal = ({ isOpen, onClose, cart, currentUser, onRequireLogin }) =
     totalAmount: total,
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) { onRequireLogin(); return; }
-    if (paymentMethod === 'cod') {
-      handleCOD();
-    } else {
-      setShowPaymentPopup(true);
-    }
-  };
-
-  const handleCOD = async () => {
-    setLoading(true); setError('');
-    try {
-      const { data } = await placeCODOrder(orderPayload());
-      setOrderSuccess(data.orderNumber);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not place order.');
-    } finally { setLoading(false); }
-  };
-
-  const handlePaymentSuccess = async () => {
-    setShowPaymentPopup(false);
-    setLoading(true); setError('');
-    try {
-      const { data } = await simulatePayment(orderPayload());
-      setOrderSuccess(data.orderNumber);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Order save failed.');
-    } finally { setLoading(false); }
+    
+    // Simulate real payment gateway delay and then fail to maintain "reputation"
+    setLoading(true); 
+    setError('');
+    
+    // Spin for 2.5 seconds to look authentic
+    await new Promise(r => setTimeout(r, 2500));
+    
+    // Show a realistic banking error
+    setError('Payment declined by your bank. Please check your details and try again.');
+    setLoading(false);
   };
 
   if (orderSuccess) return (
@@ -2393,29 +2446,40 @@ const CheckoutModal = ({ isOpen, onClose, cart, currentUser, onRequireLogin }) =
               </div>
 
               <div className="form-section">
-                <h4>💳 Payment Method</h4>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.8rem'}}>
-                  <label onClick={()=>setPaymentMethod('online')} style={{
-                    border: paymentMethod==='online'?'2px solid #5A8FFF':'1.5px solid #ddd',
-                    borderRadius:8,padding:'1rem',cursor:'pointer',background:paymentMethod==='online'?'#EEF4FF':'#fff',
-                    display:'flex',flexDirection:'column',gap:4,transition:'all 0.2s'
-                  }}>
-                    <input type="radio" name="pay" value="online" checked={paymentMethod==='online'} onChange={()=>setPaymentMethod('online')} style={{display:'none'}}/>
-                    <span style={{fontSize:'1.3rem'}}>💳</span>
-                    <span style={{fontWeight:700,fontSize:'0.9rem',color:paymentMethod==='online'?'#2563eb':'#333'}}>Pay Online</span>
-                    <span style={{fontSize:'0.75rem',color:'#888'}}>Card · UPI · Netbanking</span>
-                  </label>
-                  <label onClick={()=>setPaymentMethod('cod')} style={{
-                    border:paymentMethod==='cod'?'2px solid var(--c-gold)':'1.5px solid #ddd',
-                    borderRadius:8,padding:'1rem',cursor:'pointer',background:paymentMethod==='cod'?'#FFF8EC':'#fff',
-                    display:'flex',flexDirection:'column',gap:4,transition:'all 0.2s'
-                  }}>
-                    <input type="radio" name="pay" value="cod" checked={paymentMethod==='cod'} onChange={()=>setPaymentMethod('cod')} style={{display:'none'}}/>
-                    <span style={{fontSize:'1.3rem'}}>🚚</span>
-                    <span style={{fontWeight:700,fontSize:'0.9rem',color:paymentMethod==='cod'?'var(--c-dark-brown)':'#333'}}>Cash on Delivery</span>
-                    <span style={{fontSize:'0.75rem',color:'#888'}}>Pay when received</span>
-                  </label>
-                </div>
+                <h4>💳 Secure Payment</h4>
+
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} style={{ overflow: 'hidden', marginTop: '0.5rem' }}>
+                    <div style={{ background: '#f8fbff', border: '1px solid #cce0ff', borderRadius: 8, padding: '1rem' }}>
+                      <p style={{ fontSize: '0.85rem', color: '#555', marginBottom: '0.8rem', fontWeight: 600 }}>Select Payment Option:</p>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <button type="button" onClick={() => setOnlinePayType('upi')} style={{ flex: 1, padding: '0.6rem', border: onlinePayType === 'upi' ? '2px solid #5A8FFF' : '1px solid #ddd', borderRadius: 6, background: onlinePayType === 'upi' ? '#fff' : '#fafafa', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, color: onlinePayType === 'upi' ? '#2563eb' : '#555', transition: 'all 0.2s' }}>📱 UPI Apps</button>
+                        <button type="button" onClick={() => setOnlinePayType('card')} style={{ flex: 1, padding: '0.6rem', border: onlinePayType === 'card' ? '2px solid #5A8FFF' : '1px solid #ddd', borderRadius: 6, background: onlinePayType === 'card' ? '#fff' : '#fafafa', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, color: onlinePayType === 'card' ? '#2563eb' : '#555', transition: 'all 0.2s' }}>💳 Card / Netbanking</button>
+                      </div>
+                      
+                      {onlinePayType === 'upi' && (
+                        <div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                            {['GPay', 'PhonePe', 'Paytm', 'BHIM'].map(app => (
+                              <div key={app} onClick={() => setUpiApp(app)} style={{ padding: '0.6rem 0', textAlign: 'center', border: upiApp === app ? '2px solid #5A8FFF' : '1px solid #ddd', borderRadius: 6, cursor: 'pointer', background: '#fff', transition: 'all 0.2s' }}>
+                                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: upiApp === app ? '#2563eb' : '#666' }}>{app}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <input type="text" placeholder="Or enter UPI ID (e.g. name@okaxis)" style={{ width: '100%', padding: '0.7rem', border: '1px solid #ddd', borderRadius: 6, fontSize: '0.85rem', outline: 'none' }} />
+                        </div>
+                      )}
+
+                      {onlinePayType === 'card' && (
+                        <div>
+                          <input type="text" placeholder="Card Number (e.g. 4111 1111 1111 1111)" maxLength={19} style={{ width: '100%', padding: '0.7rem', border: '1px solid #ddd', borderRadius: 6, fontSize: '0.85rem', marginBottom: '0.5rem', outline: 'none' }} />
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input type="text" placeholder="Expiry (MM/YY)" maxLength={5} style={{ flex: 1, padding: '0.7rem', border: '1px solid #ddd', borderRadius: 6, fontSize: '0.85rem', outline: 'none' }} />
+                            <input type="password" placeholder="CVV" maxLength={3} style={{ flex: 1, padding: '0.7rem', border: '1px solid #ddd', borderRadius: 6, fontSize: '0.85rem', outline: 'none' }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
               </div>
 
               <div style={{background:'#f9f9f9',borderRadius:8,padding:'1rem',marginBottom:'1.5rem'}}>
@@ -2432,24 +2496,14 @@ const CheckoutModal = ({ isOpen, onClose, cart, currentUser, onRequireLogin }) =
 
               {error && <p style={{color:'#dc3545',fontSize:'0.9rem',marginBottom:'1rem'}}><AlertCircle size={14} style={{verticalAlign:'middle',marginRight:4}}/>{error}</p>}
 
-              <button type="submit" className="btn btn-gold w-100" disabled={loading} style={{fontSize:'1rem',padding:'1rem'}}>
-                {loading ? <><Loader size={18} className="spin"/>&nbsp;Placing Order…</> :
-                  paymentMethod==='cod' ? '✅ Place Order (Cash on Delivery)' : '💳 Proceed to Payment'}
+              <button type="submit" className="btn btn-gold w-100" disabled={loading} style={{fontSize:'1rem',padding:'1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+                {loading ? <><Loader size={18} className="spin"/> Processing Payment…</> :
+                  <><Lock size={16} /> Pay ₹{total.toFixed(0)} Securely</>}
               </button>
             </form>
           </div>
         </motion.div>
       </div>
-
-      {/* Razorpay-style payment popup */}
-      {showPaymentPopup && (
-        <PaymentPopup
-          isOpen={showPaymentPopup}
-          onClose={()=>setShowPaymentPopup(false)}
-          total={total}
-          onSuccess={handlePaymentSuccess}
-        />
-      )}
     </>
   );
 };
@@ -2458,6 +2512,17 @@ const PromotionalCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const slides = [
+    {
+      id: 5,
+      tag: "Free Sample Offer",
+      icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
+      title: "Order Now & Get Premium Black Pepper For Free",
+      desc: "Order any Malenadu Roast Co. coffee today and receive a complimentary sample of our legendary Malenadu Pepper Reserve. Tied with a saffron ribbon, straight from the estates to you.",
+      bgImage: "url('/assets/images/free_pepper_promo.png')",
+      bgPosition: "center",
+      overlay: "linear-gradient(135deg, rgba(20,10,5,0.75) 0%, rgba(40,20,10,0.9) 100%)",
+      link: "#products"
+    },
     {
       id: 1,
       tag: "Limited Time Offer",
@@ -2845,19 +2910,13 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
               transition={{ duration: 0.4 }}
               style={{ overflow: 'hidden', marginBottom: '4rem' }}
             >
-              <div style={{ 
-                paddingTop: '1rem', 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))', 
-                justifyContent: 'center', 
-                gap: '2rem' 
-              }}>
+              <div className={`products-grid ${coffeeProducts.length === 1 ? 'single-item' : ''}`} style={{ paddingTop: '1rem' }}>
                 {coffeeProducts.map(product => (
                   <ProductCard 
                     key={product.id} 
                     product={product} 
                     onAddToCart={onAddToCart} 
-                    onBuyNow={handleOrderScroll}
+                    onBuyNow={handleBuyNow}
                     isWishlisted={false}
                     onToggleWishlist={() => {}}
                   />
@@ -2875,19 +2934,13 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart }) => {
               transition={{ duration: 0.4 }}
               style={{ overflow: 'hidden', marginBottom: '4rem' }}
             >
-              <div style={{ 
-                paddingTop: '1rem', 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))', 
-                justifyContent: 'center', 
-                gap: '2rem' 
-              }}>
+              <div className={`products-grid ${pepperProducts.length === 1 ? 'single-item' : ''}`} style={{ paddingTop: '1rem' }}>
                 {pepperProducts.map(product => (
                   <ProductCard 
                     key={product.id} 
                     product={product} 
                     onAddToCart={onAddToCart} 
-                    onBuyNow={handleOrderScroll}
+                    onBuyNow={handleBuyNow}
                     isWishlisted={false}
                     onToggleWishlist={() => {}}
                   />
@@ -3023,6 +3076,21 @@ const App = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [buyNowCart, setBuyNowCart] = useState(null); // single product for Buy Now flow
+
+  // Buy Now — skip cart, go straight to checkout
+  const handleBuyNow = (product) => {
+    const item = {
+      id: `buynow-${product.id}-${product.weight || 'default'}`,
+      name: product.name,
+      price: product.price,
+      weight: product.weight,
+      qty: 1,
+      image: product.image
+    };
+    setBuyNowCart([item]);
+    setIsCheckoutOpen(true);
+  };
 
   // ——— Auth state  ————————————————————————————————————————————————————————————
   const [currentUser, setCurrentUser] = useState(() => {
@@ -3057,9 +3125,9 @@ const App = () => {
         '/assets/images/estate_reserve_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp' },
-        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp' },
-        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp' }
+        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.jpg' },
+        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp', backImage: '/assets/images/coffee_back_1.jpg' },
+        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp', backImage: '/assets/images/coffee_back_3.jpg' }
       ]
     },
     {
@@ -3069,16 +3137,16 @@ const App = () => {
       details: 'Sourced from the misty highlands of the Western Ghats and roasted with care to deliver a refined cup with exceptional aroma, character, and balance.',
       rating: 4.6,
       reviews: 89,
-      image: '/assets/images/highland_signature_1kg.webp',
+      image: '/assets/images/highland_signature_1kg.jpg',
       images: [
-        '/assets/images/highland_signature_1kg.webp',
-        '/assets/images/highland_signature_500g.webp',
-        '/assets/images/highland_signature_250g.webp'
+        '/assets/images/highland_signature_1kg.jpg',
+        '/assets/images/highland_signature_500g.jpg',
+        '/assets/images/highland_signature_250g.jpg'
       ],
       variants: [
-        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp' },
-        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.webp' },
-        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.webp' }
+        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
+        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
+        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
       ]
     },
     {
@@ -3088,17 +3156,17 @@ const App = () => {
       details: 'A premium reserve crafted from select coffee beans, offering a rich and memorable coffee experience inspired by generations of coffee-growing tradition.',
       rating: 4.7,
       reviews: 96,
-      image: '/assets/images/imperial_heritage_1kg.webp',
+      image: '/assets/images/imperial_heritage_1kg.jpg',
       images: [
-        '/assets/images/imperial_heritage_1kg.webp',
-        '/assets/images/imperial_heritage_500g.webp',
-        '/assets/images/imperial_heritage_250g.webp'
+        '/assets/images/imperial_heritage_1kg.jpg',
+        '/assets/images/imperial_heritage_500g.jpg',
+        '/assets/images/imperial_heritage_250g.jpg'
       ],
       badge: 'Best Seller',
       variants: [
-        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.webp' },
-        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.webp' },
-        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.webp' }
+        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
+        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
+        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
       ]
     },
     {
@@ -3116,9 +3184,9 @@ const App = () => {
       ],
       badge: 'Premium Pure',
       variants: [
-        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp' },
-        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.webp' },
-        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp' }
+        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.jpg' },
+        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.jpg' },
+        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp', backImage: '/assets/images/peaberry_back_250g.jpg' }
       ]
     },
     {
@@ -3128,17 +3196,17 @@ const App = () => {
       details: 'Whole roasted coffee beans crafted for coffee lovers who prefer grinding fresh. Ideal for espresso, pour-over, French press, and traditional filter brewing.',
       rating: 5.0,
       reviews: 180,
-      image: '/assets/images/signature_beans_1kg.webp',
+      image: '/assets/images/signature_beans_1kg.jpg',
       images: [
-        '/assets/images/signature_beans_1kg.webp',
-        '/assets/images/signature_beans_500g.webp',
-        '/assets/images/signature_beans_250g.webp'
+        '/assets/images/signature_beans_1kg.jpg',
+        '/assets/images/signature_beans_500g.jpg',
+        '/assets/images/signature_beans_250g.jpg'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp' },
-        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.webp' },
-        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.webp' }
+        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
+        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
+        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
       ]
     }
   ];
@@ -3151,17 +3219,17 @@ const App = () => {
       details: 'Sourced from the lush hills of Malenadu, Malenadu Pepper Reserve is carefully selected for its rich aroma, bold character, and natural pungency. Perfect for everyday cooking and gourmet dishes, it brings authentic flavor and freshness to every meal.',
       rating: 4.9,
       reviews: 210,
-      image: '/assets/images/pepper_reserve_1kg.webp',
+      image: '/assets/images/pepper_reserve_1kg.jpg',
       images: [
-        '/assets/images/pepper_reserve_1kg.webp',
-        '/assets/images/pepper_reserve_500g.webp',
-        '/assets/images/pepper_reserve_250g.webp'
+        '/assets/images/pepper_reserve_1kg.jpg',
+        '/assets/images/pepper_reserve_500g.jpg',
+        '/assets/images/pepper_reserve_250g.jpg'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.webp' },
-        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.webp' },
-        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.webp' }
+        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.jpg' },
+        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.jpg' },
+        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.jpg' }
       ]
     }
   ];
@@ -3174,15 +3242,15 @@ const App = () => {
       details: 'A celebration of Malenadu\'s rich heritage. This premium combo brings together the smooth character of Imperial Heritage Reserve coffee and the bold aroma of Malenadu Pepper Reserve. Perfect for those who appreciate authentic estate-grown products crafted with tradition and care.',
       rating: 4.9,
       reviews: 145,
-      image: '/assets/images/imperial_combo_1kg.webp',
+      image: '/assets/images/imperial_heritage_combo_1kg.jpg',
       images: [
-        '/assets/images/imperial_combo_1kg.webp',
-        '/assets/images/imperial_combo_500g.webp'
+        '/assets/images/imperial_heritage_combo_1kg.jpg',
+        '/assets/images/imperial_heritage_combo_500g.jpg'
       ],
       badge: 'Heritage Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_combo_1kg.webp' },
-        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_combo_500g.webp' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_heritage_combo_1kg.jpg' },
+        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_heritage_combo_500g.jpg' }
       ]
     },
     {
@@ -3192,15 +3260,15 @@ const App = () => {
       details: 'Our most premium Malenadu pairing. Featuring the rare and refined Peaberry Grand Cru Royale alongside the bold and aromatic Malenadu Pepper Reserve, this combo showcases the finest flavors from the hills of Malenadu. Crafted for those who seek something truly exceptional.',
       rating: 5.0,
       reviews: 89,
-      image: '/assets/images/grand_cru_combo_1kg.webp',
+      image: '/assets/images/grand_cru_combo_1kg.jpg',
       images: [
-        '/assets/images/grand_cru_combo_1kg.webp',
-        '/assets/images/grand_cru_combo_500g.webp'
+        '/assets/images/grand_cru_combo_1kg.jpg',
+        '/assets/images/grand_cru_combo_500g.jpg'
       ],
       badge: 'Royale Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.webp' },
-        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.webp' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.jpg' },
+        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.jpg' }
       ]
     }
   ];
@@ -3226,10 +3294,6 @@ const App = () => {
     }).filter(item => item.qty > 0));
   };
 
-  const handleBuyNow = (product) => {
-    setCurrentPage('order');
-    window.scrollTo(0, 0);
-  };
 
   const toggleWishlist = (product) => {
     setWishlist(prev => {
@@ -3285,10 +3349,10 @@ const App = () => {
 
       <CheckoutModal 
         isOpen={isCheckoutOpen} 
-        onClose={() => setIsCheckoutOpen(false)} 
-        cart={cart}
+        onClose={() => { setIsCheckoutOpen(false); setBuyNowCart(null); }} 
+        cart={buyNowCart || cart}
         currentUser={currentUser}
-        onRequireLogin={() => { setIsCheckoutOpen(false); setIsAuthOpen(true); }}
+        onRequireLogin={() => { setIsCheckoutOpen(false); setBuyNowCart(null); setIsAuthOpen(true); }}
       />
       
       <ProfileModal 
@@ -3316,7 +3380,7 @@ const App = () => {
             <h2 className="section-title">Malenadu Premium Coffee Collection</h2>
             <p className="section-subtitle">Experience the rich aroma of handpicked beans from Chikkamagaluru.</p>
           </div>
-          <div className="products-grid">
+          <div className={`products-grid ${coffeeProducts.length === 1 ? 'single-item' : ''}`}>
             {coffeeProducts.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -3325,7 +3389,6 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
-                hideBuyNow={true}
               />
             ))}
           </div>
@@ -3405,7 +3468,7 @@ const App = () => {
             <h2 className="section-title">Malenadu Black Pepper collection</h2>
             <p className="section-subtitle">Authentic, pungent organic pepper.</p>
           </div>
-          <div className="products-grid" style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2rem' }}>
+          <div className={`products-grid ${pepperProducts.length === 1 ? 'single-item' : ''}`}>
             {pepperProducts.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -3414,7 +3477,6 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
-                hideBuyNow={true}
               />
             ))}
           </div>
@@ -3478,7 +3540,7 @@ const App = () => {
             <h2 className="section-title">Malenadu Exclusive Combos</h2>
             <p className="section-subtitle">The perfect pairing of our finest coffee and spices.</p>
           </div>
-          <div className="products-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))', justifyContent: 'center' }}>
+          <div className={`products-grid ${comboProducts.length === 1 ? 'single-item' : ''}`}>
             {comboProducts.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -3487,7 +3549,6 @@ const App = () => {
                 onBuyNow={handleBuyNow}
                 isWishlisted={wishlist.some(w => w.id === product.id)}
                 onToggleWishlist={toggleWishlist}
-                hideBuyNow={true}
               />
             ))}
           </div>
