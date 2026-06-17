@@ -591,7 +591,6 @@ const Hero = ({ onOrderNow }) => {
                 animation: 'trustShimmer 4s ease-in-out infinite',
               }} />
               {[
-                { icon: <Star size={18} fill="#E8CA80" color="#E8CA80" />, text: '1000+ happy customers' },
                 { icon: <Truck size={18} color="#E8CA80" />, text: 'All Over India Delivery' },
                 { icon: <Leaf size={18} color="#E8CA80" />, text: 'Direct from estates' },
                 { icon: <ShieldCheck size={18} color="#E8CA80" />, text: 'FSSAI Certified' },
