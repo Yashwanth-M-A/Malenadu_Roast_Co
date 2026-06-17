@@ -3866,7 +3866,7 @@ const App = () => {
                 marginBottom: '6px',
                 textAlign: 'center'
               }}>
-                For more premium coffee products, please go through our brochure
+                For more premium coffee and pepper products, please go through our brochure
               </span>
               <a 
                 href="https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa"
