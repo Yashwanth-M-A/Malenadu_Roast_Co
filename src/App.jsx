@@ -155,31 +155,6 @@ const Header = ({
                 <span className="hide-mobile">Brochure</span>
               </motion.a>
 
-              {/* Wishlist Button */}
-              <motion.button
-                className="icon-btn"
-                aria-label="Wishlist"
-                onClick={onOpenWishlist}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                style={{ position: 'relative', color: wishlistCount > 0 ? '#e05a5a' : 'inherit' }}
-              >
-                <Heart size={22} fill={wishlistCount > 0 ? '#e05a5a' : 'none'} />
-                {wishlistCount > 0 && (
-                  <span style={{
-                    position: 'absolute', top: '-6px', right: '-6px',
-                    background: '#e05a5a', color: '#fff',
-                    borderRadius: '50%', width: '18px', height: '18px',
-                    fontSize: '0.65rem', fontWeight: 800,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'Inter, sans-serif',
-                    boxShadow: '0 2px 6px rgba(224,90,90,0.5)'
-                  }}>
-                    {wishlistCount > 9 ? '9+' : wishlistCount}
-                  </span>
-                )}
-              </motion.button>
-
               {/* Cart Button */}
               <motion.button
                 className="icon-btn"
@@ -1666,6 +1641,97 @@ const FAQSection = () => {
   );
 };
 
+
+const FarmVisitSection = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    date: '',
+    guests: '1',
+    interests: ''
+  });
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const text = `Hello Malenadu Roast Co!%0A%0AI would like to book an estate visit.%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Date:* ${formData.date}%0A*Guests:* ${formData.guests}%0A*Interests:* ${formData.interests}%0A%0APlease let me know the availability.`;
+    window.open(`https://wa.me/918217623335?text=${text}`, '_blank');
+  };
+
+  return (
+    <section id="visit-us" className="farm-visit-section section-padded" style={{ background: '#080C09', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient background glows */}
+      <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(212, 168, 112, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(31, 61, 43, 0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+        <div className="farm-visit-grid">
+          
+          {/* Left: Image Gallery */}
+          <div className="farm-gallery">
+            <div className="farm-gallery-main">
+              <img src="/assets/images/farm_landscape.webp" alt="Malenadu Estate Landscape" />
+            </div>
+            <div className="farm-gallery-sub">
+              <img src="/assets/images/user_farm_cherries.webp" alt="Coffee Cherries" />
+              <img src="/assets/images/user_farm_beans.webp" alt="Fresh Roasted Beans" />
+            </div>
+          </div>
+
+          {/* Right: Booking Form */}
+          <div className="farm-booking-form-wrap">
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+                <div style={{ width: '40px', height: '1px', background: '#D4A870' }} />
+                <span style={{ color: '#D4A870', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}>Estate Experience</span>
+              </div>
+              <h2 style={{ fontSize: 'clamp(2.2rem, 4vw, 3rem)', color: '#fff', marginBottom: '1rem', lineHeight: 1.1 }}>Visit Our Farm</h2>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.05rem', lineHeight: 1.6 }}>Step into the heart of Malenadu. Walk through misty plantations, witness our sustainable harvesting, and experience a personalized farm-to-cup tasting session.</p>
+            </div>
+
+            <form className="farm-form" onSubmit={handleSubmit}>
+              <div className="form-row">
+                <div className="input-group">
+                  <label>Full Name</label>
+                  <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="John Doe" />
+                </div>
+                <div className="input-group">
+                  <label>WhatsApp Number</label>
+                  <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="+91 9876543210" />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="input-group">
+                  <label>Preferred Date</label>
+                  <input type="date" name="date" required value={formData.date} onChange={handleChange} />
+                </div>
+                <div className="input-group">
+                  <label>Number of Guests</label>
+                  <select name="guests" value={formData.guests} onChange={handleChange}>
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                    <option value="4+">4+ People</option>
+                  </select>
+                </div>
+              </div>
+              <div className="input-group">
+                <label>Special Interests (Optional)</label>
+                <textarea name="interests" rows="3" value={formData.interests} onChange={handleChange} placeholder="E.g. Coffee tasting, Roasting process tour..."></textarea>
+              </div>
+              <button type="submit" className="farm-submit-btn">
+                Request Estate Tour <span style={{ marginLeft: '8px' }}>→</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const FeedbackSection = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [formData, setFormData] = useState({ 
@@ -2519,7 +2585,7 @@ const PromotionalCarousel = () => {
       icon: <Star size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
       title: "Order Now & Get Premium Black Pepper For Free",
       desc: "Order any Malenadu Roast Co. coffee today and receive a complimentary sample of our legendary Malenadu Pepper Reserve. Straight from the estates to you.",
-      bgImage: "url('/assets/images/free_pepper_promo.png')",
+      bgImage: "url('/assets/images/free_pepper_promo.webp')",
       bgPosition: "center",
       overlay: "linear-gradient(135deg, rgba(20,10,5,0.75) 0%, rgba(40,20,10,0.9) 100%)",
       link: "#products"
@@ -3135,9 +3201,9 @@ const App = () => {
         '/assets/images/estate_reserve_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.jpg' },
-        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp', backImage: '/assets/images/coffee_back_1.jpg' },
-        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp', backImage: '/assets/images/coffee_back_3.jpg' }
+        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
+        { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
     {
@@ -3147,16 +3213,16 @@ const App = () => {
       details: 'Sourced from the misty highlands of the Western Ghats and roasted with care to deliver a refined cup with exceptional aroma, character, and balance.',
       rating: 4.6,
       reviews: 89,
-      image: '/assets/images/highland_signature_1kg.jpg',
+      image: '/assets/images/highland_signature_1kg.webp',
       images: [
-        '/assets/images/highland_signature_1kg.jpg',
-        '/assets/images/highland_signature_500g.jpg',
-        '/assets/images/highland_signature_250g.jpg'
+        '/assets/images/highland_signature_1kg.webp',
+        '/assets/images/highland_signature_500g.webp',
+        '/assets/images/highland_signature_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
-        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
-        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
+        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
+        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
     {
@@ -3166,17 +3232,17 @@ const App = () => {
       details: 'A premium reserve crafted from select coffee beans, offering a rich and memorable coffee experience inspired by generations of coffee-growing tradition.',
       rating: 4.7,
       reviews: 96,
-      image: '/assets/images/imperial_heritage_1kg.jpg',
+      image: '/assets/images/imperial_heritage_1kg.webp',
       images: [
-        '/assets/images/imperial_heritage_1kg.jpg',
-        '/assets/images/imperial_heritage_500g.jpg',
-        '/assets/images/imperial_heritage_250g.jpg'
+        '/assets/images/imperial_heritage_1kg.webp',
+        '/assets/images/imperial_heritage_500g.webp',
+        '/assets/images/imperial_heritage_250g.webp'
       ],
       badge: 'Best Seller',
       variants: [
-        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
-        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
-        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
+        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
+        { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
     {
@@ -3194,9 +3260,9 @@ const App = () => {
       ],
       badge: 'Premium Pure',
       variants: [
-        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.jpg' },
-        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.jpg' },
-        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp', backImage: '/assets/images/peaberry_back_250g.jpg' }
+        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.webp' },
+        { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.webp' },
+        { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp', backImage: '/assets/images/peaberry_back_250g.webp' }
       ]
     },
     {
@@ -3206,17 +3272,17 @@ const App = () => {
       details: 'Whole roasted coffee beans crafted for coffee lovers who prefer grinding fresh. Ideal for espresso, pour-over, French press, and traditional filter brewing.',
       rating: 5.0,
       reviews: 180,
-      image: '/assets/images/signature_beans_1kg.jpg',
+      image: '/assets/images/signature_beans_1kg.webp',
       images: [
-        '/assets/images/signature_beans_1kg.jpg',
-        '/assets/images/signature_beans_500g.jpg',
-        '/assets/images/signature_beans_250g.jpg'
+        '/assets/images/signature_beans_1kg.webp',
+        '/assets/images/signature_beans_500g.webp',
+        '/assets/images/signature_beans_250g.webp'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.jpg', backImage: '/assets/images/coffee_back_2.jpg' },
-        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.jpg', backImage: '/assets/images/coffee_back_1.jpg' },
-        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.jpg', backImage: '/assets/images/coffee_back_3.jpg' }
+        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
+        { weight: '500g', price: '699', image: '/assets/images/signature_beans_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     }
   ];
@@ -3229,19 +3295,28 @@ const App = () => {
       details: 'Sourced from the lush hills of Malenadu, Malenadu Pepper Reserve is carefully selected for its rich aroma, bold character, and natural pungency. Perfect for everyday cooking and gourmet dishes, it brings authentic flavor and freshness to every meal.',
       rating: 4.9,
       reviews: 210,
-      image: '/assets/images/pepper_reserve_1kg.jpg',
+      image: '/assets/images/pepper_reserve_1kg.webp',
       images: [
-        '/assets/images/pepper_reserve_1kg.jpg',
-        '/assets/images/pepper_reserve_500g.jpg',
-        '/assets/images/pepper_reserve_250g.jpg'
+        '/assets/images/pepper_reserve_1kg.webp',
+        '/assets/images/pepper_reserve_500g.webp',
+        '/assets/images/pepper_reserve_250g.webp'
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.jpg' },
-        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.jpg' },
-        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.jpg' }
+        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.webp' },
+        { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.webp' },
+        { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.webp' }
       ]
     }
+  ];
+
+  const customerReviews = [
+    { name: "B K Shivamurthy", text: "Authentic Chikkamagaluru filter coffee. Perfect aroma and zero bitterness. Loved it.", rating: 5, verified: true },
+    { name: "Venkatesh V K", text: "The black pepper is incredibly pure. Delivery was delayed by a day, but the quality is unmatched.", rating: 4, verified: true },
+    { name: "Hanamantu H K", text: "Neat packaging and fast delivery. The peaberry blend is fantastic.", rating: 5, verified: true },
+    { name: "Prajwal H D", text: "Genuine estate quality. You can smell the fresh roast. Slightly expensive, but totally worth it.", rating: 4, verified: true },
+    { name: "Sunil B E", text: "Perfectly blended filter coffee. Exactly what I need for my mornings.", rating: 5, verified: true },
+    { name: "Sujan", text: "Top-notch Arabica beans! Very smooth and fresh. Will order again.", rating: 5, verified: true },
   ];
 
   const comboProducts = [
@@ -3252,15 +3327,15 @@ const App = () => {
       details: 'A celebration of Malenadu\'s rich heritage. This premium combo brings together the smooth character of Imperial Heritage Reserve coffee and the bold aroma of Malenadu Pepper Reserve. Perfect for those who appreciate authentic estate-grown products crafted with tradition and care.',
       rating: 4.9,
       reviews: 145,
-      image: '/assets/images/imperial_heritage_combo_1kg.jpg',
+      image: '/assets/images/imperial_heritage_combo_1kg.webp',
       images: [
-        '/assets/images/imperial_heritage_combo_1kg.jpg',
-        '/assets/images/imperial_heritage_combo_500g.jpg'
+        '/assets/images/imperial_heritage_combo_1kg.webp',
+        '/assets/images/imperial_heritage_combo_500g.webp'
       ],
       badge: 'Heritage Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_heritage_combo_1kg.jpg' },
-        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_heritage_combo_500g.jpg' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_heritage_combo_1kg.webp' },
+        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_heritage_combo_500g.webp' }
       ]
     },
     {
@@ -3270,15 +3345,15 @@ const App = () => {
       details: 'Our most premium Malenadu pairing. Featuring the rare and refined Peaberry Grand Cru Royale alongside the bold and aromatic Malenadu Pepper Reserve, this combo showcases the finest flavors from the hills of Malenadu. Crafted for those who seek something truly exceptional.',
       rating: 5.0,
       reviews: 89,
-      image: '/assets/images/grand_cru_combo_1kg.jpg',
+      image: '/assets/images/grand_cru_combo_1kg.webp',
       images: [
-        '/assets/images/grand_cru_combo_1kg.jpg',
-        '/assets/images/grand_cru_combo_500g.jpg'
+        '/assets/images/grand_cru_combo_1kg.webp',
+        '/assets/images/grand_cru_combo_500g.webp'
       ],
       badge: 'Royale Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.jpg' },
-        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.jpg' }
+        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.webp' },
+        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.webp' }
       ]
     }
   ];
@@ -3825,6 +3900,67 @@ const App = () => {
         </div>
       </section>
 
+      {/* ——— Customer Reviews Section ——— */}
+      <section id="reviews" className="reviews-section-wrap section-padded" style={{ background: '#FAF8F5', position: 'relative', overflow: 'hidden', borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
+        {/* Ambient Glows */}
+        <div style={{ position: 'absolute', top: '20%', left: '10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(200, 147, 90, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(37, 211, 102, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+        <div className="container">
+          <div className="section-head text-center" style={{ marginBottom: '3.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '1.2rem' }}>
+              <div style={{ width: '30px', height: '1px', background: 'var(--c-gold)' }} />
+              <span style={{ color: 'var(--c-gold)', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
+                Testimonials
+              </span>
+              <div style={{ width: '30px', height: '1px', background: 'var(--c-gold)' }} />
+            </div>
+            <h2 style={{ fontFamily: '"Georgia", serif', color: 'var(--c-dark-brown)', fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, marginBottom: '1rem' }}>
+              What Our Customers Say
+            </h2>
+            <p style={{ color: 'var(--c-dark-brown)', opacity: 0.85, fontSize: '1.05rem', fontFamily: 'Inter, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
+              Honest reviews from real customers across India who trust our premium quality.
+            </p>
+          </div>
+        </div>
+
+        <div className="reviews-marquee-container">
+          <div className="reviews-marquee">
+            {[...customerReviews, ...customerReviews].map((review, i) => (
+              <div key={i} className="review-card" style={{ background: '#0F0F0F', borderRadius: '12px', padding: '1.8rem', border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
+                <div className="review-stars" style={{ display: 'flex', gap: '3px', marginBottom: '1.2rem' }}>
+                  {[...Array(review.rating)].map((_, idx) => (
+                    <Star key={idx} size={14} fill="#D4A870" color="#D4A870" />
+                  ))}
+                </div>
+                
+                <div style={{ color: '#D4A870', fontSize: '2.5rem', fontFamily: '"Georgia", serif', lineHeight: 0.5, marginBottom: '0.5rem', opacity: 0.8 }}>
+                  &ldquo;
+                </div>
+                
+                <p className="review-text" style={{ color: '#D1D1D1', fontSize: '0.92rem', lineHeight: 1.6, fontFamily: 'Inter, sans-serif', marginBottom: '1.5rem', flexGrow: 1, fontWeight: 300 }}>
+                  {review.text}
+                </p>
+                
+                <div className="review-author" style={{ borderTop: '1px solid #2A2A2A', paddingTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ 
+                    width: '36px', height: '36px', borderRadius: '50%', 
+                    background: ['#8C001A', '#333333', '#E65100', '#1B5E20', '#4A148C', '#b71c1c'][i % 6],
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '1rem', fontWeight: 600, fontFamily: 'Inter, sans-serif'
+                  }}>
+                    {review.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 style={{ color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', fontWeight: 600, margin: '0' }}>{review.name}</h4>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ——— Premium Bulk Orders Section ——— */}
       <section id="bulk-orders" className="bulk-section-wrap" style={{
         position: 'relative',
@@ -4285,6 +4421,8 @@ const App = () => {
         </div>
       </section>
 
+      <FarmVisitSection />
+
       <FeedbackSection />
 
       <FAQSection />
@@ -4506,8 +4644,9 @@ const App = () => {
                 {[
                   { label: 'Shop Coffee', href: '#coffee' },
                   { label: 'Shop Spices', href: '#pepper' },
-                  { label: 'Our Story', href: '#story' },
+                  { label: 'Reviews', href: '#reviews' },
                   { label: 'Our Origin', href: '#process' },
+                  { label: 'Visit Our Farm', href: '#visit-us' },
                   { label: 'Bulk Orders', href: '#bulk-orders' },
                   { label: 'FSSAI Verified', href: '#fssai-compliance' },
                 ].map((link, i) => (

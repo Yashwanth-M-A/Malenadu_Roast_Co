@@ -995,3 +995,100 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
                 }
               }
             
+
+/* Reviews Section */
+.reviews-section-wrap {
+  padding: 6rem 0;
+}
+.reviews-marquee-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  padding: 1rem 0;
+}
+.reviews-marquee {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.reviews-marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 1rem)); }
+}
+.review-card {
+  background: rgba(8, 15, 10, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 168, 112, 0.25);
+  padding: 2.2rem 2rem;
+  border-radius: 16px;
+  width: 380px;
+  flex-shrink: 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.04);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+}
+.review-card:hover {
+  border-color: rgba(212, 168, 112, 0.6);
+  background: rgba(8, 15, 10, 0.7);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(212,168,112,0.1);
+}
+@media (max-width: 768px) {
+  .reviews-section-wrap { padding: 4rem 0; }
+  .review-card { width: 300px; padding: 1.8rem 1.5rem; }
+  .reviews-marquee { gap: 1.5rem; animation-duration: 30s; }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - 0.75rem)); }
+  }
+}
+@media (max-width: 480px) {
+  .reviews-section-wrap { padding: 3rem 0; }
+  .review-card { width: 270px; padding: 1.4rem 1.2rem; }
+  .review-card .review-text { font-size: 0.9rem; }
+  .review-card .review-author h4 { font-size: 1rem; }
+}
+
+
+/* Farm Visit Section */
+.farm-visit-section { padding: 7rem 0; }
+.farm-visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.farm-gallery { display: flex; flex-direction: column; gap: 1.5rem; }
+.farm-gallery-main { width: 100%; height: 380px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(212, 168, 112, 0.1); }
+.farm-gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+.farm-gallery-main:hover img { transform: scale(1.05); }
+.farm-gallery-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; height: 220px; }
+.farm-gallery-sub img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.5s ease; border: 1px solid rgba(212, 168, 112, 0.1); }
+.farm-gallery-sub img:hover { transform: scale(1.05); }
+
+.farm-booking-form-wrap { background: #111512; padding: 3.5rem; border-radius: 24px; border: 1px solid rgba(212, 168, 112, 0.15); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+.farm-form { display: flex; flex-direction: column; gap: 1.5rem; }
+.farm-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.farm-form .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.farm-form label { font-size: 0.85rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.farm-form input, .farm-form select, .farm-form textarea { background: #1A1F1B; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 1rem 1.2rem; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
+.farm-form input:focus, .farm-form select:focus, .farm-form textarea:focus { border-color: #D4A870; outline: none; background: #222823; box-shadow: 0 0 15px rgba(212, 168, 112, 0.1); }
+.farm-submit-btn { background: #D4A870; color: #080C09; font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; padding: 1.2rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; margin-top: 0.5rem; border: none; }
+.farm-submit-btn:hover { background: #E8CA80; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 168, 112, 0.3); }
+
+@media (max-width: 992px) {
+  .farm-visit-grid { grid-template-columns: 1fr; gap: 4rem; }
+  .farm-gallery-main { height: 320px; }
+  .farm-gallery-sub { height: 180px; }
+}
+@media (max-width: 600px) {
+  .farm-visit-section { padding: 4rem 0; }
+  .farm-booking-form-wrap { padding: 2.2rem 1.5rem; border-radius: 16px; }
+  .farm-form .form-row { grid-template-columns: 1fr; gap: 1.2rem; }
+  .farm-gallery { gap: 0.8rem; }
+  .farm-gallery-sub { gap: 0.8rem; height: 140px; }
+  .farm-gallery-main { height: 220px; }
+  .farm-gallery-sub img, .farm-gallery-main { border-radius: 12px; }
+}
