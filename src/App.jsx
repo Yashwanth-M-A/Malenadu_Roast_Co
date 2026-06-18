@@ -3694,7 +3694,7 @@ const App = () => {
               Partner With Us
             </button>
           </div>
-</div></section>
+</div></div></section>
 
       <section id="pepper" className="section bg-ivory section-padded">
         <div className="container">
