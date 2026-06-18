@@ -2620,7 +2620,7 @@ const PromotionalCarousel = () => {
       bgImage: "url('/assets/images/coffee_raw_2.webp')",
       bgPosition: "center",
       overlay: "linear-gradient(135deg, rgba(17,10,7,0.9) 0%, rgba(46,31,21,0.95) 100%)",
-      link: "#bulk-orders",
+      link: "#partner-with-us",
       btnText: "Enquire Now"
     }
   ];
@@ -3640,7 +3640,7 @@ const App = () => {
             </div>
           
                     {/* B2B Partner Banner */}
-          <div className="coffee-action-banner b2b-banner-flex">
+          <div id="partner-with-us" className="coffee-action-banner b2b-banner-flex">
             <div className="b2b-banner-logo-container">
               <img src="/assets/images/b2b_logo.jpg" alt="Malenadu Roast Co Logo" className="b2b-banner-logo" />
             </div>
