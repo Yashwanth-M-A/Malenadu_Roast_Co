@@ -3677,11 +3677,39 @@ const App = () => {
               </p>
               <button 
                 onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my cafe and would like to claim the free commercial filter.', '_blank')}
-                style={{ background: 'transparent', color: '#C8935A', border: '1px solid #C8935A', padding: '0.9rem 3rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.4s ease', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '2px', fontFamily: 'Inter, sans-serif' }}
-                onMouseEnter={(e) => { e.target.style.background = '#C8935A'; e.target.style.color = '#110d0a'; e.target.style.boxShadow = '0 5px 20px rgba(200, 147, 90, 0.3)'; }}
-                onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#C8935A'; e.target.style.boxShadow = 'none'; }}
+                style={{ 
+                  background: 'linear-gradient(135deg, #FFD700 0%, #FDB931 100%)', 
+                  color: '#110d0a', 
+                  border: 'none', 
+                  padding: '1.2rem 3.5rem', 
+                  borderRadius: '50px', 
+                  fontWeight: 800, 
+                  cursor: 'pointer', 
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                  fontSize: '1.1rem', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '2px', 
+                  fontFamily: 'Inter, sans-serif',
+                  boxShadow: '0 8px 25px rgba(253, 185, 49, 0.4)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => { 
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; 
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(253, 185, 49, 0.6)'; 
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #FDB931 0%, #FFD700 100%)';
+                }}
+                onMouseLeave={(e) => { 
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)'; 
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(253, 185, 49, 0.4)'; 
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #FFD700 0%, #FDB931 100%)';
+                }}
               >
                 Partner With Us
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z"/>
+                </svg>
               </button>
             </div>
             <div className="b2b-banner-image-container">
