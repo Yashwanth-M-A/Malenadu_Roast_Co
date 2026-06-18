@@ -2622,17 +2622,6 @@ const PromotionalCarousel = () => {
       overlay: "linear-gradient(135deg, rgba(17,10,7,0.9) 0%, rgba(46,31,21,0.95) 100%)",
       link: "#bulk-orders",
       btnText: "Enquire Now"
-    },
-    {
-      id: 4,
-      tag: "Gifting Made Special",
-      icon: <Heart size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />,
-      title: "Premium Gift Packs Delivered",
-      desc: "We are now delivering beautifully crafted premium gift packs for your loved ones right to their doorstep. 💕 Share the joy of authentic Malenadu flavors.",
-      bgImage: "url('/assets/images/promo_gift_bg.webp')",
-      bgPosition: "center 60%",
-      overlay: "linear-gradient(135deg, rgba(50,20,20,0.6) 0%, rgba(30,10,10,0.8) 100%)",
-      link: "#combos",
       btnText: "Gift Now"
     }
   ];
