@@ -3681,7 +3681,7 @@ const App = () => {
                 onMouseEnter={(e) => { e.target.style.background = '#C8935A'; e.target.style.color = '#110d0a'; e.target.style.boxShadow = '0 5px 20px rgba(200, 147, 90, 0.3)'; }}
                 onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#C8935A'; e.target.style.boxShadow = 'none'; }}
               >
-                Claim Offer
+                Partner With Us
               </button>
             </div>
             <div className="b2b-banner-image-container">
