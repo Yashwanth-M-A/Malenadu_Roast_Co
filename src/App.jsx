@@ -2622,7 +2622,6 @@ const PromotionalCarousel = () => {
       overlay: "linear-gradient(135deg, rgba(17,10,7,0.9) 0%, rgba(46,31,21,0.95) 100%)",
       link: "#bulk-orders",
       btnText: "Enquire Now"
-      btnText: "Gift Now"
     }
   ];
 
