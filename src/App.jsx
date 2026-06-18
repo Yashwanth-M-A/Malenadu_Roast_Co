@@ -3221,7 +3221,7 @@ const App = () => {
       ],
       variants: [
         { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
-        { weight: '500g', price: '489', image: '/assets/images/highland_signature_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '500g', price: '479', image: '/assets/images/highland_signature_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
         { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
