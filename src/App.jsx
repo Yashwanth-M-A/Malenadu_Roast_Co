@@ -1656,7 +1656,7 @@ const FarmVisitSection = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const text = `Hello Malenadu Roast Co!%0A%0AI would like to book an estate visit.%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Date:* ${formData.date}%0A*Guests:* ${formData.guests}%0A*Interests:* ${formData.interests}%0A%0APlease let me know the availability.`;
-    window.open(`https://wa.me/918217623335?text=${text}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=918217623335&text=${text}`, '_blank');
   };
 
   return (
@@ -2846,7 +2846,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onImag
       desc: 'Chat with us directly on WhatsApp to place your order.',
       icon: <img src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#25D366',
-      link: 'https://wa.me/918217623335',
+      link: 'https://api.whatsapp.com/send?phone=918217623335',
     },
     {
       name: 'Instagram',
@@ -3556,7 +3556,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to place an order for your premium coffee! ☕'), '_blank')}
+                onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to place an order for your premium coffee! ☕'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
@@ -3618,7 +3618,7 @@ const App = () => {
                 Join the Malenadu family and serve authentic premium coffee. Get a commercial South Indian filter worth <span style={{ fontWeight: 900, color: '#00E676', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>₹8,000</span> completely <span style={{ fontWeight: 900, color: '#00E676', letterSpacing: '1px', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>FREE!</span>
               </p>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in partnering with you for my cafe ☕ and would like to claim the free commercial filter! ✨'), '_blank')}
+                onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in partnering with you for my cafe ☕ and would like to claim the free commercial filter! ✨'), '_blank')}
                 style={{ 
                   background: 'linear-gradient(135deg, #FFD700 0%, #FDB931 100%)', 
                   color: '#110d0a', 
@@ -3696,7 +3696,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in ordering your premium Black Pepper! 🌿'), '_blank')}
+                onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in ordering your premium Black Pepper! 🌿'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
@@ -3776,7 +3776,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to order one of your special combo deals! 🎁'), '_blank')}
+                onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to order one of your special combo deals! 🎁'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
@@ -4388,7 +4388,7 @@ const App = () => {
           }}>
             {/* WhatsApp */}
             <motion.a
-              href="https://wa.me/918217623335" target="_blank" rel="noopener noreferrer"
+              href="https://api.whatsapp.com/send?phone=918217623335" target="_blank" rel="noopener noreferrer"
               whileHover={{ y: -8, backgroundColor: 'rgba(255,255,255,0.04)' }}
               style={{
                 background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
