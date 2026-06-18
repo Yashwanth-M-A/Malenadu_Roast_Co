@@ -1172,22 +1172,19 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 }
 .b2b-banner-image-container {
   flex: 1;
-  position: relative;
-  min-height: 600px;
-  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
   overflow: hidden;
+  background: #c39d78;
 }
 .b2b-banner-img {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
+  object-position: center center;
+  display: block;
 }
 
 @media (max-width: 950px) {
@@ -1208,10 +1205,8 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
   }
   .b2b-banner-image-container {
     width: 100%;
-    min-height: 500px;
   }
   .b2b-banner-img {
-    height: 100%;
-    max-height: none;
+    height: auto;
   }
 }
