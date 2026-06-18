@@ -3568,7 +3568,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to place an order for your premium coffee! ☕'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
@@ -3752,7 +3752,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in ordering your premium Black Pepper! 🌿'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
@@ -3874,7 +3874,7 @@ const App = () => {
                 Facing any issues while ordering?
               </span>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335', '_blank')}
+                onClick={() => window.open('https://wa.me/918217623335?text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to order one of your special combo deals! 🎁'), '_blank')}
                 style={{
                   background: '#1a1a1a',
                   color: '#ffffff',
