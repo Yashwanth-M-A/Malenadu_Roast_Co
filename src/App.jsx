@@ -3674,7 +3674,7 @@ const App = () => {
                 Join the Malenadu family and serve authentic premium coffee. Get a commercial South Indian filter worth <span style={{ fontWeight: 900, color: '#00E676', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>₹8,000</span> completely <span style={{ fontWeight: 900, color: '#00E676', letterSpacing: '1px', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>FREE!</span>
               </p>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my cafe and would like to claim the free commercial filter.', '_blank')}
+                onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! 👋 I am interested in partnering with you for my cafe ☕ and would like to claim the free commercial filter! ✨', '_blank')}
                 style={{ 
                   background: 'linear-gradient(135deg, #FFD700 0%, #FDB931 100%)', 
                   color: '#110d0a', 
