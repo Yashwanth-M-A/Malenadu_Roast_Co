@@ -3553,8 +3553,8 @@ const App = () => {
               />
             ))}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '3rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div className="coffee-actions-row">
+            <div className="coffee-action-whatsapp">
               <span style={{ 
                 fontSize: '0.85rem', 
                 color: '#C8935A', 
@@ -3609,7 +3609,7 @@ const App = () => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <div className="coffee-action-brochure">
               <span style={{ 
                 fontSize: '0.85rem', 
                 color: '#C8935A', 
@@ -3651,20 +3651,9 @@ const App = () => {
                 <Download size={18} />
                 Brochure
               </a>
-            </div></div>
+            </div>
           {/* B2B Partner Banner */}
-          <div style={{
-            marginTop: '4.5rem',
-            background: 'linear-gradient(135deg, #1a120b 0%, #2e1f15 100%)',
-            borderRadius: '12px',
-            padding: '2.5rem 2rem',
-            textAlign: 'center',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-            position: 'relative',
-            overflow: 'hidden',
-            border: '1px solid rgba(200, 147, 90, 0.3)',
-            width: '100%'
-          }}>
+          <div className="coffee-action-banner" style={{ background: "linear-gradient(135deg, #1a120b 0%, #2e1f15 100%)", borderRadius: "12px", padding: "2.5rem 2rem", textAlign: "center", boxShadow: "0 10px 30px rgba(0,0,0,0.15)", position: "relative", overflow: "hidden", border: "1px solid rgba(200, 147, 90, 0.3)" }}>
             <h3 style={{ 
               color: '#ffffff', 
               fontSize: '1.8rem', 

@@ -1092,3 +1092,41 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
   .farm-gallery-main { height: 220px; }
   .farm-gallery-sub img, .farm-gallery-main { border-radius: 12px; }
 }
+
+/* B2B Banner Responsive Ordering */
+.coffee-actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.coffee-action-whatsapp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  order: 1;
+}
+.coffee-action-brochure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  order: 2;
+}
+.coffee-action-banner {
+  order: 3;
+  width: 100%;
+  margin-top: 2rem;
+}
+@media (max-width: 768px) {
+  .coffee-actions-row {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  .coffee-action-whatsapp { order: 1; width: 100%; }
+  .coffee-action-banner { order: 2; width: 100%; margin-top: 0; }
+  .coffee-action-brochure { order: 3; width: 100%; }
+}
