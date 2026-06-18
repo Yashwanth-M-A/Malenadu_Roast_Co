@@ -1669,15 +1669,13 @@ const FarmVisitSection = () => {
         <div className="farm-visit-grid">
           
           {/* Left: Image Gallery */}
-          <div className="farm-gallery">
-            <div className="farm-gallery-main">
+          <div className="farm-gallery-main">
               <img src="/assets/images/farm_landscape.webp" alt="Malenadu Estate Landscape" />
             </div>
             <div className="farm-gallery-sub">
               <img src="/assets/images/user_farm_cherries.webp" alt="Coffee Cherries" />
               <img src="/assets/images/user_farm_beans.webp" alt="Fresh Roasted Beans" />
             </div>
-          </div>
 
           {/* Right: Booking Form */}
           <div className="farm-booking-form-wrap">
