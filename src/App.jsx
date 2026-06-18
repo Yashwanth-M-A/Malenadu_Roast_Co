@@ -3659,11 +3659,21 @@ const App = () => {
               <img src="/assets/images/b2b_logo.jpg" alt="Malenadu Roast Co Logo" className="b2b-banner-logo" />
             </div>
             <div className="b2b-banner-content">
-              <h3 style={{ color: '#ffffff', fontSize: '2rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '1rem', fontWeight: 600, letterSpacing: '1px', fontStyle: 'italic' }}>
-                Elevate Your Cafe With Premium Roasts
+              <h3 style={{ 
+                background: 'linear-gradient(90deg, #FFD700, #FDB931)', 
+                WebkitBackgroundClip: 'text', 
+                WebkitTextFillColor: 'transparent', 
+                fontSize: '2rem', 
+                fontFamily: '"Playfair Display", Georgia, serif', 
+                marginBottom: '1rem', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                fontStyle: 'italic' 
+              }}>
+                Partner With Us For Your Cafe
               </h3>
-              <p style={{ color: '#C8935A', fontSize: '1.1rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '2rem', fontWeight: 400, lineHeight: 1.6, letterSpacing: '0.5px' }}>
-                Upgrade your coffee game with authentic Chikkamagaluru roasts. Partner with us today and claim a heavy-duty Commercial Filter worth <span style={{ fontWeight: 800, color: '#e0cda5', fontSize: '1.2rem' }}>₹8,000</span> absolutely <span style={{ fontWeight: 800, color: '#e0cda5', letterSpacing: '1px' }}>FREE</span> with your first bulk order!
+              <p style={{ color: '#e0cda5', fontSize: '1.15rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '2rem', fontWeight: 400, lineHeight: 1.6, letterSpacing: '0.5px' }}>
+                Join the Malenadu family and serve authentic premium coffee. Get a commercial South Indian filter worth <span style={{ fontWeight: 900, color: '#00E676', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>₹8,000</span> completely <span style={{ fontWeight: 900, color: '#00E676', letterSpacing: '1px', fontSize: '1.3rem', textShadow: '0 0 12px rgba(0, 230, 118, 0.4)' }}>FREE!</span>
               </p>
               <button 
                 onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my cafe and would like to claim the free commercial filter.', '_blank')}
