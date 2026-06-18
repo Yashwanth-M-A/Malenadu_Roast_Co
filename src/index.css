@@ -82,7 +82,8 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 .brand-logo { 
   height: 90px; 
   width: 90px; 
-  object-fit: cover; 
+  object-fit: cover;
+  object-position: center center; 
   border-radius: 50%;
   border: 2px solid var(--c-gold);
   background: #fff;
@@ -1172,7 +1173,7 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
 .b2b-banner-image-container {
   flex: 1;
   position: relative;
-  min-height: 380px;
+  min-height: 600px;
   background: transparent;
   display: flex;
   justify-content: center;
@@ -1207,9 +1208,10 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
   }
   .b2b-banner-image-container {
     width: 100%;
-    min-height: 250px;
+    min-height: 500px;
   }
   .b2b-banner-img {
-  max-height: 250px;
-}
+    height: 100%;
+    max-height: none;
+  }
 }
