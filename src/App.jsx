@@ -3653,22 +3653,25 @@ const App = () => {
               </a>
             </div>
           
-          {/* B2B Partner Banner */}
+                    {/* B2B Partner Banner */}
           <div className="coffee-action-banner b2b-banner-flex">
+            <div className="b2b-banner-logo-container">
+              <img src="/assets/images/b2b_logo.jpg" alt="Malenadu Roast Co Logo" className="b2b-banner-logo" />
+            </div>
             <div className="b2b-banner-content">
-              <h3 style={{ color: '#ffffff', fontSize: '2.2rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '1rem', fontWeight: 800, lineHeight: 1.2 }}>
-                Want to tie up with us for your shop?
+              <h3 style={{ color: '#ffffff', fontSize: '2rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '1rem', fontWeight: 600, letterSpacing: '1px', fontStyle: 'italic' }}>
+                Partner With Us For Your Cafe
               </h3>
-              <p style={{ color: '#e0cda5', fontSize: '1.2rem', fontFamily: 'Inter, sans-serif', marginBottom: '2.5rem', fontWeight: 500, lineHeight: 1.6 }}>
-                Get a premium commercial filter worth <span style={{ color: '#25D366', fontWeight: 800, fontSize: '1.4rem' }}>₹8000</span> for completely <span style={{ color: '#25D366', fontWeight: 800, textTransform: 'uppercase' }}>FREE</span>!
+              <p style={{ color: '#C8935A', fontSize: '1.1rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '2rem', fontWeight: 400, lineHeight: 1.6, letterSpacing: '0.5px' }}>
+                Join the Malenadu family and serve authentic premium coffee. Get a commercial South Indian filter worth <span style={{ fontWeight: 800, color: '#e0cda5', fontSize: '1.2rem' }}>₹8,000</span> completely <span style={{ fontWeight: 800, color: '#e0cda5', letterSpacing: '1px' }}>FREE</span>!
               </p>
               <button 
-                onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my shop and would like to claim the free commercial filter.', '_blank')}
-                style={{ background: '#C8935A', color: '#1a1a1a', border: 'none', padding: '1.1rem 3.5rem', borderRadius: '50px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease', fontSize: '1.05rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'Inter, sans-serif', boxShadow: '0 8px 25px rgba(200, 147, 90, 0.2)' }}
-                onMouseEnter={(e) => { e.target.style.transform = 'translateY(-3px)'; e.target.style.boxShadow = '0 12px 35px rgba(200, 147, 90, 0.4)'; e.target.style.background = '#dcb07d'; }}
-                onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 8px 25px rgba(200, 147, 90, 0.2)'; e.target.style.background = '#C8935A'; }}
+                onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my cafe and would like to claim the free commercial filter.', '_blank')}
+                style={{ background: 'transparent', color: '#C8935A', border: '1px solid #C8935A', padding: '0.9rem 3rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.4s ease', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '2px', fontFamily: 'Inter, sans-serif' }}
+                onMouseEnter={(e) => { e.target.style.background = '#C8935A'; e.target.style.color = '#110d0a'; e.target.style.boxShadow = '0 5px 20px rgba(200, 147, 90, 0.3)'; }}
+                onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#C8935A'; e.target.style.boxShadow = 'none'; }}
               >
-                Partner With Us
+                Claim Offer
               </button>
             </div>
             <div className="b2b-banner-image-container">
