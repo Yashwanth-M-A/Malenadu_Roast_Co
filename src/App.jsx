@@ -3660,10 +3660,10 @@ const App = () => {
             </div>
             <div className="b2b-banner-content">
               <h3 style={{ color: '#ffffff', fontSize: '2rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '1rem', fontWeight: 600, letterSpacing: '1px', fontStyle: 'italic' }}>
-                Partner With Us For Your Cafe
+                Elevate Your Cafe With Premium Roasts
               </h3>
               <p style={{ color: '#C8935A', fontSize: '1.1rem', fontFamily: '"Playfair Display", Georgia, serif', marginBottom: '2rem', fontWeight: 400, lineHeight: 1.6, letterSpacing: '0.5px' }}>
-                Join the Malenadu family and serve authentic premium coffee. Get a commercial South Indian filter worth <span style={{ fontWeight: 800, color: '#e0cda5', fontSize: '1.2rem' }}>₹8,000</span> completely <span style={{ fontWeight: 800, color: '#e0cda5', letterSpacing: '1px' }}>FREE</span>!
+                Upgrade your coffee game with authentic Chikkamagaluru roasts. Partner with us today and claim a heavy-duty Commercial Filter worth <span style={{ fontWeight: 800, color: '#e0cda5', fontSize: '1.2rem' }}>₹8,000</span> absolutely <span style={{ fontWeight: 800, color: '#e0cda5', letterSpacing: '1px' }}>FREE</span> with your first bulk order!
               </p>
               <button 
                 onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my cafe and would like to claim the free commercial filter.', '_blank')}
