@@ -3594,50 +3594,6 @@ const App = () => {
                 Order through whatsapp
               </button>
             </div>
-
-            <div className="coffee-action-brochure">
-              <span style={{ 
-                fontSize: '0.85rem', 
-                color: '#C8935A', 
-                fontWeight: 700, 
-                letterSpacing: '1px', 
-                fontFamily: 'Inter, sans-serif', 
-                textTransform: 'uppercase',
-                borderBottom: '1.5px solid rgba(200, 147, 90, 0.4)',
-                paddingBottom: '4px',
-                marginBottom: '6px',
-                textAlign: 'center'
-              }}>
-                For more premium coffee products, please go through our brochure
-              </span>
-              <a 
-                href="https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa"
-                download="Malenadu_Roast_Co_Brochure.pdf"
-                style={{
-                  background: 'var(--c-dark-brown)',
-                  color: 'var(--c-gold)',
-                  border: '2px solid var(--c-dark-brown)',
-                  padding: '1rem 2.5rem',
-                  borderRadius: '4px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  fontSize: '1rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                }}
-                onMouseEnter={(e) => { e.target.style.transform = 'translateY(-3px)'; e.target.style.backgroundColor = '#1a1a1a'; }}
-                onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.backgroundColor = 'var(--c-dark-brown)'; }}
-              >
-                <Download size={18} />
-                Brochure
-              </a>
-            </div>
           
                     {/* B2B Partner Banner */}
           <div id="partner-with-us" className="coffee-action-banner b2b-banner-flex">
