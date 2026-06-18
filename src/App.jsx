@@ -3713,7 +3713,7 @@ const App = () => {
               </button>
             </div>
             <div className="b2b-banner-image-container">
-               <img src="/assets/images/commercial_filter.png" alt="Commercial Coffee Filter" className="b2b-banner-img" />
+               <img src="/assets/images/commercial_filter.jpg" alt="Commercial Coffee Filter" className="b2b-banner-img" />
             </div>
           </div>
 </div></div></section>
