@@ -3651,10 +3651,61 @@ const App = () => {
                 <Download size={18} />
                 Brochure
               </a>
-            </div>
+            </div></div>
+          {/* B2B Partner Banner */}
+          <div style={{
+            marginTop: '4.5rem',
+            background: 'linear-gradient(135deg, #1a120b 0%, #2e1f15 100%)',
+            borderRadius: '12px',
+            padding: '2.5rem 2rem',
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+            position: 'relative',
+            overflow: 'hidden',
+            border: '1px solid rgba(200, 147, 90, 0.3)',
+            width: '100%'
+          }}>
+            <h3 style={{ 
+              color: '#ffffff', 
+              fontSize: '1.8rem', 
+              fontFamily: '"Playfair Display", Georgia, serif',
+              marginBottom: '1rem',
+              fontWeight: 700
+            }}>
+              Want to tie up with us for your shop?
+            </h3>
+            <p style={{
+              color: '#e0cda5',
+              fontSize: '1.15rem',
+              fontFamily: 'Inter, sans-serif',
+              marginBottom: '2.5rem',
+              fontWeight: 500
+            }}>
+              Get a commercial filter worth <span style={{ color: '#25D366', fontWeight: 800, fontSize: '1.3rem' }}>₹8000</span> for completely <span style={{ color: '#25D366', fontWeight: 800, textTransform: 'uppercase' }}>FREE</span>!
+            </p>
+            <button 
+              onClick={() => window.open('https://wa.me/918217623335?text=Hello Malenadu Roast Co! I am interested in partnering with you for my shop and would like to claim the free commercial filter.', '_blank')}
+              style={{
+                background: '#C8935A',
+                color: '#1a1a1a',
+                border: 'none',
+                padding: '1rem 3.5rem',
+                borderRadius: '50px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '1.05rem',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                fontFamily: 'Inter, sans-serif'
+              }}
+              onMouseEnter={(e) => { e.target.style.transform = 'translateY(-3px)'; e.target.style.boxShadow = '0 8px 25px rgba(200, 147, 90, 0.4)'; e.target.style.background = '#dcb07d'; }}
+              onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = 'none'; e.target.style.background = '#C8935A'; }}
+            >
+              Partner With Us
+            </button>
           </div>
-        </div>
-      </section>
+</div></section>
 
       <section id="pepper" className="section bg-ivory section-padded">
         <div className="container">
