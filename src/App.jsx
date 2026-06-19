@@ -129,7 +129,7 @@ const Header = ({
           {currentPage !== 'order' && (
             <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
               <motion.a
-                href="https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa"
+                href="https://drive.google.com/uc?export=download&id=1J8q0Cp6cH0HP3PF-IN1_JgBUyWJ1vlAa"
                 download="Malenadu_Roast_Co_Brochure.pdf"
                 className="nav-brochure-link"
                 whileHover={{ scale: 1.05, boxShadow: '0 5px 15px rgba(200,169,106,0.4)' }}
@@ -2860,7 +2860,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onImag
       desc: 'Browse our full product catalog with prices and details.',
       icon: <img loading="lazy" src="/assets/images/icon_drive.webp" alt="Google Drive" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#4285F4',
-      link: 'https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa',
+      link: 'https://drive.google.com/uc?export=download&id=1J8q0Cp6cH0HP3PF-IN1_JgBUyWJ1vlAa',
     },
   ];
 
