@@ -103,7 +103,7 @@ const Header = ({
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -399,7 +399,7 @@ const Hero = ({ onOrderNow }) => {
   return (
     <section id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      <img 
+      <img loading="lazy" 
         src={TOKENS.images.hero} 
         alt="Malenadu Coffee Estate Sunrise"
         style={{
@@ -1385,7 +1385,7 @@ const ChikkamagaluruGallery = () => {
           <div className="chikka-solo-viewport" onClick={() => setActiveItem({ type: 'coffee', index: currentIndex })}>
             <div className="chikka-solo-img-wrap">
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.img loading="lazy"
                   key={currentIndex}
                   src={images[currentIndex].src}
                   alt={images[currentIndex].title}
@@ -1498,7 +1498,7 @@ const ChikkamagaluruGallery = () => {
           <div className="chikka-solo-viewport" onClick={() => setActiveItem({ type: 'pepper', index: currentPepperIndex })}>
             <div className="chikka-solo-img-wrap">
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.img loading="lazy"
                   key={currentPepperIndex}
                   src={pepperImages[currentPepperIndex].src}
                   alt={pepperImages[currentPepperIndex].title}
@@ -1576,7 +1576,7 @@ const ChikkamagaluruGallery = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="chikka-lightbox-img-wrap">
-                <img 
+                <img loading="lazy" 
                   src={activeImage.src} 
                   alt={activeImage.title} 
                   className="chikka-lightbox-img" 
@@ -1670,11 +1670,11 @@ const FarmVisitSection = () => {
           
           {/* Left: Image Gallery */}
           <div className="farm-gallery-main">
-              <img src="/assets/images/farm_landscape.webp" alt="Malenadu Estate Landscape" />
+              <img loading="lazy" src="/assets/images/farm_landscape.webp" alt="Malenadu Estate Landscape" />
             </div>
             <div className="farm-gallery-sub">
-              <img src="/assets/images/user_farm_cherries.webp" alt="Coffee Cherries" />
-              <img src="/assets/images/user_farm_beans.webp" alt="Fresh Roasted Beans" />
+              <img loading="lazy" src="/assets/images/user_farm_cherries.webp" alt="Coffee Cherries" />
+              <img loading="lazy" src="/assets/images/user_farm_beans.webp" alt="Fresh Roasted Beans" />
             </div>
 
           {/* Right: Booking Form */}
@@ -2844,21 +2844,21 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onImag
     {
       name: 'WhatsApp',
       desc: 'Chat with us directly on WhatsApp to place your order.',
-      icon: <img src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img loading="lazy" src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#25D366',
       link: 'https://api.whatsapp.com/send?phone=918217623335',
     },
     {
       name: 'Instagram',
       desc: 'DM us on Instagram to order or explore our latest offerings.',
-      icon: <img src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img loading="lazy" src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#E1306C',
       link: 'https://www.instagram.com/coffee_zone_ka?igsh=MW5sdjUzdWJodmJkZg==',
     },
     {
       name: 'Product Catalog',
       desc: 'Browse our full product catalog with prices and details.',
-      icon: <img src="/assets/images/icon_drive.webp" alt="Google Drive" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
+      icon: <img loading="lazy" src="/assets/images/icon_drive.webp" alt="Google Drive" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />,
       color: '#4285F4',
       link: 'https://drive.google.com/uc?export=download&id=12SdMgOO7EW2KW7UJUTkgfRcGWQUziXsa',
     },
@@ -3472,7 +3472,7 @@ const App = () => {
             )}
 
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.img loading="lazy"
                 key={fullscreenImage.index}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -3598,7 +3598,7 @@ const App = () => {
                     {/* B2B Partner Banner */}
           <div id="partner-with-us" className="coffee-action-banner b2b-banner-flex">
             <div className="b2b-banner-logo-container">
-              <img src="/assets/images/b2b_logo.jpg" alt="Malenadu Roast Co Logo" className="b2b-banner-logo" />
+              <img loading="lazy" src="/assets/images/b2b_logo.jpg" alt="Malenadu Roast Co Logo" className="b2b-banner-logo" />
             </div>
             <div className="b2b-banner-content">
               <h3 style={{ 
@@ -3655,7 +3655,7 @@ const App = () => {
               </button>
             </div>
             <div className="b2b-banner-image-container">
-               <img src="/assets/images/commercial_filter.jpg" alt="Commercial Coffee Filter" className="b2b-banner-img" />
+               <img loading="lazy" src="/assets/images/commercial_filter.jpg" alt="Commercial Coffee Filter" className="b2b-banner-img" />
             </div>
           </div>
 </div></div></section>
@@ -4314,7 +4314,7 @@ const App = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <img src={TOKENS.images.storyBg} alt="Coffee Plantation" />
+              <img loading="lazy" src={TOKENS.images.storyBg} alt="Coffee Plantation" />
             </motion.div>
           </Tilt>
           <motion.div 
@@ -4335,7 +4335,7 @@ const App = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <img src={TOKENS.images.pepperStoryUpload} alt="Malenadu Black Pepper Plantation" style={{ objectFit: 'cover' }} />
+              <img loading="lazy" src={TOKENS.images.pepperStoryUpload} alt="Malenadu Black Pepper Plantation" style={{ objectFit: 'cover' }} />
             </motion.div>
           </Tilt>
         </div>
@@ -4408,7 +4408,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(37,211,102,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img loading="lazy" src="/assets/images/whatsapp_icon.webp" alt="WhatsApp" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Order via WhatsApp</h4>
@@ -4462,7 +4462,7 @@ const App = () => {
                 border: '1px solid rgba(255,255,255,0.1)',
                 padding: '6px'
               }}>
-                <img src="/assets/images/gmail_icon.webp" alt="Gmail" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                <img loading="lazy" src="/assets/images/gmail_icon.webp" alt="Gmail" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Email Us</h4>
@@ -4493,7 +4493,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(220,39,67,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img loading="lazy" src="/assets/images/instagram_icon.webp" alt="Instagram" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Follow Us</h4>
@@ -4523,7 +4523,7 @@ const App = () => {
                 boxShadow: '0 0 20px rgba(24,119,242,0.4)',
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
-                <img src="/assets/images/facebook_icon.webp" alt="Facebook" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img loading="lazy" src="/assets/images/facebook_icon.webp" alt="Facebook" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ color: '#fff', fontSize: '1.15rem', margin: '0 0 0.6rem', fontWeight: 700, fontFamily: '"Georgia", serif' }}>Facebook</h4>
@@ -4551,7 +4551,7 @@ const App = () => {
           }}>
             {/* Left: Brand */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <img src={TOKENS.images.logo} alt="Malenadu Roast Co" style={{ height: '100px', width: '100px', borderRadius: '50%', border: '2px solid #C8935A', padding: '2px', background: '#fff', marginBottom: '1.5rem' }} />
+              <img loading="lazy" src={TOKENS.images.logo} alt="Malenadu Roast Co" style={{ height: '100px', width: '100px', borderRadius: '50%', border: '2px solid #C8935A', padding: '2px', background: '#fff', marginBottom: '1.5rem' }} />
               <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.88rem', lineHeight: '1.8', maxWidth: '380px', margin: 0 }}>
                 Authentic coffee and spices sourced from the hills of Chikkamagaluru. Direct from our estates to your table.
               </p>
