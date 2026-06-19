@@ -3187,8 +3187,8 @@ const App = () => {
         '/assets/images/estate_reserve_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '500g', price: '429', image: '/assets/images/estate_reserve_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '1kg', price: '799', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '250g', price: '249', image: '/assets/images/estate_reserve_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
@@ -3206,8 +3206,8 @@ const App = () => {
         '/assets/images/highland_signature_250g.webp'
       ],
       variants: [
-        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '500g', price: '479', image: '/assets/images/highland_signature_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '1kg', price: '899', image: '/assets/images/highland_signature_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '250g', price: '279', image: '/assets/images/highland_signature_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
@@ -3226,8 +3226,8 @@ const App = () => {
       ],
       badge: 'Best Seller',
       variants: [
-        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '500g', price: '529', image: '/assets/images/imperial_heritage_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '1kg', price: '999', image: '/assets/images/imperial_heritage_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '250g', price: '289', image: '/assets/images/imperial_heritage_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     },
@@ -3246,8 +3246,8 @@ const App = () => {
       ],
       badge: 'Premium Pure',
       variants: [
-        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.webp' },
         { weight: '500g', price: '650', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.webp' },
+        { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.webp' },
         { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp', backImage: '/assets/images/peaberry_back_250g.webp' }
       ]
     },
@@ -3266,8 +3266,8 @@ const App = () => {
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '500g', price: '680', image: '/assets/images/signature_beans_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
     }
@@ -3289,8 +3289,8 @@ const App = () => {
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.webp' },
         { weight: '500g', price: '579', image: '/assets/images/pepper_reserve_500g.webp' },
+        { weight: '1kg', price: '1099', image: '/assets/images/pepper_reserve_1kg.webp' },
         { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_250g.webp' }
       ]
     }
@@ -3320,8 +3320,8 @@ const App = () => {
       ],
       badge: 'Heritage Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_heritage_combo_1kg.webp' },
-        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_heritage_combo_500g.webp' }
+        { weight: '500g Coffee + 100g Pepper', price: '699', image: '/assets/images/imperial_heritage_combo_500g.webp' },
+        { weight: '1kg Coffee + 250g Pepper', price: '1279', image: '/assets/images/imperial_heritage_combo_1kg.webp' }
       ]
     },
     {
@@ -3338,8 +3338,8 @@ const App = () => {
       ],
       badge: 'Royale Pair',
       variants: [
-        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.webp' },
-        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.webp' }
+        { weight: '500g Coffee + 100g Pepper', price: '849', image: '/assets/images/grand_cru_combo_500g.webp' },
+        { weight: '1kg Coffee + 250g Pepper', price: '1549', image: '/assets/images/grand_cru_combo_1kg.webp' }
       ]
     }
   ];
