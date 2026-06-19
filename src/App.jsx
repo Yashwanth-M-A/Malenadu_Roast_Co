@@ -3246,7 +3246,7 @@ const App = () => {
       ],
       badge: 'Premium Pure',
       variants: [
-        { weight: '500g', price: '650', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.webp' },
+        { weight: '500g', price: '649', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.webp' },
         { weight: '1kg', price: '1249', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.webp' },
         { weight: '250g', price: '399', image: '/assets/images/peaberry_grand_cru_250g.webp', backImage: '/assets/images/peaberry_back_250g.webp' }
       ]
@@ -3266,7 +3266,7 @@ const App = () => {
       ],
       badge: 'Premium Reserve',
       variants: [
-        { weight: '500g', price: '680', image: '/assets/images/signature_beans_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
+        { weight: '500g', price: '679', image: '/assets/images/signature_beans_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
         { weight: '1kg', price: '1299', image: '/assets/images/signature_beans_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' },
         { weight: '250g', price: '399', image: '/assets/images/signature_beans_250g.webp', backImage: '/assets/images/coffee_back_3.webp' }
       ]
