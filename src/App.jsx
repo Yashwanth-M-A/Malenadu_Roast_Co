@@ -155,30 +155,7 @@ const Header = ({
                 <span className="hide-mobile">Brochure</span>
               </motion.a>
 
-              {/* Cart Button */}
-              <motion.button
-                className="icon-btn"
-                aria-label="Cart"
-                onClick={onOpenCart}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                style={{ position: 'relative' }}
-              >
-                <ShoppingCart size={22} />
-                {cartItemCount > 0 && (
-                  <span style={{
-                    position: 'absolute', top: '-6px', right: '-6px',
-                    background: 'var(--c-gold)', color: 'var(--c-dark-brown)',
-                    borderRadius: '50%', width: '18px', height: '18px',
-                    fontSize: '0.65rem', fontWeight: 800,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'Inter, sans-serif',
-                    boxShadow: '0 2px 6px rgba(200,147,90,0.5)'
-                  }}>
-                    {cartItemCount > 9 ? '9+' : cartItemCount}
-                  </span>
-                )}
-              </motion.button>
+              
 
               <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
                 <button className="icon-btn" aria-label="Search" onClick={() => setIsSearchOpen(!isSearchOpen)}>
@@ -881,29 +858,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick 
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="product-card-actions">
-            {onAddToCart && (
-              <button
-                className="btn-card-action btn-card-action-outline"
-                onClick={(e) => { e.stopPropagation(); handleDirectAddToCart(e); }}
-              >
-                <ShoppingCart />
-                Add to Cart
-              </button>
-            )}
-
-            {!hideBuyNow && onBuyNow && (
-              <button
-                className="btn-card-action btn-card-action-primary"
-                onClick={(e) => { e.stopPropagation(); handleDirectBuyNow(e); }}
-              >
-                <ShoppingBag />
-                Buy Now
-              </button>
-            )}
           </div>
-        </div>
       </motion.div>
     </Tilt>
   );
@@ -1600,7 +1555,7 @@ const FAQSection = () => {
   const faqs = [
     { q: "Where do you source your coffee and pepper?", a: "Our coffee and pepper are directly sourced from our own estates in Chikkamagaluru (Malenadu), ensuring freshness, authenticity, and premium quality without any middlemen." },
     { q: "How fresh is your coffee?", a: "We roast our coffee in small batches to maintain freshness. This ensures rich aroma, strong flavor, and a better brewing experience in every cup." },
-    { q: "How can I place an order?", a: "Simply click on “Start Your Order” and connect with us via WhatsApp. We’ll guide you through the process and confirm your order quickly." },
+    { q: "How can I place an order?", a: "Simply click on “order through whatsapp” and connect with us via WhatsApp. We’ll guide you through the process and confirm your order quickly." },
     { q: "How long does delivery take?", a: "We deliver across India, with most orders reaching you within 2–5 days, depending on your location." },
     { q: "Do you offer bulk or combo deals?", a: "Yes, we offer combo packs and special discounts on bulk orders. You can place bulk orders by contacting us on WhatsApp or by filling out the form available in our bulk orders section." }
   ];
@@ -3553,7 +3508,7 @@ const App = () => {
                 marginBottom: '6px',
                 textAlign: 'center'
               }}>
-                Facing any issues while ordering?
+                Place your order directly through WhatsApp.
               </span>
               <button 
                 onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to place an order for your premium coffee! ☕'), '_blank')}
@@ -3693,7 +3648,7 @@ const App = () => {
                 marginBottom: '6px',
                 textAlign: 'center'
               }}>
-                Facing any issues while ordering?
+                Place your order directly through WhatsApp.
               </span>
               <button 
                 onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I am interested in ordering your premium Black Pepper! 🌿'), '_blank')}
@@ -3773,7 +3728,7 @@ const App = () => {
                 marginBottom: '6px',
                 textAlign: 'center'
               }}>
-                Facing any issues while ordering?
+                Place your order directly through WhatsApp.
               </span>
               <button 
                 onClick={() => window.open('https://api.whatsapp.com/send?phone=918217623335&text=' + encodeURIComponent('Hello Malenadu Roast Co! 👋 I would like to order one of your special combo deals! 🎁'), '_blank')}
