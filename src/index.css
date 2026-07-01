@@ -1215,3 +1215,26 @@ button { cursor: pointer; font-family: var(--font-sans); border: none; outline: 
     height: auto;
   }
 }
+
+/* ========================================= */
+/* STRICT MOBILE PERFORMANCE OPTIMIZATIONS   */
+/* ========================================= */
+@media (max-width: 768px) {
+  /* Force hardware acceleration (GPU) on heavy painted elements */
+  img, video, .glass-card, .product-card, .story-image {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform, opacity;
+  }
+
+  /* Reduce extremely expensive CSS filters on mobile */
+  .glass-card {
+    backdrop-filter: blur(8px) !important; /* Cap blur to 8px max to prevent GPU locking */
+  }
+  
+  /* Disable smooth scrolling on html/body if it interferes with iOS momentum scrolling */
+  html, body {
+    overscroll-behavior-y: none;
+  }
+}

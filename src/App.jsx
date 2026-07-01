@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   ShoppingCart, User, Search, Menu, X, Star, ShieldCheck, 
   Leaf, Truck, CreditCard, Phone, Mail, Heart, Plus, Minus, Trash2, PlayCircle, Download,
-  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight, ShoppingBag
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight, ShoppingBag, MapPin, Sun, Flame, Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
@@ -664,7 +664,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick 
   };
 
   return (
-    <Tilt tiltMaxAngleX={8} tiltMaxAngleY={8} scale={1.02} transitionSpeed={2000} className="h-100" style={{ height: '100%' }}>
+    <Tilt tiltEnable={typeof window !== 'undefined' && window.innerWidth > 768} tiltMaxAngleX={8} tiltMaxAngleY={8} scale={1.02} transitionSpeed={2000} className="h-100" style={{ height: '100%' }}>
       <motion.div 
         className="product-card"
         initial={{ opacity: 0, y: 40 }}
@@ -3082,6 +3082,99 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onImag
   );
 };
 
+
+const CoffeeInfoSection = () => {
+  const pillars = [
+    {
+      image: "/assets/images/farm_landscape.webp",
+      title: "Grown in the Clouds",
+      desc: "Sourced directly from heritage estates in Chikkamagaluru, grown at high altitudes (1200m+) where the cool climate develops dense, flavorful beans."
+    },
+    {
+      image: "/assets/images/sun_drying_real.png",
+      title: "Carefully Processed",
+      desc: "We use traditional washed and natural sun-drying methods to preserve the authentic, earthy tasting notes of the Western Ghats."
+    },
+    {
+      image: "/assets/images/user_farm_beans.webp",
+      title: "Masterfully Roasted",
+      desc: "Every batch is roasted to a perfect medium-dark level to bring out rich aromas of dark chocolate and roasted nuts, without any burnt bitterness."
+    },
+    {
+      image: "/assets/images/user_roasted.jpg",
+      title: "Roasted to Order",
+      desc: "To ensure you get the absolute best filter coffee experience, we only roast your beans after you place your WhatsApp order."
+    }
+  ];
+
+  return (
+    <section style={{ background: '#FAF8F5', padding: '5rem 0', borderTop: '1px solid rgba(0,0,0,0.05)', position: 'relative' }}>
+      <div className="container">
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '1.2rem' }}>
+            <div style={{ width: '30px', height: '1px', background: 'var(--c-gold)' }} />
+            <span style={{ color: 'var(--c-gold)', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
+              The Malenadu Difference
+            </span>
+            <div style={{ width: '30px', height: '1px', background: 'var(--c-gold)' }} />
+          </div>
+          <h2 style={{ fontFamily: '"Georgia", serif', color: 'var(--c-dark-brown)', fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 700, margin: '0 0 1rem' }}>
+            Why Our Coffee Stands Out
+          </h2>
+          <p style={{ color: 'var(--c-dark-brown)', opacity: 0.8, fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto', fontFamily: 'Inter, sans-serif', lineHeight: 1.6 }}>
+            From high-altitude cultivation to small-batch roasting, every step is designed to deliver true specialty coffee.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '2rem',
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
+          {pillars.map((pillar, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              whileHover={{ y: -5, boxShadow: '0 15px 35px rgba(0,0,0,0.06)' }}
+              style={{
+                background: '#fff',
+                padding: '2.5rem 2rem',
+                borderRadius: '16px',
+                textAlign: 'center',
+                boxShadow: '0 5px 15px rgba(0,0,0,0.03)',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(200, 147, 90, 0.1)'
+              }}
+            >
+              <div style={{
+                width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden',
+                margin: '0 auto 1.5rem', position: 'relative', border: '1px solid rgba(0,0,0,0.05)'
+              }}>
+                <img src={pillar.image} alt={pillar.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+              </div>
+              <h3 style={{
+                fontFamily: '"Georgia", serif', color: 'var(--c-dark-brown)', fontSize: '1.3rem', fontWeight: 700, marginBottom: '1rem'
+              }}>
+                {pillar.title}
+              </h3>
+              <p style={{
+                fontFamily: 'Inter, sans-serif', color: 'var(--c-dark-brown)', opacity: 0.75, fontSize: '0.95rem', lineHeight: 1.6, margin: 0
+              }}>
+                {pillar.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -3775,6 +3868,9 @@ const App = () => {
         </div>
       </section>
 
+      {/* ——— Coffee Information Section ——— */}
+      <CoffeeInfoSection />
+
       {/* ——— Customer Reviews Section ——— */}
       <section id="reviews" className="reviews-section-wrap section-padded" style={{ background: '#FAF8F5', position: 'relative', overflow: 'hidden', borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
         {/* Ambient Glows */}
@@ -4241,7 +4337,7 @@ const App = () => {
           </motion.h2>
           <div className="features-grid">
             {[{icon: <Leaf/>, t: 'Farm Sourced'}, {icon: <ShieldCheck/>, t: 'Premium Quality'}, {icon: <Truck/>, t: 'Fast Delivery'}, {icon: <CreditCard/>, t: 'Secure Payment'}].map((f,i) => (
-              <Tilt key={i} tiltMaxAngleX={15} tiltMaxAngleY={15} scale={1.05} transitionSpeed={1500} style={{ transformStyle: 'preserve-3d' }}>
+              <Tilt tiltEnable={typeof window !== 'undefined' && window.innerWidth > 768} key={i} tiltMaxAngleX={15} tiltMaxAngleY={15} scale={1.05} transitionSpeed={1500} style={{ transformStyle: 'preserve-3d' }}>
                 <motion.div 
                   className="feature-item fade-in" 
                   initial={{ opacity: 0, z: -50, rotateY: 30 }}
@@ -4261,7 +4357,7 @@ const App = () => {
 
       <section id="story" className="section story-section">
         <div className="container story-container">
-          <Tilt className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
+          <Tilt tiltEnable={typeof window !== 'undefined' && window.innerWidth > 768} className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
             <motion.div 
               style={{ width: '100%', height: '100%' }}
               initial={{ opacity: 0, rotateY: -20, x: -50 }}
@@ -4282,7 +4378,7 @@ const App = () => {
             <h2>Born in the Hills of Malenadu</h2>
             <p>Our products are sourced from one of India's richest coffee and spice regions. Every bean and every peppercorn reflects purity, freshness, and heritage.</p>
           </motion.div>
-          <Tilt className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
+          <Tilt tiltEnable={typeof window !== 'undefined' && window.innerWidth > 768} className="story-image" tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.03}>
             <motion.div 
               style={{ width: '100%', height: '100%' }}
               initial={{ opacity: 0, rotateY: 20, x: 50 }}
