@@ -482,7 +482,7 @@ const Hero = ({ onOrderNow }) => {
                 fontWeight: 400,
               }}
             >
-              From the lush hills of Malenadu to your everyday cup, we bring you coffee that's freshly roasted, rich in aroma, and crafted to make every sip feel truly special.
+              Sustainably grown, freshly roasted, and crafted to give you the best filter coffee experience straight from the hills of Malenadu.
             </motion.p>
 
             {/* CTA Row: Button */}
@@ -3132,7 +3132,7 @@ const App = () => {
       id: 1,
       name: 'Malenadu Estate Reserve',
       description: 'Rooted in Tradition, Crafted for Today',
-      details: 'A smooth and balanced filter coffee crafted from carefully selected estate-grown beans from Chikmagaluru. Perfect for those who enjoy authentic coffee with a rich aroma and satisfying finish.',
+      details: 'Voted as the best filter coffee blend for everyday drinking. A smooth, aromatic, and perfectly balanced cup crafted from carefully selected estate-grown beans from Chikkamagaluru.',
       rating: 4.8,
       reviews: 124,
       image: '/assets/images/estate_reserve_1kg.webp',
@@ -4330,6 +4330,19 @@ const App = () => {
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.5)', maxWidth: '580px', margin: '0 auto', fontSize: '0.95rem', lineHeight: '1.6' }}>
               We'd love to hear from you! Reach out through any of the channels below and our team will get back to you soon.
+            </p>
+          </motion.div>
+
+          {/* SEO Paragraph */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{ textAlign: 'center', marginBottom: '4rem', padding: '0 1rem' }}
+          >
+            <p style={{ color: 'rgba(255,255,255,0.4)', maxWidth: '800px', margin: '0 auto', fontSize: '0.85rem', lineHeight: '1.8' }}>
+              Malenadu Roast Co is dedicated to bringing you the <strong>best filter coffee in India</strong>. Recognized as the best filter coffee from Chikkamagaluru and the best filter coffee in Karnataka, our premium blends are sourced directly from high-altitude estates. Whether you're looking for the best filter coffee from India or the freshest beans from Karnataka, we roast to order, ensuring every cup is packed with authentic Malenadu flavor.
             </p>
           </motion.div>
 
