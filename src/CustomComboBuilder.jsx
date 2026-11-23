@@ -9,8 +9,8 @@ const COMBO_COFFEES = [
     badge: 'Signature 70:30',
     tag: 'Traditional Degree Filter Coffee',
     weights: [
-      { label: '500g', price: 449, image: '/assets/images/estate_reserve_500g.webp' },
-      { label: '1kg', price: 839, image: '/assets/images/estate_reserve_1kg.webp' }
+      { label: '500g', price: 449, image: '/assets/images/estate_reserve_front.jpg' },
+      { label: '1kg', price: 839, image: '/assets/images/estate_reserve_front.jpg' }
     ]
   },
   {
@@ -19,8 +19,8 @@ const COMBO_COFFEES = [
     badge: 'Heritage 85:15',
     tag: 'Dark Roast Filter Coffee',
     weights: [
-      { label: '500g', price: 559, image: '/assets/images/imperial_heritage_500g.webp' },
-      { label: '1kg', price: 1049, image: '/assets/images/imperial_heritage_1kg.webp' }
+      { label: '500g', price: 559, image: '/assets/images/imperial_heritage_front.jpg' },
+      { label: '1kg', price: 1049, image: '/assets/images/imperial_heritage_front.jpg' }
     ]
   },
   {
@@ -29,8 +29,8 @@ const COMBO_COFFEES = [
     badge: 'Rare Single Pearl',
     tag: 'Dense Estate Peaberry Roast',
     weights: [
-      { label: '500g', price: 689, image: '/assets/images/peaberry_grand_cru_500g.webp' },
-      { label: '1kg', price: 1319, image: '/assets/images/peaberry_grand_cru_1kg.webp' }
+      { label: '500g', price: 689, image: '/assets/images/peaberry_grand_cru_front.jpg' },
+      { label: '1kg', price: 1319, image: '/assets/images/peaberry_grand_cru_front.jpg' }
     ]
   },
   {
@@ -39,8 +39,18 @@ const COMBO_COFFEES = [
     badge: '100% Arabica',
     tag: 'High-Elevation Medium Roast',
     weights: [
-      { label: '500g', price: 509, image: '/assets/images/highland_signature_500g.webp' },
-      { label: '1kg', price: 949, image: '/assets/images/highland_signature_1kg.webp' }
+      { label: '500g', price: 509, image: '/assets/images/highland_signature_front.jpg' },
+      { label: '1kg', price: 949, image: '/assets/images/highland_signature_front.jpg' }
+    ]
+  },
+  {
+    id: 16,
+    name: 'Malenadu Signature Beans',
+    badge: '100% Whole Beans',
+    tag: 'Whole Roasted Coffee Beans',
+    weights: [
+      { label: '500g', price: 719, image: '/assets/images/signature_beans_front.jpg' },
+      { label: '1kg', price: 1369, image: '/assets/images/signature_beans_front.jpg' }
     ]
   }
 ];
@@ -54,7 +64,7 @@ const COMBO_PEPPERS = [
     weight: '250g',
     desc: 'Kitchen Standard Pouch',
     price: 319,
-    image: '/assets/images/pepper_reserve_250g.webp'
+    image: '/assets/images/pepper_reserve_front.jpg'
   },
   {
     id: 'p500',
@@ -63,7 +73,7 @@ const COMBO_PEPPERS = [
     weight: '500g',
     desc: 'Culinary Pantry Pack',
     price: 609,
-    image: '/assets/images/pepper_reserve_500g.webp'
+    image: '/assets/images/pepper_reserve_front.jpg'
   },
   {
     id: 'p1000',
@@ -72,7 +82,7 @@ const COMBO_PEPPERS = [
     weight: '1kg',
     desc: 'Annual Harvest Bag',
     price: 1159,
-    image: '/assets/images/pepper_reserve_1kg.webp'
+    image: '/assets/images/pepper_reserve_front.jpg'
   }
 ];
 

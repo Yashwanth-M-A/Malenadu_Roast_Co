@@ -802,13 +802,13 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
     if (onShareProduct) {
       onShareProduct(product, e);
     } else {
-      const origin = typeof window !== 'undefined' && window.location && window.location.origin 
-        ? window.location.origin 
+      const origin = typeof window !== 'undefined' && window.location && window.location.origin
+        ? window.location.origin
         : 'https://www.malenaduroastco.works';
       const shareUrl = `${origin}/?product=${encodeURIComponent(product.name)}#products`;
       const shareText = `☕ *${product.name}*\n${product.specs?.flavorNotes || product.tagline || 'Single-Estate Artisanal Roast from Chikkamagaluru'}\n💰 Starting at ₹${product.price} (Incl. 5% GST)\n\nTaste the authentic single-estate roast from Chikkamagaluru:\n👉 ${shareUrl}`;
       if (typeof navigator !== 'undefined' && navigator.share) {
-        navigator.share({ title: product.name, text: shareText, url: shareUrl }).catch(() => {});
+        navigator.share({ title: product.name, text: shareText, url: shareUrl }).catch(() => { });
       } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
         navigator.clipboard.writeText(shareUrl);
         alert('Product link copied to clipboard!');
@@ -1111,6 +1111,8 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                 maxHeight: '100%',
                 maxWidth: '100%',
                 objectFit: 'contain',
+                filter: 'drop-shadow(0 14px 24px rgba(24, 17, 12, 0.16))',
+                transform: isHovered ? 'scale(1.04)' : 'scale(1)',
                 borderRadius: '8px',
                 border: '2px solid #000000',
                 boxShadow: '0 8px 20px rgba(0,0,0,0.18)',
@@ -1202,6 +1204,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                     <img
                       src={img}
                       alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                       style={{
                         width: '100%',
                         height: '100%',
@@ -9731,7 +9734,7 @@ const PromotionalCarousel = () => {
       btnText: 'Build Your Combo',
       btnClass: 'btn-slide-2',
       link: '#combos',
-      cardImg: '/assets/images/coffee_pepper_combo_hero_v2.jpg',
+      cardImg: '/assets/images/combos_lineup.jpg',
       cardImgStyle: {
         mixBlendMode: 'normal',
         borderRadius: '22px',
@@ -9758,7 +9761,7 @@ const PromotionalCarousel = () => {
       btnText: 'Discuss MOQ & Bulk Partnership',
       btnClass: 'btn-slide-3',
       link: '#partner-bulk',
-      cardImg: '/assets/images/special_frame_card_3.webp',
+      cardImg: '/assets/images/malenadu_full_lineup.jpg',
       cardImgStyle: {
         mixBlendMode: 'normal',
         borderRadius: '22px',
@@ -11715,12 +11718,12 @@ const App = () => {
     if (e && e.stopPropagation) e.stopPropagation();
     if (!product) return;
 
-    const origin = typeof window !== 'undefined' && window.location && window.location.origin 
-      ? window.location.origin 
+    const origin = typeof window !== 'undefined' && window.location && window.location.origin
+      ? window.location.origin
       : 'https://www.malenaduroastco.works';
     const productSlug = encodeURIComponent(product.name || 'Malenadu Coffee');
     const shareUrl = `${origin}/?product=${productSlug}#products`;
-    
+
     const shareTitle = `${product.name} | Malenadu Roast Co.`;
     const shareText = `☕ *${product.name}*\n${product.specs?.flavorNotes || product.tagline || 'Artisanal Single-Estate Roast from Chikkamagaluru estate.'}\n💰 Starting at ₹${product.price} (Inclusive of 5% GST)\n\nTaste the authentic single-estate roast from Chikkamagaluru:\n👉 ${shareUrl}`;
 
@@ -12283,19 +12286,19 @@ const App = () => {
                   {
                     id: 'coffee',
                     label: 'Coffee',
-                    image: '/assets/images/category_coffee_v3.webp',
+                    image: '/assets/images/estate_reserve_front.jpg',
                     sub: '5 Estate Blends'
                   },
                   {
                     id: 'pepper',
                     label: 'Pepper',
-                    image: '/assets/images/category_pepper_v3.webp',
+                    image: '/assets/images/pepper_reserve_front.jpg',
                     sub: 'Handpicked Whole Spices'
                   },
                   {
                     id: 'combos',
                     label: 'Combos',
-                    image: '/assets/images/category_combos_v5.webp',
+                    image: '/assets/images/combos_lineup.jpg',
                     sub: 'Build Your Combo'
                   }
                 ].map(cat => {

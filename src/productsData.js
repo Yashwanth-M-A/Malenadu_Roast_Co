@@ -314,15 +314,16 @@ export const DEFAULT_PEPPER_PRODUCTS = [
     rating: 4.9,
     reviews: 210,
     badge: 'Tellicherry Bold',
-    image: '/assets/images/pepper_reserve_1kg.webp',
+    image: '/assets/images/pepper_reserve_front.jpg',
     images: [
-      '/assets/images/pepper_reserve_1kg.webp',
-      '/assets/images/pepper_reserve_500g.webp',
-      '/assets/images/pepper_reserve_250g.webp'
+      '/assets/images/pepper_reserve_front.jpg',
+      '/assets/images/pepper_reserve_back.jpg',
+      '/assets/images/malenadu_full_lineup.jpg'
     ],
     variants: [
-      { weight: '500g', price: '609', image: '/assets/images/pepper_reserve_500g.webp' },
-      { weight: '1kg', price: '1159', image: '/assets/images/pepper_reserve_1kg.webp' }
+      { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
+      { weight: '500g', price: '609', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
+      { weight: '1kg', price: '1159', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' }
     ],
     specs: {
       grade: 'Tellicherry Garbled Special Extra Bold (TGSEB)',
@@ -367,12 +368,13 @@ export const DEFAULT_PEPPER_PRODUCTS = [
     rating: 5.0,
     reviews: 99,
     badge: '₹8 Payment Test',
-    image: '/assets/images/pepper_reserve_500g.webp',
+    image: '/assets/images/pepper_reserve_front.jpg',
     images: [
-      '/assets/images/pepper_reserve_500g.webp'
+      '/assets/images/pepper_reserve_front.jpg',
+      '/assets/images/pepper_reserve_back.jpg'
     ],
     variants: [
-      { weight: '500g', price: '8', image: '/assets/images/pepper_reserve_500g.webp' }
+      { weight: '500g', price: '8', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' }
     ],
     freeShipping: true,
     specs: {
@@ -406,14 +408,15 @@ export const DEFAULT_COMBO_PRODUCTS = [
     rating: 4.9,
     reviews: 145,
     badge: 'Heritage Pair',
-    image: '/assets/images/imperial_heritage_combo_1kg.webp',
+    image: '/assets/images/combos_lineup.jpg',
     images: [
-      '/assets/images/imperial_heritage_combo_1kg.webp',
-      '/assets/images/imperial_heritage_combo_500g.webp'
+      '/assets/images/combos_lineup.jpg',
+      '/assets/images/imperial_heritage_front.jpg',
+      '/assets/images/pepper_reserve_front.jpg'
     ],
     variants: [
-      { weight: '500g Coffee + 100g Pepper', price: '739', image: '/assets/images/imperial_heritage_combo_500g.webp' },
-      { weight: '1kg Coffee + 250g Pepper', price: '1349', image: '/assets/images/imperial_heritage_combo_1kg.webp' }
+      { weight: '500g Coffee + 100g Pepper', price: '739', image: '/assets/images/combos_lineup.jpg' },
+      { weight: '1kg Coffee + 250g Pepper', price: '1349', image: '/assets/images/combos_lineup.jpg' }
     ],
     specs: {
       coffeePart: 'Imperial Heritage 85:15 Dark Roast Filter Coffee',
@@ -442,14 +445,15 @@ export const DEFAULT_COMBO_PRODUCTS = [
     rating: 5.0,
     reviews: 89,
     badge: 'Royale Pair',
-    image: '/assets/images/grand_cru_combo_1kg.webp',
+    image: '/assets/images/combos_lineup.jpg',
     images: [
-      '/assets/images/grand_cru_combo_1kg.webp',
-      '/assets/images/grand_cru_combo_500g.webp'
+      '/assets/images/combos_lineup.jpg',
+      '/assets/images/peaberry_grand_cru_front.jpg',
+      '/assets/images/pepper_reserve_front.jpg'
     ],
     variants: [
-      { weight: '500g Coffee + 100g Pepper', price: '899', image: '/assets/images/grand_cru_combo_500g.webp' },
-      { weight: '1kg Coffee + 250g Pepper', price: '1629', image: '/assets/images/grand_cru_combo_1kg.webp' }
+      { weight: '500g Coffee + 100g Pepper', price: '899', image: '/assets/images/combos_lineup.jpg' },
+      { weight: '1kg Coffee + 250g Pepper', price: '1629', image: '/assets/images/combos_lineup.jpg' }
     ],
     specs: {
       coffeePart: 'Peaberry Grand Cru Royale (100% Pure Coffee | 0% Chicory)',
