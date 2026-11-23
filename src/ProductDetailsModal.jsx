@@ -253,23 +253,26 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
               title="Click to enlarge / view high-resolution image"
               style={{
                 background: '#FDFBF7',
-                border: '2px solid #18110C',
+                border: '1px solid #eee5da',
                 borderRadius: '12px',
-                padding: '1.5rem',
+                padding: '1.25rem',
                 textAlign: 'center',
                 position: 'relative',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.02)',
                 cursor: 'zoom-in',
                 overflow: 'hidden',
-                transition: 'all 0.25s ease'
+                transition: 'all 0.25s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#18110C';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(24, 17, 12, 0.2)';
+                e.currentTarget.style.borderColor = '#C8935A';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(200, 147, 90, 0.18)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#18110C';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)';
+                e.currentTarget.style.borderColor = '#eee5da';
+                e.currentTarget.style.boxShadow = 'inset 0 0 20px rgba(0,0,0,0.02)';
               }}
             >
               {/* Zoom HD Pill Badge */}
@@ -301,13 +304,16 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                 alt={product.name}
                 style={{
                   maxHeight: '340px',
-                  width: '100%',
+                  width: 'auto',
+                  maxWidth: '100%',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.12))',
+                  borderRadius: '10px',
+                  border: '2px solid #000000',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                   transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.04)';
+                  e.currentTarget.style.transform = 'scale(1.03)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'scale(1)';
@@ -315,7 +321,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
               />
             </div>
 
-            {/* Thumbnail Strip with Crisp Black Borders */}
+            {/* Thumbnail Strip with Crisp Black Borders Directly on Images */}
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'center' }}>
                 {allImages.map((img, idx) => (
@@ -323,19 +329,29 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
                     style={{
-                      width: '56px',
-                      height: '56px',
+                      width: '58px',
+                      height: '58px',
                       borderRadius: '8px',
-                      border: activeImageIndex === idx ? '2.5px solid #18110C' : '1.5px solid #18110C',
-                      background: '#fff',
-                      padding: '3px',
+                      border: 'none',
+                      background: 'transparent',
+                      padding: '0',
                       cursor: 'pointer',
-                      boxShadow: activeImageIndex === idx ? '0 3px 10px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0,0,0,0.1)',
                       transition: 'all 0.2s',
-                      transform: activeImageIndex === idx ? 'scale(1.04)' : 'scale(1)'
+                      transform: activeImageIndex === idx ? 'scale(1.06)' : 'scale(1)'
                     }}
                   >
-                    <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img
+                      src={img}
+                      alt="Thumbnail"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: '8px',
+                        border: activeImageIndex === idx ? '2px solid #000000' : '1px solid #000000',
+                        boxShadow: activeImageIndex === idx ? '0 4px 12px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'
+                      }}
+                    />
                   </button>
                 ))}
               </div>
@@ -1317,7 +1333,9 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                   maxHeight: '74vh',
                   maxWidth: '85vw',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))',
+                  borderRadius: '10px',
+                  border: '2px solid #000000',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
                   userSelect: 'none'
                 }}
               />

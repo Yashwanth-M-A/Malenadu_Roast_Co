@@ -1111,8 +1111,10 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                 maxHeight: '100%',
                 maxWidth: '100%',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 14px 24px rgba(24, 17, 12, 0.16))',
-                transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                borderRadius: '8px',
+                border: '2px solid #000000',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.18)',
+                transform: isHovered ? 'scale(1.03)' : 'scale(1)',
                 transition: 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)'
               }}
             />
@@ -1200,7 +1202,13 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                     <img
                       src={img}
                       alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: '4px',
+                        border: '1px solid #000000'
+                      }}
                     />
                   </button>
                 );
