@@ -64,13 +64,11 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
   if (!isOpen || !product) return null;
 
   // Build images list
-  const allImages = (product.id === 16 || product.name === 'Malenadu Signature Beans')
-    ? (Array.isArray(product.images) && product.images.length > 0 ? product.images : [product.image])
+  const allImages = (Array.isArray(product.images) && product.images.length > 0)
+    ? product.images
     : (selectedVariant?.backImage 
         ? [selectedVariant.image, selectedVariant.backImage]
-        : (product.images && product.images.length > 0 
-            ? product.images 
-            : [product.image || '/assets/images/coffee_pack_new.webp']));
+        : [selectedVariant?.image || product.image || '/assets/images/coffee_pack_new.webp']);
 
   const currentImage = allImages[activeImageIndex] || allImages[0];
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;

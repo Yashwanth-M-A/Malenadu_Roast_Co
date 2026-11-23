@@ -856,17 +856,12 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
 
   // Aggregate ALL images of this product to allow full sliding showcase
   const allImages = React.useMemo(() => {
-    if (product.id === 16 && Array.isArray(product.images) && product.images.length > 0) {
+    if (Array.isArray(product.images) && product.images.length > 0) {
       return product.images;
     }
     const list = [];
     if (selectedVariant?.image) list.push(selectedVariant.image);
     if (selectedVariant?.backImage) list.push(selectedVariant.backImage);
-    if (Array.isArray(product.images)) {
-      product.images.forEach(img => {
-        if (img && !list.includes(img)) list.push(img);
-      });
-    }
     if (product.image && !list.includes(product.image)) list.push(product.image);
     if (Array.isArray(product.variants)) {
       product.variants.forEach(v => {
@@ -874,7 +869,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
         if (v.backImage && !list.includes(v.backImage)) list.push(v.backImage);
       });
     }
-    return list.length > 0 ? list : ['/assets/images/estate_reserve_500g.webp'];
+    return list.length > 0 ? list : ['/assets/images/estate_reserve_front.jpg'];
   }, [product, selectedVariant]);
 
   useEffect(() => {
@@ -6522,7 +6517,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
                         <img
-                          src="/assets/images/estate_reserve_500g.webp"
+                          src="/assets/images/estate_reserve_front.jpg"
                           alt="Estate Reserve 500g"
                           style={{
                             width: '38px',

@@ -11,15 +11,15 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     rating: 4.6,
     reviews: 124,
     badge: 'Signature 70:30',
-    image: '/assets/images/estate_reserve_1kg.webp',
+    image: '/assets/images/estate_reserve_front.jpg',
     images: [
-      '/assets/images/estate_reserve_1kg.webp',
-      '/assets/images/estate_reserve_500g.webp',
-      '/assets/images/estate_reserve_250g.webp'
+      '/assets/images/estate_reserve_front.jpg',
+      '/assets/images/estate_reserve_back.jpg',
+      '/assets/images/estate_reserve_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '449', image: '/assets/images/estate_reserve_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
-      { weight: '1kg', price: '839', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' }
+      { weight: '500g', price: '449', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' },
+      { weight: '1kg', price: '839', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark Roast (Full City)',
@@ -77,15 +77,15 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     rating: 4.4,
     reviews: 89,
     badge: 'Highland 80:20',
-    image: '/assets/images/highland_signature_1kg.webp',
+    image: '/assets/images/highland_signature_front.jpg',
     images: [
-      '/assets/images/highland_signature_1kg.webp',
-      '/assets/images/highland_signature_500g.webp',
-      '/assets/images/highland_signature_250g.webp'
+      '/assets/images/highland_signature_front.jpg',
+      '/assets/images/highland_signature_back.jpg',
+      '/assets/images/highland_signature_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '509', image: '/assets/images/highland_signature_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
-      { weight: '1kg', price: '949', image: '/assets/images/highland_signature_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' }
+      { weight: '500g', price: '509', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' },
+      { weight: '1kg', price: '949', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' }
     ],
     specs: {
       roast: 'Medium Roast',
@@ -135,15 +135,15 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     rating: 4.7,
     reviews: 96,
     badge: 'Heritage 85:15',
-    image: '/assets/images/imperial_heritage_1kg.webp',
+    image: '/assets/images/imperial_heritage_front.jpg',
     images: [
-      '/assets/images/imperial_heritage_1kg.webp',
-      '/assets/images/imperial_heritage_500g.webp',
-      '/assets/images/imperial_heritage_250g.webp'
+      '/assets/images/imperial_heritage_front.jpg',
+      '/assets/images/imperial_heritage_back.jpg',
+      '/assets/images/imperial_heritage_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '559', image: '/assets/images/imperial_heritage_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
-      { weight: '1kg', price: '1049', image: '/assets/images/imperial_heritage_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' }
+      { weight: '500g', price: '559', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' },
+      { weight: '1kg', price: '1049', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' }
     ],
     specs: {
       roast: 'Dark Roast (Vienna Roast)',
@@ -193,15 +193,15 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     rating: 4.6,
     reviews: 82,
     badge: '100% Pure Peaberry',
-    image: '/assets/images/peaberry_grand_cru_1kg.webp',
+    image: '/assets/images/peaberry_grand_cru_front.jpg',
     images: [
-      '/assets/images/peaberry_grand_cru_1kg.webp',
-      '/assets/images/peaberry_grand_cru_500g.webp',
-      '/assets/images/peaberry_grand_cru_250g.webp'
+      '/assets/images/peaberry_grand_cru_front.jpg',
+      '/assets/images/peaberry_grand_cru_back.jpg',
+      '/assets/images/peaberry_grand_cru_duo.webp'
     ],
     variants: [
-      { weight: '500g', price: '689', image: '/assets/images/peaberry_grand_cru_500g.webp', backImage: '/assets/images/peaberry_back_500g.webp' },
-      { weight: '1kg', price: '1319', image: '/assets/images/peaberry_grand_cru_1kg.webp', backImage: '/assets/images/peaberry_back_1kg.webp' }
+      { weight: '500g', price: '689', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' },
+      { weight: '1kg', price: '1319', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark (City+) Roast',
