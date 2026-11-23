@@ -6153,56 +6153,58 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
             {cart.length > 0 && (
               shippingDetails.isFreeShipping ? (
                 <div style={{
-                  background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-                  borderBottom: '1px solid #86efac',
-                  padding: '0.85rem 1.25rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '5px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: 800, color: '#166534', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span>🎉</span> 100% FREE Delivery Unlocked!
-                    </span>
-                    <span style={{ fontSize: '0.72rem', background: '#16a34a', color: '#fff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>
-                      SAVED ₹{shippingDetails.standardFee}
-                    </span>
-                  </div>
-                  <div style={{ height: '6px', background: 'rgba(22, 163, 74, 0.2)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: '100%', background: '#16a34a', borderRadius: '4px' }} />
-                  </div>
-                  <span style={{ fontSize: '0.74rem', color: '#15803d' }}>
-                    Your order qualifies for complimentary express estate shipping pan-India!
-                  </span>
-                </div>
-              ) : (
-                <div style={{
-                  background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                  borderBottom: '1px solid #fde68a',
-                  padding: '0.85rem 1.25rem',
+                  background: 'linear-gradient(135deg, #FAF8F5 0%, #F3EFEA 100%)',
+                  borderBottom: '1px solid rgba(200, 147, 90, 0.3)',
+                  padding: '0.9rem 1.25rem',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '6px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: 800, color: '#92400e', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span>🚚</span> Add {shippingDetails.gramsToFree}g more for <strong>FREE Delivery</strong>
+                    <span style={{ fontWeight: 700, color: '#18110C', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#C8935A' }}>✦</span>
+                      <span>Complimentary Estate Courier</span>
                     </span>
-                    <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#b45309' }}>
-                      {shippingDetails.progressPct}%
+                    <span style={{ fontSize: '0.7rem', background: '#16a34a', color: '#ffffff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.5px' }}>
+                      FREE SHIPPING UNLOCKED
+                    </span>
+                  </div>
+                  <div style={{ height: '4px', background: 'rgba(200, 147, 90, 0.2)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: '100%', background: 'linear-gradient(90deg, #C8935A, #E8CA80)', borderRadius: '4px' }} />
+                  </div>
+                  <span style={{ fontSize: '0.74rem', color: '#64748b', lineHeight: 1.4 }}>
+                    Your order qualifies for complimentary express estate delivery pan-India.
+                  </span>
+                </div>
+              ) : (
+                <div style={{
+                  background: 'linear-gradient(135deg, #FAF8F5 0%, #F5F0E8 100%)',
+                  borderBottom: '1px solid rgba(200, 147, 90, 0.3)',
+                  padding: '0.9rem 1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 700, color: '#18110C', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#C8935A' }}>✦</span>
+                      <span>Add {shippingDetails.gramsToFree}g for Complimentary Delivery</span>
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9E6B34', background: 'rgba(200, 147, 90, 0.15)', padding: '2px 7px', borderRadius: '4px' }}>
+                      {shippingDetails.progressPct}% Unlocked
                     </span>
                   </div>
 
-                  <div style={{ height: '6px', background: '#fde68a', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${shippingDetails.progressPct}%`, background: 'linear-gradient(90deg, #f59e0b, #d97706)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                  <div style={{ height: '4px', background: 'rgba(0, 0, 0, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${shippingDetails.progressPct}%`, background: 'linear-gradient(90deg, #C8935A, #D4A870)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
                   </div>
 
-                  <p style={{ margin: 0, fontSize: '0.74rem', color: '#78350f', lineHeight: 1.35 }}>
-                    Orders under 1kg incur standard shipping (₹44 Karnataka / ₹68 Other States). Add 1 more 500g pack or Tellicherry pepper to make delivery <strong>FREE</strong>!
+                  <p style={{ margin: 0, fontSize: '0.74rem', color: '#64748b', lineHeight: 1.4 }}>
+                    Orders from 1 kg receive complimentary expedited dispatch directly from our Chikkamagaluru estate roastery.
                   </p>
 
                   {/* 1-Click Upsell Buttons */}
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                     <button
                       type="button"
                       onClick={() => {
@@ -6215,19 +6217,22 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                       }}
                       style={{
                         flex: 1,
-                        padding: '6px 8px',
+                        padding: '7px 10px',
                         background: '#ffffff',
-                        border: '1.5px solid #d97706',
+                        border: '1px solid rgba(200, 147, 90, 0.45)',
                         borderRadius: '6px',
-                        color: '#92400e',
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
+                        color: '#18110C',
+                        fontSize: '0.73rem',
+                        fontWeight: 600,
                         cursor: 'pointer',
                         textAlign: 'center',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                        transition: 'all 0.2s ease'
                       }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8935A'; e.currentTarget.style.background = '#FAF7F2'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.45)'; e.currentTarget.style.background = '#ffffff'; }}
                     >
-                      ☕ + 1 More 500g (Free Delivery)
+                      + Add 500g Pack (Free Delivery)
                     </button>
 
                     <button
@@ -6246,19 +6251,22 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                       }}
                       style={{
                         flex: 1,
-                        padding: '6px 8px',
+                        padding: '7px 10px',
                         background: '#ffffff',
-                        border: '1.5px solid #16a34a',
+                        border: '1px solid rgba(200, 147, 90, 0.45)',
                         borderRadius: '6px',
-                        color: '#166534',
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
+                        color: '#18110C',
+                        fontSize: '0.73rem',
+                        fontWeight: 600,
                         cursor: 'pointer',
                         textAlign: 'center',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                        transition: 'all 0.2s ease'
                       }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8935A'; e.currentTarget.style.background = '#FAF7F2'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.45)'; e.currentTarget.style.background = '#ffffff'; }}
                     >
-                      🌿 + Pepper 250g (₹299)
+                      + Add Pepper (250g · ₹299)
                     </button>
                   </div>
                 </div>
@@ -6278,7 +6286,12 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
                       <p className="cart-item-price">
-                        ₹{item.price} {item.weight ? `<span style="font-size: 0.78rem; color: #64748b; font-weight: normal;">(${item.weight})</span>` : ''}
+                        ₹{item.price}
+                        {item.weight && (
+                          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, marginLeft: '6px' }}>
+                            ({item.weight})
+                          </span>
+                        )}
                       </p>
                       <div className="qty-controls">
                         <button onClick={() => updateQuantity(item.id, -1)}><Minus size={14} /></button>
