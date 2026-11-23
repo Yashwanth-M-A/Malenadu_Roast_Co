@@ -6203,71 +6203,143 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                     Orders from 1 kg receive complimentary expedited dispatch directly from our Chikkamagaluru estate roastery.
                   </p>
 
-                  {/* 1-Click Upsell Buttons */}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const currentCoffee = cart.find(c => !(c.name || '').toLowerCase().includes('pepper'));
-                        if (currentCoffee && updateQuantity) {
-                          updateQuantity(currentCoffee.id, 1);
-                        } else if (onAddToCart) {
-                          onAddToCart({ id: 1, name: 'Malenadu Estate Reserve', price: 429, weight: '500g', image: '/assets/images/estate_reserve_500g.webp' });
-                        }
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '7px 10px',
-                        background: '#ffffff',
-                        border: '1px solid rgba(200, 147, 90, 0.45)',
-                        borderRadius: '6px',
-                        color: '#18110C',
-                        fontSize: '0.73rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8935A'; e.currentTarget.style.background = '#FAF7F2'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.45)'; e.currentTarget.style.background = '#ffffff'; }}
-                    >
-                      + Add 500g Pack (Free Delivery)
-                    </button>
+                  {/* 1-Click Upsell Cards with Actual Product Images */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                    {/* Coffee Upsell Card */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(200, 147, 90, 0.35)',
+                      borderRadius: '8px',
+                      padding: '6px 10px',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                      gap: '10px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+                        <img
+                          src="/assets/images/estate_reserve_500g.webp"
+                          alt="Estate Reserve 500g"
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            objectFit: 'contain',
+                            borderRadius: '5px',
+                            background: '#FAF7F2',
+                            padding: '2px',
+                            border: '1px solid rgba(200, 147, 90, 0.2)',
+                            flexShrink: 0
+                          }}
+                        />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#18110C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            Malenadu Estate Reserve
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '1px' }}>
+                            <strong style={{ color: '#0F172A' }}>₹449</strong> (500g) • <span style={{ color: '#15803d', fontWeight: 600 }}>Unlocks Free Delivery</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentCoffee = cart.find(c => !(c.name || '').toLowerCase().includes('pepper'));
+                          if (currentCoffee && updateQuantity) {
+                            updateQuantity(currentCoffee.id, 1);
+                          } else if (onAddToCart) {
+                            onAddToCart({ id: 1, name: 'Malenadu Estate Reserve', price: 449, weight: '500g', image: '/assets/images/estate_reserve_500g.webp' });
+                          }
+                        }}
+                        style={{
+                          background: '#18110C',
+                          color: '#F8DA9D',
+                          border: '1px solid #C8935A',
+                          borderRadius: '5px',
+                          padding: '5px 12px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#C8935A'; e.currentTarget.style.color = '#18110C'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = '#18110C'; e.currentTarget.style.color = '#F8DA9D'; }}
+                      >
+                        + Add
+                      </button>
+                    </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onAddToCart) {
-                          onAddToCart({
-                            id: 4,
-                            name: 'Malenadu Pepper Reserve',
-                            price: 299,
-                            weight: '250g',
-                            category: 'pepper',
-                            image: '/assets/images/pepper_reserve_250g.webp'
-                          });
-                        }
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '7px 10px',
-                        background: '#ffffff',
-                        border: '1px solid rgba(200, 147, 90, 0.45)',
-                        borderRadius: '6px',
-                        color: '#18110C',
-                        fontSize: '0.73rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8935A'; e.currentTarget.style.background = '#FAF7F2'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.45)'; e.currentTarget.style.background = '#ffffff'; }}
-                    >
-                      + Add Pepper (250g · ₹299)
-                    </button>
+                    {/* Pepper Upsell Card */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(200, 147, 90, 0.35)',
+                      borderRadius: '8px',
+                      padding: '6px 10px',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                      gap: '10px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+                        <img
+                          src="/assets/images/pepper_reserve_250g.webp"
+                          alt="Tellicherry Pepper 250g"
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            objectFit: 'contain',
+                            borderRadius: '5px',
+                            background: '#FAF7F2',
+                            padding: '2px',
+                            border: '1px solid rgba(200, 147, 90, 0.2)',
+                            flexShrink: 0
+                          }}
+                        />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#18110C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            Tellicherry Black Pepper
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '1px' }}>
+                            <strong style={{ color: '#0F172A' }}>₹299</strong> (250g) • <span style={{ color: '#78716c' }}>Single-Estate Whole Spice</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onAddToCart) {
+                            onAddToCart({
+                              id: 4,
+                              name: 'Malenadu Pepper Reserve',
+                              price: 299,
+                              weight: '250g',
+                              category: 'pepper',
+                              image: '/assets/images/pepper_reserve_250g.webp'
+                            });
+                          }
+                        }}
+                        style={{
+                          background: '#18110C',
+                          color: '#F8DA9D',
+                          border: '1px solid #C8935A',
+                          borderRadius: '5px',
+                          padding: '5px 12px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#C8935A'; e.currentTarget.style.color = '#18110C'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = '#18110C'; e.currentTarget.style.color = '#F8DA9D'; }}
+                      >
+                        + Add
+                      </button>
+                    </div>
                   </div>
                 </div>
               )
