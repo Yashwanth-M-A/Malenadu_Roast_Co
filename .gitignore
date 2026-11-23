@@ -29,6 +29,7 @@ dist-ssr
 .env.production
 
 # Temporary & agent scratch files
+arrow_check_*.png
 scripts/
 step_*.*
 scratch_*.*
