@@ -1202,7 +1202,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     const customerName = order.shippingName || 'Valued Customer';
     const orderNum = order.orderNumber || '';
     const total = order.totalAmount ? `₹${order.totalAmount}` : '';
-    const invoiceUrl = `https://malenaduroastco.works/api/invoice?order=${orderNum}`;
+    const invoiceUrl = `https://www.malenaduroastco.works/api/invoice?order=${orderNum}`;
     const address = order.shippingAddress || '';
     const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://malenaduroastco.works';
 
@@ -1574,7 +1574,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     const status = (customStatus || order.orderStatus || order.status || 'placed').toUpperCase();
     const orderNum = order.orderNumber || order.id || order._id || '';
     const total = order.totalAmount || order.total || '';
-    const invoiceUrl = 'https://malenaduroastco.works/api/invoice?order=' + orderNum;
+    const invoiceUrl = 'https://www.malenaduroastco.works/api/invoice?order=' + orderNum;
 
     const subject = 'Order #' + orderNum + ' Status Update: ' + status + ' | Malenadu Roast Co.';
     const emailBody = 'Hello ' + customerName + ',\n\n' +
@@ -4234,7 +4234,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               'Status: ' + status + '\n' +
               awbText + '\n\n' +
               'Download Official GST Tax Invoice:\n' +
-              'https://malenaduroastco.works/api/invoice?order=' + orderNum + '\n\n' +
+              'https://www.malenaduroastco.works/api/invoice?order=' + orderNum + '\n\n' +
               'Thank you for choosing Malenadu Roast Co. Chikkamagaluru estate!\n\n' +
               'Warm regards,\n' +
               'Malenadu Roast Co. Support\n' +
