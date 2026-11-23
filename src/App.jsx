@@ -856,6 +856,9 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
 
   // Aggregate ALL images of this product to allow full sliding showcase
   const allImages = React.useMemo(() => {
+    if (product.id === 16 && Array.isArray(product.images) && product.images.length > 0) {
+      return product.images;
+    }
     const list = [];
     if (selectedVariant?.image) list.push(selectedVariant.image);
     if (selectedVariant?.backImage) list.push(selectedVariant.backImage);

@@ -250,15 +250,15 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     rating: 4.8,
     reviews: 180,
     badge: '100% Whole Beans',
-    image: '/assets/images/signature_beans_1kg.webp',
+    image: '/assets/images/signature_beans_front.jpg',
     images: [
-      '/assets/images/signature_beans_1kg.webp',
-      '/assets/images/signature_beans_500g.webp',
-      '/assets/images/signature_beans_250g.webp'
+      '/assets/images/signature_beans_front.jpg',
+      '/assets/images/signature_beans_back.jpg',
+      '/assets/images/signature_beans_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '719', image: '/assets/images/signature_beans_500g.webp', backImage: '/assets/images/coffee_back_1.webp' },
-      { weight: '1kg', price: '1369', image: '/assets/images/signature_beans_1kg.webp', backImage: '/assets/images/coffee_back_2.webp' }
+      { weight: '500g', price: '719', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' },
+      { weight: '1kg', price: '1369', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark Roast',
