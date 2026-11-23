@@ -1236,53 +1236,66 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       reviewSection = `*Rate & Review Your Purchased Coffee:*\n👉 ${defaultUrl}\n\n`;
     }
 
-    const st = (newStatus || 'placed').toLowerCase();
+    const rawSt = String(newStatus || order.orderStatus || order.status || 'placed').toLowerCase().trim();
+    const isShipped = rawSt.includes('ship') || rawSt.includes('transit') || rawSt.includes('dispatch');
+    const isDelivered = rawSt.includes('deliver') || rawSt.includes('complete');
+    const isPacked = rawSt.includes('pack') || rawSt.includes('roast');
+    const isCancelled = rawSt.includes('cancel');
 
-    if (st === 'shipped') {
-      return `🚚 *Order Dispatched! | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName}! 👋\n` +
-        `Great news! Your coffee order #${orderNum} has been batch-roasted and dispatched from our Chikkamagaluru estate.\n\n` +
+    if (isShipped) {
+      return `🚚 *Order Dispatched & In Transit! | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName}! 📦\n` +
+        `Great news! Your order #${orderNum} has been batch-roasted and dispatched from our Chikkamagaluru estate.\n\n` +
         `📦 *Order ID:* #${orderNum}\n` +
+        (order.awbCode ? `🚀 *Tracking / AWB Number:* ${order.awbCode}\n` : '') +
         `💰 *Total Amount:* ${total} (Paid Online)\n\n` +
-        `🛒 *Items:*\n${itemsList}\n\n` +
+        `🛒 *Items Dispatched:*\n${itemsList}\n\n` +
         (address ? `📍 *Shipping To:*\n${address}\n\n` : '') +
-        `🚚 *Delivery:* Expected arrival in 2–4 business days with live tracking updates.\n\n` +
+        `🚚 *Courier & Delivery:* In transit with express courier. Expected arrival in 2–4 business days with tracking updates.\n\n` +
         `📄 *Download Official GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
-        reviewSection +
-        `_Reply directly to this chat anytime if you have any questions!_\n\n` +
+        `_Reply directly to this chat anytime if you have questions!_\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
-    if (st === 'delivered') {
+    if (isDelivered) {
       return `✨ *Order Delivered! | Malenadu Roast Co.*\n\n` +
         `Hello ${customerName}! 🎉\n` +
-        `Your coffee order #${orderNum} has been delivered!\n\n` +
+        `Your artisanal coffee & spice parcel #${orderNum} has been delivered successfully to your doorstep!\n\n` +
         `📦 *Order ID:* #${orderNum}\n` +
         `🛒 *Items Delivered:*\n${itemsList}\n\n` +
-        `📄 *GST Tax Invoice:* ${invoiceUrl}\n\n` +
+        `⭐ *Rate & Review Your Experience:*\n` +
         reviewSection +
-        `We hope you enjoy the rich aroma and freshness of our shade-grown single-estate coffee! Need brewing tips or grind adjustments? Reply anytime right here on WhatsApp! ☕\n\n` +
+        `📄 *Download GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
+        `We hope you enjoy every cup of fresh, shade-grown Malenadu roast! Need brewing tips or grind adjustments? Reply anytime right here on WhatsApp! ☕\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
-    if (st === 'packed' || st === 'roasting') {
-      return `☕ *Fresh Batch-Roast Update | Malenadu Roast Co.*\n\n` +
+    if (isPacked) {
+      return `🌿 *Order Packed & Freshly Roasted! | Malenadu Roast Co.*\n\n` +
         `Hello ${customerName}! 👋\n` +
-        `Your coffee order #${orderNum} has been freshly roasted and sealed in aroma-lock one-way valve pouches at our Chikkamagaluru estate. Staged for courier handover!\n\n` +
+        `Your order #${orderNum} has been freshly batch-roasted and sealed in our premium aroma-lock one-way valve pouches at our Chikkamagaluru estate. Staged for courier handover today!\n\n` +
         `📦 *Order ID:* #${orderNum}\n` +
-        `🛒 *Items:*\n${itemsList}\n\n` +
-        `📄 *GST Tax Invoice:* ${invoiceUrl}\n\n` +
-        reviewSection +
+        `💰 *Total Amount:* ${total}\n\n` +
+        `🛒 *Items Packed:*\n${itemsList}\n\n` +
+        (address ? `📍 *Shipping To:*\n${address}\n\n` : '') +
+        `🚚 *Status:* Packed and ready for dispatch.\n\n` +
+        `📄 *Download GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
+        `_Need to customize grind size or delivery timing? Reply directly to this WhatsApp chat!_\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
-    if (st === 'cancelled') {
-      return `*Order Notice | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName}, your coffee order #${orderNum} has been marked as CANCELLED.\n\n` +
-        `If this was unexpected or if you have questions, please reply directly to this chat or call +91 8217623335.`;
+    if (isCancelled) {
+      return `❌ *Order Cancellation Notice | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName},\n` +
+        `Your order #${orderNum} has been marked as CANCELLED as requested.\n\n` +
+        `📦 *Order ID:* #${orderNum}\n` +
+        `💰 *Total Amount:* ${total}\n\n` +
+        `💳 *Refund Details:* If prepaid, your refund has been processed to your original payment method and will reflect within 3–5 banking business days.\n\n` +
+        `If this was unexpected or if you have questions, please reply directly to this chat or call our estate team at +91 8217623335.\n\n` +
+        `*Malenadu Roast Co.* — Chikkamagaluru, Karnataka.`;
     }
 
-    // Default: Order Confirmed
+    // Default: Order Confirmed (Placed)
     return `☕ *Order Confirmed! | Malenadu Roast Co.*\n\n` +
       `Hello ${customerName}! 👋\n` +
       `Thank you for your order from our Chikkamagaluru estate. Your order is confirmed and queued for fresh batch-roasting!\n\n` +
@@ -1310,12 +1323,51 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       window.open(waUrl, '_blank');
     }
     return { message, waUrl, cleanPhone: formattedPhone };
-  };;
+  };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
+      // 1. Immediately update in PostgreSQL database via API
+      let orderNum = '';
+      const orderObj = orders.find(o => String(o._id) === String(orderId) || String(o.orderNumber) === String(orderId) || String(o.id) === String(orderId));
+      if (orderObj && orderObj.orderNumber) {
+        orderNum = orderObj.orderNumber;
+      } else {
+        orderNum = String(orderId);
+      }
+
+      if (orderNum) {
+        try {
+          await fetch('/api/orders', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderNumber: orderNum, orderStatus: newStatus })
+          });
+        } catch (apiErr) {
+          console.warn('API update order status error:', apiErr);
+        }
+      }
+
+      // 2. Immediately update in React state so all UI reflects the new status instantly
+      let updatedOrder = null;
+      setOrders(prev => prev.map(o => {
+        if (String(o._id) === String(orderId) || String(o.orderNumber) === String(orderId) || String(o.id) === String(orderId)) {
+          const updated = {
+            ...o,
+            orderStatus: newStatus,
+            status: newStatus,
+            updatedAt: new Date().toISOString(),
+            ...(newStatus === 'delivered' ? { deliveredAt: new Date().toISOString() } : {})
+          };
+          updatedOrder = updated;
+          return updated;
+        }
+        return o;
+      }));
+
+      // 3. Update localStorage cache
       const allOrders = JSON.parse(localStorage.getItem('malenadu_orders') || '[]');
-      const idx = allOrders.findIndex(o => o._id === orderId || o.orderNumber === orderId);
+      const idx = allOrders.findIndex(o => String(o._id) === String(orderId) || String(o.orderNumber) === String(orderId));
       if (idx !== -1) {
         allOrders[idx].orderStatus = newStatus;
         allOrders[idx].status = newStatus;
@@ -1325,29 +1377,27 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
         } else if (newStatus === 'cancelled') {
           delete allOrders[idx].deliveredAt;
         }
-        localStorage.setItem('malenadu_orders', JSON.stringify(allOrders));
-        loadOrders();
-
-        const updatedOrder = allOrders[idx];
-        const { message, waUrl, cleanPhone } = handleSendStatusNotification(updatedOrder, newStatus);
-
-        const emailDispatched = false;
-
-        // 2. Set Status Alert Banner with 1-click WhatsApp Action
-        setStatusUpdateAlert({
-          order: updatedOrder,
-          newStatus,
-          message,
-          waUrl,
-          phone: cleanPhone,
-          emailDispatched
-        });
-
-        // 3. Auto-open WhatsApp if enabled by admin
-        if (autoOpenWhatsAppOnStatus && cleanPhone) {
-          window.open(waUrl, '_blank');
-        }
+      } else if (updatedOrder) {
+        allOrders.unshift(updatedOrder);
       }
+      localStorage.setItem('malenadu_orders', JSON.stringify(allOrders));
+
+      const finalOrder = updatedOrder || orderObj || { orderNumber: orderNum, orderStatus: newStatus };
+      const { message, waUrl, cleanPhone } = handleSendStatusNotification(finalOrder, newStatus, true);
+
+      // 4. Set Status Alert Banner
+      setStatusUpdateAlert({
+        order: finalOrder,
+        newStatus,
+        message,
+        waUrl,
+        phone: cleanPhone,
+        emailDispatched: false
+      });
+
+      setLocalNotice(`✓ Order #${orderNum} status changed to ${newStatus.toUpperCase()}! WhatsApp opened.`);
+      setTimeout(() => setLocalNotice(''), 4500);
+
     } catch (e) {
       console.error('Failed to update status', e);
     }
@@ -4158,14 +4208,14 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
 
           // Admin sends package status update directly on WhatsApp
           const handleSendPackageWhatsApp = (order) => {
-            const status = order.orderStatus || order.status || 'placed';
-            const { message, waUrl, cleanPhone } = handleSendStatusNotification(order, status);
+            const freshOrder = orders.find(o => String(o.orderNumber) === String(order.orderNumber) || String(o._id) === String(order._id) || String(o.id) === String(order.id)) || order;
+            const status = freshOrder.orderStatus || freshOrder.status || 'placed';
+            const { message, waUrl, cleanPhone } = handleSendStatusNotification(freshOrder, status, true);
             if (!cleanPhone) {
               alert('Customer phone number not available for this order.');
               return;
             }
-            window.open(waUrl, '_blank');
-            setLocalNotice(`✓ Package status update WhatsApp opened for Order #${order.orderNumber} (${order.shippingName || 'Customer'}).`);
+            setLocalNotice(`✓ ${status.toUpperCase()} status WhatsApp update opened for Order #${freshOrder.orderNumber} (${freshOrder.shippingName || 'Customer'}).`);
             setTimeout(() => setLocalNotice(''), 4500);
           };
 
