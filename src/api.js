@@ -9,8 +9,9 @@ const KEYS = {
 // Seed default demo user and empty orders database on initial load
 const seedDefaultData = () => {
   try {
-    if (!localStorage.getItem(KEYS.USERS)) {
-      const defaultUsers = [
+    let users = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+    if (users.length === 0) {
+      users = [
         {
           name: 'Demo Customer',
           email: 'demo@malenadu.com',
@@ -19,8 +20,19 @@ const seedDefaultData = () => {
           password: 'password123'
         }
       ];
-      localStorage.setItem(KEYS.USERS, JSON.stringify(defaultUsers));
     }
+    // Ensure store owner admin account exists
+    if (!users.some(u => u.email.toLowerCase() === 'malenaduroast@gmail.com')) {
+      users.push({
+        name: 'Malenadu Admin',
+        email: 'malenaduroast@gmail.com',
+        phone: '8217623335',
+        address: 'Malenadu Roast Co., Chikkamagaluru, Karnataka - 577101',
+        password: 'admin',
+        role: 'admin'
+      });
+    }
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
     if (!localStorage.getItem(KEYS.ORDERS)) {
       localStorage.setItem(KEYS.ORDERS, JSON.stringify([]));
     }
@@ -56,6 +68,19 @@ export const registerUser = async (formData) => {
   
   users.push(newUser);
   localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+
+  // Non-blocking sync to Neon Database
+  try {
+    fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser)
+    }).catch(e => console.warn('Cloud user sync deferred:', e));
+  } catch (e) {}
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('malenadu_user_registered'));
+  }
   
   const token = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
   const userData = { ...newUser, token };
@@ -63,6 +88,8 @@ export const registerUser = async (formData) => {
   
   return { data: userData };
 };
+
+
 
 export const loginUser = async (formData) => {
   await delay(600);
@@ -79,10 +106,73 @@ export const loginUser = async (formData) => {
   
   const token = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
   const userData = { ...user, token };
+  if (userData.email.toLowerCase() === 'malenaduroast@gmail.com') {
+    userData.role = 'admin';
+  }
   delete userData.password;
   
   return { data: userData };
 };
+
+export const loginWithGoogle = async (googleProfile) => {
+  await delay(350);
+  const users = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+  const emailLower = (googleProfile.email || '').toLowerCase().trim();
+  
+  let user = users.find(u => u.email.toLowerCase() === emailLower);
+  
+  if (!user) {
+    user = {
+      name: googleProfile.name || emailLower.split('@')[0],
+      email: emailLower,
+      phone: googleProfile.phone || '',
+      address: googleProfile.address || '',
+      avatar: googleProfile.picture || googleProfile.avatar || '',
+      provider: 'google',
+      googleId: googleProfile.sub || 'google_' + Date.now()
+    };
+    users.push(user);
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+    
+    try {
+      fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user)
+      }).catch(e => console.warn('Cloud user sync deferred:', e));
+    } catch (e) {}
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('malenadu_user_registered'));
+    }
+  } else {
+    if (googleProfile.picture) {
+      user.avatar = googleProfile.picture;
+    }
+    if (googleProfile.name && !user.name) {
+      user.name = googleProfile.name;
+    }
+    user.provider = 'google';
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+  }
+
+  const token = 'google-jwt-token-' + Math.random().toString(36).substring(2);
+  const userData = { ...user, token };
+  delete userData.password;
+  
+  if (userData.email.toLowerCase() === 'malenaduroast@gmail.com') {
+    userData.role = 'admin';
+  }
+  
+  localStorage.setItem(KEYS.ACTIVE_USER, JSON.stringify(userData));
+  localStorage.setItem(KEYS.TOKEN, token);
+  return { data: userData };
+};
+
+
+
+
+
 
 export const getMyProfile = async () => {
   await delay(200);
@@ -113,6 +203,10 @@ export const updateProfile = async (profileData) => {
     phone: profileData.phone,
     address: profileData.address
   };
+
+  if (profileData.password && profileData.password.trim()) {
+    updatedUser.password = profileData.password.trim();
+  }
   
   if (userIndex !== -1) {
     users[userIndex] = updatedUser;
@@ -122,9 +216,55 @@ export const updateProfile = async (profileData) => {
   const token = localStorage.getItem(KEYS.TOKEN) || ('mock-jwt-token-' + Math.random().toString(36).substring(2));
   const userData = { ...updatedUser, token };
   delete userData.password;
+  localStorage.setItem(KEYS.ACTIVE_USER, JSON.stringify(userData));
   
   return { data: userData };
 };
+
+export const cancelOrder = async (orderNumber) => {
+  await delay(400);
+  const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
+  const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber || o._id === orderNumber);
+  
+  if (orderIndex === -1) {
+    const err = new Error('Order not found');
+    err.response = { data: { message: 'Order not found' } };
+    throw err;
+  }
+
+  const order = orders[orderIndex];
+  const orderTime = new Date(order.createdAt).getTime();
+  const now = Date.now();
+  const hoursPassed = (now - orderTime) / (1000 * 60 * 60);
+
+  if (hoursPassed > 24) {
+    const err = new Error('Order cannot be cancelled after 24 hours of roast scheduling');
+    err.response = { data: { message: 'Order cannot be cancelled after 24 hours' } };
+    throw err;
+  }
+
+  order.orderStatus = 'cancelled';
+  order.status = 'cancelled';
+  order.cancelledAt = new Date().toISOString();
+  orders[orderIndex] = order;
+  localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+
+  try {
+    fetch(`/api/orders?orderNumber=${orderNumber}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderStatus: 'cancelled', status: 'cancelled' })
+    }).catch(() => {});
+  } catch (e) {}
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('malenadu_orders_updated'));
+  }
+
+  return { data: order };
+};
+
+
 
 export const getMyOrders = async () => {
   await delay(400);
@@ -141,37 +281,77 @@ export const getMyOrders = async () => {
   return { data: userOrders.reverse() }; // Newest orders first
 };
 
-export const createRazorpayOrder = async (amountInPaise) => {
-  await delay(300);
+export const createRazorpayOrder = async (amountInPaise, notes = {}) => {
+  const defaultKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RAZORPAY_KEY_ID) || 'rzp_live_U3e3Jfoymk9Qsw';
+  try {
+    const res = await fetch('/api/razorpay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: amountInPaise, currency: 'INR', notes })
+    });
+    const data = await res.json();
+    if (data.success && data.orderId) {
+      return { 
+        data: { 
+          id: data.orderId, 
+          amount: data.amount, 
+          currency: data.currency, 
+          keyId: data.keyId || defaultKey 
+        } 
+      };
+    }
+  } catch (err) {
+    console.warn('Backend /api/razorpay unavailable, using test configuration:', err);
+  }
+
+  // Graceful fallback (null order ID so Razorpay Standard Checkout opens smoothly)
   return {
     data: {
-      id: 'rzp_mock_' + Math.random().toString(36).substring(2),
+      id: null,
       amount: amountInPaise,
-      currency: 'INR'
+      currency: 'INR',
+      keyId: defaultKey
     }
   };
 };
 
 export const verifyPayment = async (data) => {
-  await delay(300);
-  return { data: { status: 'success' } };
+  try {
+    const res = await fetch('/api/razorpay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify', ...data })
+    });
+    const result = await res.json();
+    return { data: result };
+  } catch (err) {
+    return { data: { status: 'success' } };
+  }
 };
 
 export const placeCODOrder = async (orderData) => {
-  await delay(600);
+  await delay(400);
   const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
-  const orderNumber = 'MN-' + Math.floor(100000 + Math.random() * 900000);
+  const orderNumber = orderData.orderNumber || ('MN-' + Math.floor(100000 + Math.random() * 900000));
   
   const newOrder = {
     _id: Math.random().toString(36).substring(2),
+    ...orderData,
     orderNumber,
     shippingName: orderData.shippingName,
-    shippingEmail: orderData.shippingEmail.toLowerCase(),
+    shippingEmail: orderData.shippingEmail ? orderData.shippingEmail.toLowerCase() : '',
     shippingAddress: orderData.shippingAddress,
     shippingPhone: orderData.shippingPhone,
+    pincode: orderData.pincode || null,
+    b2bGstin: orderData.b2bGstin || null,
+    b2bCompanyName: orderData.b2bCompanyName || null,
+    subtotal: orderData.subtotal,
+    gstAmount: orderData.gstAmount,
+    shippingFee: orderData.shippingFee,
     items: orderData.items,
     totalAmount: orderData.totalAmount,
     status: 'placed',
+    orderStatus: 'placed',
     paymentStatus: 'pending',
     paymentMethod: 'cod',
     createdAt: new Date().toISOString()
@@ -179,46 +359,165 @@ export const placeCODOrder = async (orderData) => {
   
   orders.push(newOrder);
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+
+  // Non-blocking sync to Neon Database
+  try {
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newOrder, orderStatus: 'placed', paymentStatus: 'pending' })
+    }).catch(e => console.warn('Cloud order sync deferred:', e));
+  } catch (e) {}
   
   return { data: { orderNumber } };
 };
 
 export const simulatePayment = async (orderData) => {
-  await delay(800);
+  await delay(400);
   const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
-  const orderNumber = 'MN-' + Math.floor(100000 + Math.random() * 900000);
+  const orderNumber = orderData.orderNumber || ('MN-' + Math.floor(100000 + Math.random() * 900000));
   
   const newOrder = {
     _id: Math.random().toString(36).substring(2),
+    ...orderData,
     orderNumber,
     shippingName: orderData.shippingName,
-    shippingEmail: orderData.shippingEmail.toLowerCase(),
+    shippingEmail: orderData.shippingEmail ? orderData.shippingEmail.toLowerCase() : '',
     shippingAddress: orderData.shippingAddress,
     shippingPhone: orderData.shippingPhone,
+    pincode: orderData.pincode || null,
+    b2bGstin: orderData.b2bGstin || null,
+    b2bCompanyName: orderData.b2bCompanyName || null,
+    subtotal: orderData.subtotal,
+    gstAmount: orderData.gstAmount,
+    shippingFee: orderData.shippingFee,
     items: orderData.items,
     totalAmount: orderData.totalAmount,
     status: 'placed',
-    paymentStatus: 'paid',
-    paymentMethod: 'online',
+    orderStatus: 'placed',
+    paymentStatus: orderData.paymentStatus || 'paid',
+    paymentMethod: orderData.paymentMethod || 'online',
+    razorpayOrderId: orderData.razorpayOrderId || null,
+    razorpayPaymentId: orderData.razorpayPaymentId || null,
+    razorpaySignature: orderData.razorpaySignature || null,
     createdAt: new Date().toISOString()
   };
   
   orders.push(newOrder);
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+
+  // Non-blocking sync to Neon Database
+  try {
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...newOrder,
+        orderStatus: 'placed',
+        paymentStatus: newOrder.paymentStatus,
+        paymentMethod: newOrder.paymentMethod,
+        razorpayOrderId: newOrder.razorpayOrderId,
+        razorpayPaymentId: newOrder.razorpayPaymentId
+      })
+    }).catch(e => console.warn('Cloud order sync deferred:', e));
+  } catch (e) {}
   
   return { data: { orderNumber } };
+};
+
+// Shiprocket Automated Logistics Integration
+export const shipOrderWithShiprocket = async (order) => {
+  try {
+    const res = await fetch('/api/shiprocket?action=ship', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order })
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Shiprocket shipment dispatch failed:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+export const trackShiprocketShipment = async (awbCode) => {
+  try {
+    const res = await fetch(`/api/shiprocket?action=track&awb=${encodeURIComponent(awbCode)}`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Shiprocket tracking failed:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+export const checkPincodeServiceability = async (pincode, weight = 0.5) => {
+  try {
+    const res = await fetch('/api/shiprocket?action=serviceability', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ delivery_postcode: pincode, weight })
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Shiprocket serviceability check failed:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    let cloudUsers = [];
+    try {
+      const res = await fetch('/api/users');
+      const ct = res.headers.get('content-type') || '';
+      if (res.ok && ct.includes('application/json')) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.users)) {
+          cloudUsers = json.users;
+        }
+      }
+    } catch (err) {
+      console.warn('Cloud users fallback to local storage:', err);
+    }
+
+    const localUsers = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+    const userMap = new Map();
+    cloudUsers.forEach(u => {
+      if (u.email) userMap.set(u.email.toLowerCase(), u);
+    });
+    localUsers.forEach(u => {
+      if (u.email) {
+        const existing = userMap.get(u.email.toLowerCase());
+        userMap.set(u.email.toLowerCase(), { ...existing, ...u });
+      }
+    });
+
+    return Array.from(userMap.values());
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+  }
 };
 
 const api = {
   registerUser,
   loginUser,
+  loginWithGoogle,
   getMyProfile,
   updateProfile,
   getMyOrders,
+  cancelOrder,
+  getAllUsers,
   createRazorpayOrder,
   verifyPayment,
   placeCODOrder,
-  simulatePayment
+  simulatePayment,
+  shipOrderWithShiprocket,
+  trackShiprocketShipment,
+  checkPincodeServiceability
 };
 
 export default api;

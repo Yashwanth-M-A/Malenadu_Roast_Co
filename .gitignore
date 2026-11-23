@@ -27,3 +27,15 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+# Temporary & agent scratch files
+scripts/
+step_*.*
+scratch_*.*
+scratch/
+test_card_*.png
+dossier_*.txt
+modal_mid_lines.txt
+temp_*.json
+fix_app.cjs
+
