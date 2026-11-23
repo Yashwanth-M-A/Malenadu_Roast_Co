@@ -1184,7 +1184,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                       width: '38px',
                       height: '38px',
                       borderRadius: '6px',
-                      border: isActive ? '2px solid #C8935A' : '1px solid #D8CFC4',
+                      border: isActive ? '2px solid #18110C' : '1.5px solid #18110C',
                       background: '#FFFFFF',
                       padding: '2px',
                       cursor: 'pointer',
@@ -1193,7 +1193,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                       alignItems: 'center',
                       justifyContent: 'center',
                       transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                      boxShadow: isActive ? '0 2px 8px rgba(200,147,90,0.35)' : 'none',
+                      boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
                       transition: 'all 0.2s ease'
                     }}
                   >

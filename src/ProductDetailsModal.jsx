@@ -253,23 +253,23 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
               title="Click to enlarge / view high-resolution image"
               style={{
                 background: '#FDFBF7',
-                border: '1px solid #eee5da',
+                border: '2px solid #18110C',
                 borderRadius: '12px',
                 padding: '1.5rem',
                 textAlign: 'center',
                 position: 'relative',
-                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.02)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                 cursor: 'zoom-in',
                 overflow: 'hidden',
                 transition: 'all 0.25s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#C8935A';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(200, 147, 90, 0.18)';
+                e.currentTarget.style.borderColor = '#18110C';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(24, 17, 12, 0.2)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#eee5da';
-                e.currentTarget.style.boxShadow = 'inset 0 0 20px rgba(0,0,0,0.02)';
+                e.currentTarget.style.borderColor = '#18110C';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)';
               }}
             >
               {/* Zoom HD Pill Badge */}
@@ -315,7 +315,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
               />
             </div>
 
-            {/* Thumbnail Strip */}
+            {/* Thumbnail Strip with Crisp Black Borders */}
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'center' }}>
                 {allImages.map((img, idx) => (
@@ -326,12 +326,13 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                       width: '56px',
                       height: '56px',
                       borderRadius: '8px',
-                      border: activeImageIndex === idx ? '2px solid #C8935A' : '1px solid #e2e8f0',
+                      border: activeImageIndex === idx ? '2.5px solid #18110C' : '1.5px solid #18110C',
                       background: '#fff',
                       padding: '3px',
                       cursor: 'pointer',
-                      boxShadow: activeImageIndex === idx ? '0 2px 8px rgba(200, 147, 90, 0.3)' : 'none',
-                      transition: 'all 0.2s'
+                      boxShadow: activeImageIndex === idx ? '0 3px 10px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0,0,0,0.1)',
+                      transition: 'all 0.2s',
+                      transform: activeImageIndex === idx ? 'scale(1.04)' : 'scale(1)'
                     }}
                   >
                     <img src={img} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -339,35 +340,6 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                 ))}
               </div>
             )}
-
-            {/* Trust Assurances Grid */}
-            <div style={{
-              marginTop: '1.5rem',
-              background: '#FAF8F5',
-              border: '1px solid #eee5da',
-              borderRadius: '10px',
-              padding: '1rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
-                <Leaf size={16} color="#15803d" />
-                <span>Single-Estate Harvest from the Hills of Chikkamagaluru</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
-                <ShieldCheck size={16} color="#C8935A" />
-                <span>100% Tax Compliant & FSSAI Certified (5% GST Invoice Included)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
-                <Award size={16} color="#b45309" />
-                <span>Multi-layer Aroma Pouch with 1-Way Freshness Valve</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
-                <Truck size={16} color="#0284c7" />
-                <span>Dispatched within 24 Hours via Shiprocket Pan-India Logistics</span>
-              </div>
-            </div>
           </div>
 
           {/* Right Column: Product Intelligence, Specs, Brew Recipe & FAQs */}
@@ -525,48 +497,80 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', flexGrow: 1, justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', gap: '10px', flexGrow: 1, justifyContent: 'flex-end', flexWrap: 'wrap', minWidth: '240px' }}>
                 <button
                   onClick={handleAddToCartClick}
                   style={{
-                    padding: '0.75rem 1.25rem',
+                    flex: '1 1 120px',
+                    padding: '0.85rem 1.25rem',
                     borderRadius: '8px',
-                    border: '1.5px solid #C8935A',
+                    border: '1.5px solid #18110C',
                     background: '#FFFFFF',
-                    color: '#8c6239',
+                    color: '#18110C',
                     fontWeight: 700,
-                    fontSize: '0.88rem',
+                    fontSize: '0.92rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '6px',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
                   }}
                 >
-                  <ShoppingCart size={16} />
+                  <ShoppingCart size={17} />
                   <span>Add to Cart</span>
                 </button>
 
                 <button
                   onClick={handleBuyNowClick}
                   style={{
-                    padding: '0.75rem 1.5rem',
+                    flex: '1 1 120px',
+                    padding: '0.85rem 1.5rem',
                     borderRadius: '8px',
-                    border: 'none',
+                    border: '1.5px solid #18110C',
                     background: '#18110C',
-                    color: '#FBF8F3',
+                    color: '#F8DA9D',
                     fontWeight: 700,
-                    fontSize: '0.88rem',
+                    fontSize: '0.92rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '6px',
                     boxShadow: '0 4px 14px rgba(24, 17, 12, 0.35)'
                   }}
                 >
-                  <ShoppingBag size={16} color="#E8CA80" />
+                  <ShoppingBag size={17} color="#F8DA9D" />
                   <span>Buy Now</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Estate Trust Accreditations (Cleanly displayed after Add to Cart / Buy Now actions) */}
+            <div style={{
+              background: '#FAF8F5',
+              border: '1px solid #eee5da',
+              borderRadius: '10px',
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
+                <Leaf size={16} color="#15803d" />
+                <span>Single-Estate Harvest from the Hills of Chikkamagaluru</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
+                <ShieldCheck size={16} color="#C8935A" />
+                <span>100% Tax Compliant & FSSAI Certified (5% GST Invoice Included)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
+                <Award size={16} color="#b45309" />
+                <span>Multi-layer Aroma Pouch with 1-Way Freshness Valve</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.8rem', color: '#2C1810', fontWeight: 600 }}>
+                <Truck size={16} color="#0284c7" />
+                <span>Dispatched within 24 Hours via Shiprocket Pan-India Logistics</span>
               </div>
             </div>
 
@@ -1385,7 +1389,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                       width: '46px',
                       height: '46px',
                       borderRadius: '6px',
-                      border: activeImageIndex === idx ? '2px solid #E8CA80' : '1px solid rgba(255,255,255,0.2)',
+                      border: activeImageIndex === idx ? '2.5px solid #E8CA80' : '1.5px solid #18110C',
                       background: '#FFFFFF',
                       padding: '2px',
                       cursor: 'pointer',
