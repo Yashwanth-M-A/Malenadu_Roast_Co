@@ -176,7 +176,14 @@ const Header = ({
   };
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    let lastScrolled = false;
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 50;
+      if (scrolled !== lastScrolled) {
+        lastScrolled = scrolled;
+        setIsScrolled(scrolled);
+      }
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -463,63 +470,87 @@ const DroppingBeans = () => {
       });
     };
 
-    const beans = Array.from({ length: 32 }, () => {
-      const size = 22 + Math.random() * 33; // smaller â€” more realistic scale
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const beanCount = isMobile ? 12 : 28;
+
+    const beans = Array.from({ length: beanCount }, () => {
+      const size = 20 + Math.random() * (isMobile ? 22 : 30);
       return {
-        x: Math.random() * window.innerWidth,
-        y: -100 - Math.random() * window.innerHeight,
+        x: Math.random() * (canvas.width || window.innerWidth),
+        y: -80 - Math.random() * (canvas.height || window.innerHeight),
         w: size,
         h: size * 0.75,
-        speedY: 0.7 + Math.random() * 1.3,
-        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: 0.6 + Math.random() * 1.0,
+        speedX: (Math.random() - 0.5) * 0.4,
         rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.022,
+        rotSpeed: (Math.random() - 0.5) * 0.018,
         wobble: Math.random() * Math.PI * 2,
-        wobbleAmp: 0.2 + Math.random() * 0.5,
-        wobbleSpeed: 0.01 + Math.random() * 0.016,
+        wobbleAmp: 0.2 + Math.random() * 0.4,
+        wobbleSpeed: 0.01 + Math.random() * 0.014,
         opacity: 0.65 + Math.random() * 0.35,
       };
     });
+    // Sort once upfront by size for depth ordering
+    beans.sort((a, b) => a.w - b.w);
+
+    let isVisible = true;
+    let isTicking = false;
 
     const tick = () => {
+      if (!isVisible) {
+        isTicking = false;
+        return;
+      }
+      isTicking = true;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (processedBitmap) {
-        [...beans]
-          .sort((a, b) => a.w - b.w)
-          .forEach((b) => {
-            b.wobble += b.wobbleSpeed;
-            b.y += b.speedY;
-            b.x += b.speedX + Math.sin(b.wobble) * b.wobbleAmp;
-            b.rotation += b.rotSpeed;
+        const len = beans.length;
+        for (let i = 0; i < len; i++) {
+          const b = beans[i];
+          b.wobble += b.wobbleSpeed;
+          b.y += b.speedY;
+          b.x += b.speedX + Math.sin(b.wobble) * b.wobbleAmp;
+          b.rotation += b.rotSpeed;
 
-            if (b.y > canvas.height + 80) {
-              b.y = -80;
-              b.x = Math.random() * canvas.width;
-            }
+          if (b.y > canvas.height + 60) {
+            b.y = -60;
+            b.x = Math.random() * canvas.width;
+          }
 
-            ctx.save();
-            ctx.translate(b.x, b.y);
-            ctx.rotate(b.rotation);
-            ctx.globalAlpha = b.opacity;
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(b.rotation);
+          ctx.globalAlpha = b.opacity;
 
-            // Natural drop shadow
-            ctx.shadowColor = 'rgba(0,0,0,0.55)';
-            ctx.shadowBlur = b.w * 0.25;
-            ctx.shadowOffsetX = b.w * 0.06;
-            ctx.shadowOffsetY = b.w * 0.05;
+          if (!isMobile) {
+            ctx.shadowColor = 'rgba(0,0,0,0.45)';
+            ctx.shadowBlur = b.w * 0.2;
+            ctx.shadowOffsetX = b.w * 0.05;
+            ctx.shadowOffsetY = b.w * 0.04;
+          }
 
-            ctx.drawImage(processedBitmap, -b.w / 2, -b.h / 2, b.w, b.h);
-            ctx.restore();
-          });
+          ctx.drawImage(processedBitmap, -b.w / 2, -b.h / 2, b.w, b.h);
+          ctx.restore();
+        }
       }
 
       raf = requestAnimationFrame(tick);
     };
 
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible && !isTicking) {
+        raf = requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.05 });
+
+    if (canvas) observer.observe(canvas);
     tick();
+
     return () => {
       cancelAnimationFrame(raf);
+      if (canvas) observer.unobserve(canvas);
       window.removeEventListener('resize', resize);
     };
   }, []);
@@ -11015,7 +11046,7 @@ const CoffeeInfoSection = ({ onImageClick }) => {
         {plantationPhotos.map((photo, idx) => (
           <div key={idx} className={`bento-diff-${idx}`}>
             <Tilt
-              tiltEnable={true}
+              tiltEnable={typeof window !== 'undefined' && window.innerWidth > 768}
               tiltMaxAngleX={8}
               tiltMaxAngleY={8}
               perspective={1000}
