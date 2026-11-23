@@ -12286,19 +12286,19 @@ const App = () => {
                   {
                     id: 'coffee',
                     label: 'Coffee',
-                    image: '/assets/images/estate_reserve_front.jpg',
+                    image: '/assets/images/category_coffee_v3.webp',
                     sub: '5 Estate Blends'
                   },
                   {
                     id: 'pepper',
                     label: 'Pepper',
-                    image: '/assets/images/pepper_reserve_front.jpg',
+                    image: '/assets/images/category_pepper_v3.webp',
                     sub: 'Handpicked Whole Spices'
                   },
                   {
                     id: 'combos',
                     label: 'Combos',
-                    image: '/assets/images/combos_lineup.jpg',
+                    image: '/assets/images/category_combos_v5.webp',
                     sub: 'Build Your Combo'
                   }
                 ].map(cat => {
