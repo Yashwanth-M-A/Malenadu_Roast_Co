@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ShoppingCart, Sparkles, RotateCcw, Eye, Coffee, User, Search, Menu, X, Star, ShieldCheck,
   Leaf, Truck, CreditCard, Phone, Mail, Heart, Plus, Minus, Trash2, PlayCircle, Download, FileText,
-  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight, ShoppingBag, MapPin, Sun, Flame, Clock, Check, Maximize2, Home, Briefcase, Edit2, Info
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, CheckCircle, AlertCircle, Loader, Lock, Smartphone, MessageCircle, ExternalLink, Package, ArrowRight, ShoppingBag, MapPin, Sun, Flame, Clock, Check, Maximize2, Home, Briefcase, Edit2, Info, Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
@@ -783,7 +783,7 @@ const getProductReviewSnippet = (product) => {
   }
 };
 
-const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick, onOpenDetails }) => {
+const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick, onOpenDetails, onShareProduct }) => {
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants ? product.variants[0] : null
   );
@@ -796,6 +796,25 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleShareClick = (e) => {
+    if (e) e.stopPropagation();
+    if (onShareProduct) {
+      onShareProduct(product, e);
+    } else {
+      const origin = typeof window !== 'undefined' && window.location && window.location.origin 
+        ? window.location.origin 
+        : 'https://www.malenaduroastco.works';
+      const shareUrl = `${origin}/?product=${encodeURIComponent(product.name)}#products`;
+      const shareText = `☕ *${product.name}*\n${product.specs?.flavorNotes || product.tagline || 'Single-Estate Artisanal Roast from Chikkamagaluru'}\n💰 Starting at ₹${product.price} (Incl. 5% GST)\n\nTaste the authentic single-estate roast from Chikkamagaluru:\n👉 ${shareUrl}`;
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        navigator.share({ title: product.name, text: shareText, url: shareUrl }).catch(() => {});
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl);
+        alert('Product link copied to clipboard!');
+      }
+    }
+  };
 
   // E-Commerce Star Rating State (Amazon & Flipkart Style, dynamically connected to 100+ customer reviews)
   const [liveRating, setLiveRating] = useState(() => {
@@ -993,6 +1012,48 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
               </span>
             ) : null}
           </div>
+
+          {/* Top Right Floating Share Button */}
+          <button
+            type="button"
+            onClick={handleShareClick}
+            title="Share this product via WhatsApp or apps"
+            aria-label="Share product"
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              zIndex: 4,
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.94)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(200, 147, 90, 0.4)',
+              color: '#18110C',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s ease',
+              opacity: (isHovered || isMobile) ? 1 : 0.82
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#18110C';
+              e.currentTarget.style.color = '#F8DA9D';
+              e.currentTarget.style.borderColor = '#C8935A';
+              e.currentTarget.style.transform = 'scale(1.08)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.94)';
+              e.currentTarget.style.color = '#18110C';
+              e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.4)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <Share2 size={15} />
+          </button>
 
           {/* Left Arrow Button */}
           {allImages.length > 1 && (
@@ -2668,6 +2729,245 @@ const WishlistSidebar = ({ isOpen, onClose, wishlist, onRemove, onAddToCart }) =
         </>
       )}
     </AnimatePresence>
+  );
+};
+
+/* --- Luxury Product Share Modal (Direct WhatsApp, Link Copy, Email & Social) --- */
+const ShareModal = ({ shareData, onClose }) => {
+  const [copied, setCopied] = useState(false);
+  if (!shareData || !shareData.product) return null;
+
+  const { product, shareUrl, shareText } = shareData;
+
+  const handleCopy = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl || window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    window.open(waUrl, '_blank');
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`${product.name} | Malenadu Roast Co.`);
+    const body = encodeURIComponent(shareText);
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const handleTwitter = () => {
+    const tweetText = encodeURIComponent(`Discover ${product.name} single-estate artisanal roast from Chikkamagaluru: ${shareUrl}`);
+    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 99999,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'rgba(24, 17, 12, 0.75)',
+      backdropFilter: 'blur(5px)',
+      padding: '1rem'
+    }}>
+      <div style={{ position: 'fixed', inset: 0 }} onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        style={{
+          position: 'relative',
+          background: '#FFFFFF',
+          borderRadius: '16px',
+          width: '100%',
+          maxWidth: '440px',
+          padding: '24px',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+          border: '1.5px solid rgba(200, 147, 90, 0.4)',
+          zIndex: 100000
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div>
+            <h3 style={{ margin: '0 0 4px', fontSize: '1.15rem', color: '#18110C', fontFamily: 'Georgia, serif', fontWeight: 800 }}>
+              Share Product
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>
+              Share this single-estate artisanal roast with friends & family
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#F1F5F9',
+              border: 'none',
+              borderRadius: '50%',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#475569'
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Product Preview Card */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: '#FAF8F5',
+          border: '1px solid rgba(200, 147, 90, 0.3)',
+          borderRadius: '10px',
+          padding: '10px 12px',
+          marginBottom: '20px'
+        }}>
+          <img
+            src={product.image || product.images?.[0] || '/assets/images/estate_reserve_500g.webp'}
+            alt={product.name}
+            style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '6px', background: '#FFFFFF', padding: '2px', border: '1px solid #EFEAE2' }}
+          />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#18110C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {product.name}
+            </div>
+            <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '2px' }}>
+              Starting at <strong style={{ color: '#0F172A' }}>₹{product.price}</strong> • Chikkamagaluru Single-Estate
+            </div>
+          </div>
+        </div>
+
+        {/* Share Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* WhatsApp Direct Share */}
+          <button
+            type="button"
+            onClick={handleWhatsApp}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              width: '100%',
+              padding: '11px',
+              background: '#25D366',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '0.88rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <MessageCircle size={18} fill="#FFFFFF" color="#25D366" />
+            <span>Share on WhatsApp</span>
+          </button>
+
+          {/* Copy Link Input Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#F8FAFC',
+            border: '1px solid #CBD5E1',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            padding: '3px'
+          }}>
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              style={{
+                flex: 1,
+                border: 'none',
+                background: 'transparent',
+                padding: '8px 10px',
+                fontSize: '0.78rem',
+                color: '#334155',
+                outline: 'none',
+                fontFamily: 'monospace'
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              style={{
+                background: copied ? '#15803D' : '#18110C',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '8px 14px',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {copied ? '✓ Copied!' : 'Copy Link'}
+            </button>
+          </div>
+
+          {/* Secondary Shares (Email & X) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '2px' }}>
+            <button
+              type="button"
+              onClick={handleEmail}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px',
+                background: '#FFFFFF',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                color: '#334155',
+                cursor: 'pointer'
+              }}
+            >
+              <Mail size={15} />
+              <span>Email</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTwitter}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px',
+                background: '#FFFFFF',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                color: '#334155',
+                cursor: 'pointer'
+              }}
+            >
+              <ExternalLink size={15} />
+              <span>X / Twitter</span>
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
@@ -9793,7 +10093,7 @@ const PromotionalCarousel = () => {
 };
 
 
-const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onBuyNow, onOpenDetails, onImageClick }) => {
+const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onBuyNow, onOpenDetails, onImageClick, onShareProduct }) => {
   const [expandedSection, setExpandedSection] = useState(null);
 
   const handleOrderScroll = () => {
@@ -9941,6 +10241,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onBuyN
                     onToggleWishlist={() => { }}
                     onImageClick={onImageClick}
                     onOpenDetails={onOpenDetails}
+                    onShareProduct={onShareProduct}
                   />
                 ))}
               </div>
@@ -9967,6 +10268,7 @@ const OrderPage = ({ onBack, coffeeProducts, pepperProducts, onAddToCart, onBuyN
                     onToggleWishlist={() => { }}
                     onImageClick={onImageClick}
                     onOpenDetails={onOpenDetails}
+                    onShareProduct={onShareProduct}
                   />
                 ))}
               </div>
@@ -11400,17 +11702,52 @@ const App = () => {
   const [activeDetailsProduct, setActiveDetailsProduct] = useState(null);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
 
+  // Top-Level Product Sharing State (Native Web Share + Luxury Desktop Modal)
+  const [activeShareProduct, setActiveShareProduct] = useState(null); // { product, shareUrl, shareText }
+
+  const handleShareProduct = async (product, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!product) return;
+
+    const origin = typeof window !== 'undefined' && window.location && window.location.origin 
+      ? window.location.origin 
+      : 'https://www.malenaduroastco.works';
+    const productSlug = encodeURIComponent(product.name || 'Malenadu Coffee');
+    const shareUrl = `${origin}/?product=${productSlug}#products`;
+    
+    const shareTitle = `${product.name} | Malenadu Roast Co.`;
+    const shareText = `☕ *${product.name}*\n${product.specs?.flavorNotes || product.tagline || 'Artisanal Single-Estate Roast from Chikkamagaluru estate.'}\n💰 Starting at ₹${product.price} (Inclusive of 5% GST)\n\nTaste the authentic single-estate roast from Chikkamagaluru:\n👉 ${shareUrl}`;
+
+    // 1. If mobile device supports Web Share API, open native share drawer directly (WhatsApp, Instagram, Telegram, SMS, etc.)
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl
+        });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    // 2. Fallback for desktop or non-WebShare browsers: Open elegant Share Modal
+    setActiveShareProduct({ product, shareUrl, shareText });
+  };
+
   // Top-Level Rate & Review State (triggered via URL ?rateProduct=... or after Checkout)
   const [globalReviewItem, setGlobalReviewItem] = useState(null); // { order, item, itemImg }
 
-  // Automatic Listener for Direct Product Rating & Review Link (e.g. from WhatsApp or Invoice PDF)
+  // Automatic Listener for Direct Product Rating & Review Link AND Shared Product Links (?product=...)
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const checkReviewUrl = () => {
+    const checkUrlParams = () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const rateProduct = urlParams.get('rateProduct');
         const orderNum = urlParams.get('order') || 'MN-VERIFIED';
+        const productParam = urlParams.get('product') || urlParams.get('share');
 
         if (rateProduct) {
           const decodedProduct = decodeURIComponent(rateProduct);
@@ -11436,15 +11773,35 @@ const App = () => {
             },
             itemImg
           });
+        } else if (productParam) {
+          const decodedProduct = decodeURIComponent(productParam).toLowerCase().trim();
+          const data = typeof getStoredProducts === 'function' ? getStoredProducts() : null;
+          const allProducts = data ? (Array.isArray(data) ? data : [
+            ...(Array.isArray(data.coffee) ? data.coffee : []),
+            ...(Array.isArray(data.pepper) ? data.pepper : []),
+            ...(Array.isArray(data.combos) ? data.combos : [])
+          ]) : [];
+          const matchedProd = allProducts.find(p =>
+            (p.name || '').toLowerCase() === decodedProduct ||
+            (p.name || '').toLowerCase().includes(decodedProduct) ||
+            decodedProduct.includes((p.name || '').toLowerCase())
+          );
+          if (matchedProd) {
+            setActiveDetailsProduct(matchedProd);
+            setTimeout(() => {
+              const el = document.getElementById('products');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+          }
         }
       } catch (err) {
-        console.error('Error resolving review URL params:', err);
+        console.error('Error resolving URL params:', err);
       }
     };
 
-    checkReviewUrl();
-    window.addEventListener('popstate', checkReviewUrl);
-    return () => window.removeEventListener('popstate', checkReviewUrl);
+    checkUrlParams();
+    window.addEventListener('popstate', checkUrlParams);
+    return () => window.removeEventListener('popstate', checkUrlParams);
   }, []);
 
   // Hash-based routing for policies, order page & commercial partnership
@@ -11746,7 +12103,16 @@ const App = () => {
         onAddToCart={handleAddToCart}
         onBuyNow={handleBuyNow}
         onImageClick={setFullscreenImage}
+        onShareProduct={handleShareProduct}
       />
+
+      {/* Luxury Product Share Modal */}
+      {activeShareProduct && (
+        <ShareModal
+          shareData={activeShareProduct}
+          onClose={() => setActiveShareProduct(null)}
+        />
+      )}
 
       <CheckoutModal
         isOpen={isCheckoutOpen}
@@ -11871,6 +12237,7 @@ const App = () => {
           onBuyNow={handleBuyNow}
           onOpenDetails={setActiveDetailsProduct}
           onImageClick={setFullscreenImage}
+          onShareProduct={handleShareProduct}
         />
       ) : currentPage === 'admin' ? (
         <AdminDashboard
@@ -12004,6 +12371,7 @@ const App = () => {
                         onToggleWishlist={toggleWishlist}
                         onImageClick={setFullscreenImage}
                         onOpenDetails={setActiveDetailsProduct}
+                        onShareProduct={handleShareProduct}
                       />
                     ))}
                   </div>

@@ -3,11 +3,11 @@ import { getReviewsForProduct } from './productReviewsData.js';
 import { 
   X, User, ShoppingCart, ShoppingBag, Star, ShieldCheck, Leaf, Truck, Check, 
   ChevronDown, MessageCircle, Clock, Flame, Award, HelpCircle, ExternalLink, Info,
-  Maximize2, ChevronLeft, ChevronRight
+  Maximize2, ChevronLeft, ChevronRight, Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onBuyNow, onImageClick }) => {
+export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onBuyNow, onImageClick, onShareProduct }) => {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageZoomed, setIsImageZoomed] = useState(false);
@@ -172,26 +172,69 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
             <strong style={{ color: '#18110C' }}>{product.name}</strong>
           </div>
 
-          <button
-            onClick={onClose}
-            style={{
-              background: '#f1f5f9',
-              border: 'none',
-              borderRadius: '50%',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#475569',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#0f172a'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                if (onShareProduct) {
+                  onShareProduct(product, e);
+                } else {
+                  const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
+                  const shareUrl = `${origin}/?product=${encodeURIComponent(product.name)}#products`;
+                  const shareText = `☕ *${product.name}*\n${product.specs?.flavorNotes || 'Artisanal Single-Estate Roast from Chikkamagaluru'}\n💰 Starting at ₹${currentPrice} (Incl. 5% GST)\n\nTaste the authentic single-estate roast:\n👉 ${shareUrl}`;
+                  if (typeof navigator !== 'undefined' && navigator.share) {
+                    navigator.share({ title: product.name, text: shareText, url: shareUrl }).catch(() => {});
+                  } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    navigator.clipboard.writeText(shareUrl);
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 2500);
+                  }
+                }
+              }}
+              title="Share this product via WhatsApp or other apps"
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid rgba(200, 147, 90, 0.4)',
+                borderRadius: '20px',
+                padding: '5px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#18110C',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8935A'; e.currentTarget.style.background = '#FAF7F2'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(200, 147, 90, 0.4)'; e.currentTarget.style.background = '#FFFFFF'; }}
+            >
+              <Share2 size={13} color="#8C6239" />
+              <span>{isCopied ? '✓ Copied' : 'Share'}</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              style={{
+                background: '#f1f5f9',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#475569',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#0f172a'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Modal Scrollable Body */}
