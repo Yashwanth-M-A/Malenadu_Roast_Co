@@ -9734,7 +9734,7 @@ const PromotionalCarousel = () => {
       btnText: 'Build Your Combo',
       btnClass: 'btn-slide-2',
       link: '#combos',
-      cardImg: '/assets/images/combos_lineup.jpg',
+      cardImg: '/assets/images/coffee_pepper_combo_hero_v3.jpg',
       cardImgStyle: {
         mixBlendMode: 'normal',
         borderRadius: '22px',
