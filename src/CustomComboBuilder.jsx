@@ -285,7 +285,10 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
                     style={{
                       maxHeight: '160px',
                       maxWidth: '90%',
-                      objectFit: 'contain'
+                      objectFit: 'contain',
+                      borderRadius: '8px',
+                      border: '2px solid #000000',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.14)'
                     }}
                   />
                 </div>
@@ -464,7 +467,10 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
                     style={{
                       maxHeight: '160px',
                       maxWidth: '90%',
-                      objectFit: 'contain'
+                      objectFit: 'contain',
+                      borderRadius: '8px',
+                      border: '2px solid #000000',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.14)'
                     }}
                   />
                 </div>
@@ -529,20 +535,21 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               background: '#FFFFFF',
-              border: '1px solid #EBE5DB',
+              border: '2px solid #000000',
               borderRadius: '8px',
-              padding: '6px',
+              padding: '4px',
               width: '74px',
               height: '74px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <img
                 src={activeCoffeeVariant.image}
                 alt={activeCoffee.name}
-                style={{ maxHeight: '62px', maxWidth: '100%', objectFit: 'contain' }}
+                style={{ maxHeight: '62px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px', border: '1px solid #000000' }}
               />
             </div>
 
@@ -550,20 +557,21 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
 
             <div style={{
               background: '#FFFFFF',
-              border: '1px solid #EBE5DB',
+              border: '2px solid #000000',
               borderRadius: '8px',
-              padding: '6px',
+              padding: '4px',
               width: '74px',
               height: '74px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <img
                 src={activePepper.image}
                 alt={activePepper.name}
-                style={{ maxHeight: '62px', maxWidth: '100%', objectFit: 'contain' }}
+                style={{ maxHeight: '62px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px', border: '1px solid #000000' }}
               />
             </div>
 
