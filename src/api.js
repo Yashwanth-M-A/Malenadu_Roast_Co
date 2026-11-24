@@ -294,16 +294,22 @@ export const getMyOrders = async () => {
     console.warn('Could not fetch cloud orders for user:', err);
   }
 
-  // 2. Fetch local orders
+  // 2. Fetch local orders (filter out legacy demo orders)
   const allOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
   const userLocalOrders = allOrders.filter(
-    o => o && o.shippingEmail && o.shippingEmail.toLowerCase().trim() === userEmail
+    o => o && o.shippingEmail && o.shippingEmail.toLowerCase().trim() === userEmail &&
+         (o.orderNumber === 'MN-187976' || new Date(o.createdAt || 0) >= new Date('2026-11-25T00:00:00Z'))
   );
 
   // 3. Merge and deduplicate by orderNumber, prioritizing populated items
   const orderMap = new Map();
   cloudOrders.forEach(o => {
-    if (o && o.orderNumber) orderMap.set(o.orderNumber, o);
+    if (o && o.orderNumber) {
+      const isReal = o.orderNumber === 'MN-187976' || new Date(o.createdAt || 0) >= new Date('2026-11-25T00:00:00Z');
+      if (isReal) {
+        orderMap.set(o.orderNumber, o);
+      }
+    }
   });
 
   userLocalOrders.forEach(o => {

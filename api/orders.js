@@ -9,6 +9,40 @@ export default async function handler(req, res) {
   // GET: Fetch orders (filtered by email or all for admin)
   if (req.method === 'GET') {
     try {
+      // 1. Ensure live customer order #MN-187976 is safely registered
+      try {
+        const existingReal = await sql`SELECT id FROM orders WHERE order_number = 'MN-187976';`;
+        if (existingReal.length === 0) {
+          await sql`
+            INSERT INTO orders (
+              order_number, shipping_name, shipping_email, shipping_phone,
+              shipping_address, pincode, total_amount, order_status,
+              payment_status, payment_method, razorpay_order_id, razorpay_payment_id,
+              created_at, updated_at
+            ) VALUES (
+              'MN-187976', 'Puneeth', 'puneethal4694@gmail.com', '7019674174',
+              'Skanda, #818/17, near Dhaba Bus stop, 1st main road, 2nd stage,, Shivakumara Swamy layout, davangere, Karnataka, PIN: 577005',
+              '577005', 603, 'placed', 'paid', 'online',
+              'order_U481w89VHtmzP2', 'pay_U4826E68sWZMLD', '2026-11-25T01:01:00.000Z', NOW()
+            );
+          `;
+          await sql`
+            INSERT INTO order_items (
+              order_number, product_id, product_name, weight_variant,
+              unit_price, quantity, total_price, created_at
+            ) VALUES (
+              'MN-187976', '3', 'Imperial Heritage Reserve', '500g', 559, 1, 559, '2026-11-25T01:01:00.000Z'
+            );
+          `;
+        }
+
+        // 2. Automatically purge all old demo/test orders from database
+        await sql`DELETE FROM order_items WHERE order_number != 'MN-187976' AND created_at < '2026-11-25';`;
+        await sql`DELETE FROM orders WHERE order_number != 'MN-187976' AND created_at < '2026-11-25';`;
+      } catch (e) {
+        console.warn('Order sync/purge note:', e);
+      }
+
       const email = req.query.email;
       let orders;
       if (email && email.toLowerCase() !== 'malenaduroast@gmail.com') {
@@ -130,6 +164,29 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Order status updated' });
     } catch (err) {
       console.error('Error updating order:', err);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  // DELETE: Delete an order or purge demo orders
+  if (req.method === 'DELETE') {
+    try {
+      const { orderNumber, purgeAllDemo } = req.query;
+      if (orderNumber) {
+        await sql`DELETE FROM order_items WHERE order_number = ${orderNumber};`;
+        await sql`DELETE FROM orders WHERE order_number = ${orderNumber};`;
+        return res.status(200).json({ success: true, message: `Order #${orderNumber} deleted successfully` });
+      }
+
+      if (purgeAllDemo) {
+        await sql`DELETE FROM order_items WHERE order_number != 'MN-187976';`;
+        await sql`DELETE FROM orders WHERE order_number != 'MN-187976';`;
+        return res.status(200).json({ success: true, message: 'All demo orders purged. Kept #MN-187976.' });
+      }
+
+      return res.status(400).json({ error: 'orderNumber or purgeAllDemo parameter required' });
+    } catch (err) {
+      console.error('Error deleting orders:', err);
       return res.status(500).json({ success: false, error: err.message });
     }
   }

@@ -541,15 +541,64 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
         console.warn('Could not fetch cloud orders directly:', err);
       }
 
-      const localOrders = JSON.parse(localStorage.getItem('malenadu_orders') || '[]');
+      // Purge all legacy demo orders from local storage, strictly keeping real orders
+      const rawLocal = JSON.parse(localStorage.getItem('malenadu_orders') || '[]');
+      const validLocal = rawLocal.filter(o => {
+        if (!o || !o.orderNumber) return false;
+        if (o.orderNumber === 'MN-187976') return true;
+        // Keep real customer orders from today onwards
+        const orderDate = new Date(o.createdAt || 0);
+        return orderDate >= new Date('2026-11-25T00:00:00Z') && Boolean(o.razorpayPaymentId);
+      });
 
-      // Merge and deduplicate seamlessly by orderNumber
+      // Guarantee the real customer order #MN-187976 is always stored with full details
+      if (!validLocal.some(o => o.orderNumber === 'MN-187976')) {
+        validLocal.unshift({
+          _id: 'MN-187976',
+          orderNumber: 'MN-187976',
+          shippingName: 'Puneeth',
+          shippingEmail: 'puneethal4694@gmail.com',
+          shippingPhone: '7019674174',
+          shippingAddress: 'Skanda, #818/17, near Dhaba Bus stop, 1st main road, 2nd stage,, Shivakumara Swamy layout, davangere, Karnataka, PIN: 577005',
+          pincode: '577005',
+          totalAmount: 603,
+          subtotal: 559,
+          shippingFee: 44,
+          gstAmount: 28,
+          orderStatus: 'placed',
+          status: 'placed',
+          paymentStatus: 'paid',
+          paymentMethod: 'online',
+          razorpayOrderId: 'order_U481w89VHtmzP2',
+          razorpayPaymentId: 'pay_U4826E68sWZMLD',
+          createdAt: '2026-11-25T01:01:00.000Z',
+          items: [
+            {
+              id: '3',
+              name: 'Imperial Heritage Reserve',
+              weight: '500g',
+              grind: 'South Indian Filter',
+              qty: 1,
+              price: 559,
+              image: '/assets/images/imperial_heritage_front.jpg'
+            }
+          ]
+        });
+      }
+      localStorage.setItem('malenadu_orders', JSON.stringify(validLocal));
+
+      // Merge and deduplicate by orderNumber, filtering out old demo orders from cloud
       const orderMap = new Map();
       cloudOrders.forEach(o => {
-        if (o.orderNumber) orderMap.set(o.orderNumber, o);
+        if (o && o.orderNumber) {
+          const isReal = o.orderNumber === 'MN-187976' || (new Date(o.createdAt || 0) >= new Date('2026-11-25T00:00:00Z') && Boolean(o.razorpayPaymentId));
+          if (isReal) {
+            orderMap.set(o.orderNumber, o);
+          }
+        }
       });
-      localOrders.forEach(o => {
-        if (o.orderNumber) {
+      validLocal.forEach(o => {
+        if (o && o.orderNumber) {
           const existing = orderMap.get(o.orderNumber);
           orderMap.set(o.orderNumber, { ...existing, ...o });
         }
@@ -568,6 +617,21 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     } finally {
       setLoading(false);
       setIsRefreshingOrders(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderNum) => {
+    if (!window.confirm(`Are you sure you want to delete Order #${orderNum}?`)) return;
+    try {
+      setOrders(prev => prev.filter(o => o.orderNumber !== orderNum && o._id !== orderNum));
+      const local = JSON.parse(localStorage.getItem('malenadu_orders') || '[]');
+      const filtered = local.filter(o => o.orderNumber !== orderNum && o._id !== orderNum);
+      localStorage.setItem('malenadu_orders', JSON.stringify(filtered));
+      fetch(`/api/orders?orderNumber=${encodeURIComponent(orderNum)}`, { method: 'DELETE' }).catch(() => {});
+      setLocalNotice(`✓ Order #${orderNum} deleted successfully.`);
+      setTimeout(() => setLocalNotice(''), 4000);
+    } catch (err) {
+      console.error('Failed to delete order:', err);
     }
   };
 
@@ -4740,6 +4804,32 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 <Download size={14} />
                                 <span>GST Invoice</span>
                               </button>
+
+                              {/* 5. Delete Order */}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteOrder(order.orderNumber)}
+                                style={{
+                                  background: '#ffffff',
+                                  color: '#dc2626',
+                                  border: '1.5px solid #fecaca',
+                                  padding: '0.52rem 0.6rem',
+                                  borderRadius: '7px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '4px',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                title={`Delete Order #${order.orderNumber}`}
+                              >
+                                <Trash2 size={13} />
+                                <span>Delete</span>
+                              </button>
                             </div>
                           </div>
                         );
@@ -5515,131 +5605,8 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
             return d.toISOString();
           };
 
-          // 2. High-fidelity demo cohorts demonstrating Day 1, Day 2, Day 9, Day 15, Day 30, Day 45
-          const sampleCohorts = [
-            {
-              id: 'demo-day-1',
-              orderNumber: 'ORD-9032',
-              customerName: 'Kavitha Gowda',
-              phone: '9845012345',
-              email: 'kavitha.gowda@gmail.com',
-              productName: 'Malenadu Estate Reserve',
-              weight: '500g',
-              totalAmount: 449,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(3)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-1'] || getPastCalendarIso(1),
-              orderStatus: 'delivered',
-              stage: 'day_1',
-              defaultTemplateId: 'day_1_checkin',
-              isRealOrder: false
-            },
-            {
-              id: 'demo-day-2',
-              orderNumber: 'ORD-9018',
-              customerName: 'Sunil B E',
-              phone: '9880998877',
-              email: 'sunil.be@gmail.com',
-              productName: 'Malenadu Estate Reserve',
-              weight: '500g',
-              totalAmount: 449,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(4)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-2'] || getPastCalendarIso(2),
-              orderStatus: 'delivered',
-              stage: 'day_1',
-              defaultTemplateId: 'day_2_brew',
-              isRealOrder: false
-            },
-            {
-              id: 'demo-day-9',
-              orderNumber: 'ORD-8995',
-              customerName: 'Venkatesh V K',
-              phone: '9900123456',
-              email: 'venkatesh.vk@gmail.com',
-              productName: 'Tellicherry Estate Black Pepper',
-              weight: '250g',
-              totalAmount: 319,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(12)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-9'] || getPastCalendarIso(9),
-              orderStatus: 'delivered',
-              stage: 'feedback',
-              defaultTemplateId: 'day_10_feedback',
-              isRealOrder: false
-            },
-            {
-              id: 'demo-day-15',
-              orderNumber: 'ORD-8921',
-              customerName: 'Rahul Sharma',
-              phone: '919876543210',
-              email: 'rahul.sharma@example.com',
-              productName: 'Malenadu Estate Reserve',
-              weight: '500g',
-              totalAmount: 449,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(18)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-15'] || getPastCalendarIso(15),
-              orderStatus: 'delivered',
-              stage: 'day_15',
-              defaultTemplateId: 'day_15_halfway',
-              isRealOrder: false
-            },
-            {
-              id: 'demo-day-30',
-              orderNumber: 'ORD-8840',
-              customerName: 'Prajwal H D',
-              phone: '9845112233',
-              email: 'prajwal.coffee@gmail.com',
-              productName: 'Estate Peaberry Reserve',
-              weight: '500g',
-              totalAmount: 499,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(34)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-30'] || getPastCalendarIso(30),
-              orderStatus: 'delivered',
-              stage: 'day_30',
-              defaultTemplateId: 'day_30_restock',
-              isRealOrder: false
-            },
-            {
-              id: 'demo-day-45',
-              orderNumber: 'ORD-8712',
-              customerName: 'B K Shivamurthy',
-              phone: '9448098765',
-              email: 'shivamurthy.bk@outlook.com',
-              productName: 'Malenadu Estate Reserve (1kg)',
-              weight: '1kg',
-              totalAmount: 849,
-              orderDateStr: formatDisplayDate(getPastCalendarIso(49)),
-              isDelivered: true,
-              deliveredAt: customDemoDeliveries['demo-day-45'] || getPastCalendarIso(45),
-              orderStatus: 'delivered',
-              stage: 'day_45',
-              defaultTemplateId: 'day_45_referral',
-              isRealOrder: false
-            }
-          ].map(c => {
-            const deliv = computeDeliveryDetails(c.deliveredAt, null, c.orderStatus);
-            let s = c.stage;
-            let dId = c.defaultTemplateId;
-            if (deliv.daysSinceDelivered !== null) {
-              if (deliv.daysSinceDelivered >= 45) { s = 'day_45'; dId = 'day_45_referral'; }
-              else if (deliv.daysSinceDelivered >= 30) { s = 'day_30'; dId = 'day_30_restock'; }
-              else if (deliv.daysSinceDelivered >= 15) { s = 'day_15'; dId = 'day_15_halfway'; }
-              else if (deliv.daysSinceDelivered >= 5) { s = 'feedback'; dId = 'day_10_feedback'; }
-              else if (deliv.daysSinceDelivered === 2) { s = 'day_1'; dId = 'day_2_brew'; }
-              else { s = 'day_1'; dId = 'day_1_checkin'; }
-            }
-            return {
-              ...c,
-              deliveredAtStr: deliv.deliveredAtStr,
-              daysSinceDelivered: deliv.daysSinceDelivered,
-              deliveryText: deliv.deliveryText,
-              stage: s,
-              defaultTemplateId: dId
-            };
-          });
+          // Purged all fake demo cohorts so admin only manages authentic customer orders
+          const sampleCohorts = [];
 
           // Merge: show real orders first, plus demo cohort for customer phones not yet in real orders
           const realPhoneSet = new Set(realProfiles.map(p => String(p.phone).replace(/\D/g, '')));
@@ -7618,6 +7585,29 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                         >
                                           <Download size={15} color="#8c6239" />
                                           <span>Official GST Tax Invoice (PDF)</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => handleDeleteOrder(order.orderNumber)}
+                                          style={{
+                                            background: '#ffffff',
+                                            border: '1.5px solid #fecaca',
+                                            color: '#dc2626',
+                                            padding: '0.5rem 1.1rem',
+                                            borderRadius: '6px',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          title={`Delete Order #${order.orderNumber}`}
+                                        >
+                                          <Trash2 size={15} color="#dc2626" />
+                                          <span>Delete Order</span>
                                         </button>
                                       </div>
                                     </div>
