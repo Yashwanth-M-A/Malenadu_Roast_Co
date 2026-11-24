@@ -40,7 +40,7 @@ export const DeviceMessagingModal = ({ isOpen, onClose, defaultTab = 'whatsapp' 
         date: new Date().toISOString()
       });
       localStorage.setItem('malenadu_catalog_requests', JSON.stringify(logs.slice(0, 50)));
-    } catch(err) {}
+    } catch(err) { void err; }
 
     window.open(whatsappUrl, '_blank');
     setStatusMsg('Redirecting to WhatsApp to send your catalog immediately...');

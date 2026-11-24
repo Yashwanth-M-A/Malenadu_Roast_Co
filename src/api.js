@@ -51,13 +51,13 @@ export const registerUser = async (formData) => {
   await delay(600);
   const users = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
   const exists = users.find(u => u.email.toLowerCase() === formData.email.toLowerCase());
-  
+
   if (exists) {
     const err = new Error('Email address already registered');
     err.response = { data: { message: 'Email address already registered' } };
     throw err;
   }
-  
+
   const newUser = {
     name: formData.name,
     email: formData.email.toLowerCase(),
@@ -65,7 +65,7 @@ export const registerUser = async (formData) => {
     address: formData.address || '',
     password: formData.password
   };
-  
+
   users.push(newUser);
   localStorage.setItem(KEYS.USERS, JSON.stringify(users));
 
@@ -76,16 +76,18 @@ export const registerUser = async (formData) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newUser)
     }).catch(e => console.warn('Cloud user sync deferred:', e));
-  } catch (e) {}
+  } catch (e) {
+    void e;
+  }
 
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('malenadu_user_registered'));
   }
-  
+
   const token = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
   const userData = { ...newUser, token };
   delete userData.password; // Do not return password
-  
+
   return { data: userData };
 };
 
@@ -97,20 +99,20 @@ export const loginUser = async (formData) => {
   const user = users.find(
     u => u.email.toLowerCase() === formData.email.toLowerCase() && u.password === formData.password
   );
-  
+
   if (!user) {
     const err = new Error('Invalid email or password');
     err.response = { data: { message: 'Invalid email or password' } };
     throw err;
   }
-  
+
   const token = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
   const userData = { ...user, token };
   if (userData.email.toLowerCase() === 'malenaduroast@gmail.com') {
     userData.role = 'admin';
   }
   delete userData.password;
-  
+
   return { data: userData };
 };
 
@@ -118,9 +120,9 @@ export const loginWithGoogle = async (googleProfile) => {
   await delay(350);
   const users = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
   const emailLower = (googleProfile.email || '').toLowerCase().trim();
-  
+
   let user = users.find(u => u.email.toLowerCase() === emailLower);
-  
+
   if (!user) {
     user = {
       name: googleProfile.name || emailLower.split('@')[0],
@@ -133,14 +135,16 @@ export const loginWithGoogle = async (googleProfile) => {
     };
     users.push(user);
     localStorage.setItem(KEYS.USERS, JSON.stringify(users));
-    
+
     try {
       fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
       }).catch(e => console.warn('Cloud user sync deferred:', e));
-    } catch (e) {}
+    } catch (e) {
+      void e;
+    }
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('malenadu_user_registered'));
@@ -159,11 +163,11 @@ export const loginWithGoogle = async (googleProfile) => {
   const token = 'google-jwt-token-' + Math.random().toString(36).substring(2);
   const userData = { ...user, token };
   delete userData.password;
-  
+
   if (userData.email.toLowerCase() === 'malenaduroast@gmail.com') {
     userData.role = 'admin';
   }
-  
+
   localStorage.setItem(KEYS.ACTIVE_USER, JSON.stringify(userData));
   localStorage.setItem(KEYS.TOKEN, token);
   return { data: userData };
@@ -193,10 +197,10 @@ export const updateProfile = async (profileData) => {
     err.response = { data: { message: 'Unauthorized' } };
     throw err;
   }
-  
+
   const users = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
   const userIndex = users.findIndex(u => u.email.toLowerCase() === activeUser.email.toLowerCase());
-  
+
   const updatedUser = {
     ...(userIndex !== -1 ? users[userIndex] : activeUser),
     name: profileData.name,
@@ -207,17 +211,17 @@ export const updateProfile = async (profileData) => {
   if (profileData.password && profileData.password.trim()) {
     updatedUser.password = profileData.password.trim();
   }
-  
+
   if (userIndex !== -1) {
     users[userIndex] = updatedUser;
     localStorage.setItem(KEYS.USERS, JSON.stringify(users));
   }
-  
+
   const token = localStorage.getItem(KEYS.TOKEN) || ('mock-jwt-token-' + Math.random().toString(36).substring(2));
   const userData = { ...updatedUser, token };
   delete userData.password;
   localStorage.setItem(KEYS.ACTIVE_USER, JSON.stringify(userData));
-  
+
   return { data: userData };
 };
 
@@ -225,7 +229,7 @@ export const cancelOrder = async (orderNumber) => {
   await delay(400);
   const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
   const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber || o._id === orderNumber);
-  
+
   if (orderIndex === -1) {
     const err = new Error('Order not found');
     err.response = { data: { message: 'Order not found' } };
@@ -254,8 +258,10 @@ export const cancelOrder = async (orderNumber) => {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderStatus: 'cancelled', status: 'cancelled' })
-    }).catch(() => {});
-  } catch (e) {}
+    }).catch(() => { });
+  } catch (e) {
+    void e;
+  }
 
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('malenadu_orders_updated'));
@@ -333,13 +339,13 @@ export const createRazorpayOrder = async (amountInPaise, notes = {}) => {
     });
     const data = await res.json();
     if (data.success && data.orderId) {
-      return { 
-        data: { 
-          id: data.orderId, 
-          amount: data.amount, 
-          currency: data.currency, 
-          keyId: data.keyId || defaultKey 
-        } 
+      return {
+        data: {
+          id: data.orderId,
+          amount: data.amount,
+          currency: data.currency,
+          keyId: data.keyId || defaultKey
+        }
       };
     }
   } catch (err) {
@@ -375,7 +381,7 @@ export const placeCODOrder = async (orderData) => {
   await delay(400);
   const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
   const orderNumber = orderData.orderNumber || ('MN-' + Math.floor(100000 + Math.random() * 900000));
-  
+
   const newOrder = {
     _id: Math.random().toString(36).substring(2),
     ...orderData,
@@ -398,7 +404,7 @@ export const placeCODOrder = async (orderData) => {
     paymentMethod: 'cod',
     createdAt: new Date().toISOString()
   };
-  
+
   orders.push(newOrder);
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
 
@@ -409,8 +415,10 @@ export const placeCODOrder = async (orderData) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...newOrder, orderStatus: 'placed', paymentStatus: 'pending' })
     }).catch(e => console.warn('Cloud order sync deferred:', e));
-  } catch (e) {}
-  
+  } catch (e) {
+    void e;
+  }
+
   return { data: { orderNumber } };
 };
 
@@ -418,7 +426,7 @@ export const simulatePayment = async (orderData) => {
   await delay(400);
   const orders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
   const orderNumber = orderData.orderNumber || ('MN-' + Math.floor(100000 + Math.random() * 900000));
-  
+
   const newOrder = {
     _id: Math.random().toString(36).substring(2),
     ...orderData,
@@ -444,7 +452,7 @@ export const simulatePayment = async (orderData) => {
     razorpaySignature: orderData.razorpaySignature || null,
     createdAt: new Date().toISOString()
   };
-  
+
   orders.push(newOrder);
   localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
 
@@ -462,8 +470,10 @@ export const simulatePayment = async (orderData) => {
         razorpayPaymentId: newOrder.razorpayPaymentId
       })
     }).catch(e => console.warn('Cloud order sync deferred:', e));
-  } catch (e) {}
-  
+  } catch (e) {
+    void e;
+  }
+
   return { data: { orderNumber } };
 };
 

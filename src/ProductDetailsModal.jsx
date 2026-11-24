@@ -27,7 +27,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
     if (e) e.stopPropagation();
     setHelpfulVotes(prev => {
       const updated = { ...prev, [revId]: !prev[revId] };
-      try { localStorage.setItem('malenadu_review_helpful_votes', JSON.stringify(updated)); } catch(e) {}
+      try { localStorage.setItem('malenadu_review_helpful_votes', JSON.stringify(updated)); } catch(e) { void e; }
       return updated;
     });
   };
