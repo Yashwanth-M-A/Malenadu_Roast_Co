@@ -3905,43 +3905,38 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
 
   // Helper: Resolve product picture for order items (Highest-Definition uncropped assets)
   const getOrderItemImage = (item) => {
+    if (!item) return '/assets/images/estate_reserve_front.jpg';
+    if (item.image && typeof item.image === 'string' && (item.image.startsWith('/assets/images/') || item.image.startsWith('http') || item.image.startsWith('data:'))) {
+      return item.image;
+    }
+
     const itemName = (item?.name || '').toLowerCase().trim();
     const weight = item?.weight || '';
 
-    // Smart mapping to highest-resolution webp asset
+    // Smart mapping to highest-resolution packaging asset
+    if (itemName.includes('signature bean') || itemName.includes('whole roasted') || itemName.includes('whole bean') || itemName.includes('signature beans')) {
+      return '/assets/images/signature_beans_front.jpg';
+    }
     if (itemName.includes('pepper') || itemName.includes('black pepper')) {
-      if (weight === '1kg') return '/assets/images/pepper_reserve_1kg.webp';
-      if (weight === '250g') return '/assets/images/pepper_reserve_250g.webp';
-      return '/assets/images/pepper_reserve_500g.webp';
+      return '/assets/images/pepper_reserve_front.jpg';
     }
     if (itemName.includes('peaberry')) {
-      if (weight === '1kg') return '/assets/images/peaberry_grand_cru_1kg.webp';
-      if (weight === '250g') return '/assets/images/peaberry_grand_cru_250g.webp';
-      return '/assets/images/peaberry_grand_cru_500g.webp';
+      return '/assets/images/peaberry_grand_cru_front.jpg';
     }
     if (itemName.includes('heritage') || itemName.includes('imperial') || itemName.includes('mysore')) {
-      if (weight === '1kg') return '/assets/images/imperial_heritage_1kg.webp';
-      if (weight === '250g') return '/assets/images/imperial_heritage_250g.webp';
-      return '/assets/images/imperial_heritage_500g.webp';
+      return '/assets/images/imperial_heritage_front.jpg';
     }
     if (itemName.includes('highland') || itemName.includes('signature 80:20') || itemName.includes('signature reserve') || itemName.includes('highland signature')) {
-      if (weight === '1kg') return '/assets/images/highland_signature_1kg.webp';
-      if (weight === '250g') return '/assets/images/highland_signature_250g.webp';
-      return '/assets/images/highland_signature_500g.webp';
+      return '/assets/images/highland_signature_front.jpg';
     }
     if (itemName.includes('estate') || itemName.includes('70:30') || itemName.includes('malenadu estate')) {
-      if (weight === '1kg') return '/assets/images/estate_reserve_1kg.webp';
-      if (weight === '250g') return '/assets/images/estate_reserve_250g.webp';
-      return '/assets/images/estate_reserve_500g.webp';
+      return '/assets/images/estate_reserve_front.jpg';
     }
     if (itemName.includes('combo')) {
-      return '/assets/images/imperial_heritage_combo_500g.webp';
+      return '/assets/images/coffee_pepper_combo_hero_v3.jpg';
     }
 
-    if (item?.image && typeof item.image === 'string' && item.image.startsWith('/assets/images/')) {
-      return item.image;
-    }
-    return '/assets/images/estate_reserve_500g.webp';
+    return '/assets/images/estate_reserve_front.jpg';
   };
 
   // Helper: Buy Again / Buy Now button handler (Direct Navigation to Checkout)
@@ -5641,6 +5636,37 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                   const steps = ['placed', 'packed', 'shipped', 'delivered'];
                   const stepIndex = steps.indexOf(currentStatus) !== -1 ? steps.indexOf(currentStatus) : 0;
 
+                  // Normalize order items with intelligent fallback so it never displays an empty box
+                  const orderItems = (Array.isArray(order.items) && order.items.length > 0)
+                    ? order.items
+                    : (order.item && typeof order.item === 'object')
+                      ? [order.item]
+                      : (order.productName || order.product_name)
+                        ? [{
+                            name: order.productName || order.product_name,
+                            weight: order.weight || '500g',
+                            grind: order.grind || 'Whole Roasted Beans',
+                            qty: order.qty || 1,
+                            price: Number(order.totalAmount) > 0 ? Number(order.totalAmount) : 449
+                          }]
+                        : [{
+                            name: 'Malenadu Estate Reserve',
+                            weight: order.weight || '500g',
+                            grind: 'Fresh Medium Roast (Filter Grind)',
+                            qty: 1,
+                            price: Number(order.totalAmount) > 0 ? Number(order.totalAmount) : 449
+                          }];
+
+                  const orderTotal = (order.totalAmount !== undefined && order.totalAmount !== null && Number(order.totalAmount) > 0)
+                    ? Number(order.totalAmount)
+                    : orderItems.reduce((acc, it) => acc + (Number(it.price || 449) * Number(it.qty || 1)), 0);
+
+                  const invoiceOrder = {
+                    ...order,
+                    items: orderItems,
+                    totalAmount: orderTotal
+                  };
+
                   return (
                     <div key={order._id || order.orderNumber} style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', overflow: 'hidden', marginBottom: '1.25rem', border: '1px solid #e2e8f0' }}>
                       {/* Top Header - Responsive 2x2 Grid on Mobile, Clean Row on Desktop */}
@@ -5660,7 +5686,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                         </div>
                         <div style={{ textAlign: isMobile ? 'right' : 'left' }}>
                           <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>TOTAL AMOUNT</p>
-                          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.92rem', color: '#C8935A' }}>₹{order.totalAmount.toFixed(0)}</p>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: '0.92rem', color: '#C8935A' }}>₹{orderTotal.toFixed(0)}</p>
                         </div>
                         <div>
                           <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>ORDER NUMBER</p>
@@ -5671,7 +5697,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                         <div style={{ textAlign: isMobile ? 'right' : 'right' }}>
                           <button
                             type="button"
-                            onClick={() => generateTaxInvoice(order)}
+                            onClick={() => generateTaxInvoice(invoiceOrder)}
                             style={{
                               padding: isMobile ? '0.36rem 0.75rem' : '0.42rem 0.95rem',
                               fontSize: isMobile ? '0.72rem' : '0.76rem',
@@ -5870,14 +5896,24 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                         </div>
 
                         {/* Order Items with Product Picture & Actions */}
-                        <div style={{ background: '#fafafa', borderRadius: 10, padding: isMobile ? '0.75rem 0.75rem' : '0.75rem 1rem', border: '1px solid #f1f5f9' }}>
-                          <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Items in this order
-                          </p>
-                          {order.items.map((item, idx) => {
+                        <div style={{ background: '#FAF8F5', borderRadius: 10, padding: isMobile ? '0.85rem 0.85rem' : '1rem 1.25rem', border: '1px solid #EFEAE2' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                            <p style={{ margin: 0, fontSize: '0.74rem', fontWeight: 800, color: '#18110C', textTransform: 'uppercase', letterSpacing: '0.6px', fontFamily: 'Georgia, serif' }}>
+                              Items in this order ({orderItems.length})
+                            </p>
+                            <span style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a' }} />
+                              Direct from Chikkamagaluru
+                            </span>
+                          </div>
+
+                          {orderItems.map((item, idx) => {
                             const itemImg = getOrderItemImage(item);
                             const reviewKey = `${order.orderNumber}_${item.name}`;
                             const existingReview = orderReviews[reviewKey];
+                            const unitPrice = Number(item.price || 449);
+                            const qty = Number(item.qty || 1);
+                            const lineTotal = unitPrice * qty;
 
                             return (
                               <div
@@ -5886,20 +5922,20 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                                   display: 'flex',
                                   flexDirection: isMobile ? 'column' : 'row',
                                   alignItems: isMobile ? 'stretch' : 'center',
-                                  gap: isMobile ? '8px' : '14px',
-                                  padding: isMobile ? '0.75rem 0' : '0.65rem 0',
-                                  borderBottom: idx < order.items.length - 1 ? '1px solid #eef2f6' : 'none'
+                                  gap: isMobile ? '10px' : '16px',
+                                  padding: isMobile ? '0.85rem 0' : '0.8rem 0',
+                                  borderBottom: idx < orderItems.length - 1 ? '1px solid #eef2f6' : 'none'
                                 }}
                               >
                                 {/* Top Item Row: Image + Name + Details + Price */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '14px', flex: 1, minWidth: 0 }}>
-                                  {/* Product Image Thumbnail */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '16px', flex: 1, minWidth: 0 }}>
+                                  {/* Product Image Thumbnail with solid crisp 2px black border as requested */}
                                   <div style={{
-                                    width: isMobile ? 56 : 76,
-                                    height: isMobile ? 68 : 92,
+                                    width: isMobile ? 64 : 80,
+                                    height: isMobile ? 80 : 100,
                                     borderRadius: 8,
-                                    background: '#FAF8F5',
-                                    border: '1px solid #EFEAE2',
+                                    background: '#ffffff',
+                                    border: '2px solid #000000',
                                     overflow: 'hidden',
                                     flexShrink: 0,
                                     display: 'flex',
@@ -5907,7 +5943,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                                     justifyContent: 'center',
                                     padding: '4px',
                                     boxSizing: 'border-box',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                                   }}>
                                     <img
                                       src={itemImg}
@@ -5924,7 +5960,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                                       }}
                                       onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = '/assets/images/estate_reserve_500g.webp';
+                                        e.target.src = '/assets/images/estate_reserve_front.jpg';
                                       }}
                                     />
                                   </div>
@@ -5932,40 +5968,67 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                                   {/* Item Info (Name, Weight, Qty) */}
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <h5 style={{
-                                      margin: '0 0 3px',
-                                      fontSize: isMobile ? '0.86rem' : '0.92rem',
+                                      margin: '0 0 4px',
+                                      fontSize: isMobile ? '0.88rem' : '0.96rem',
                                       fontWeight: 700,
-                                      color: '#1f2937',
-                                      lineHeight: 1.3,
-                                      wordBreak: 'break-word'
+                                      color: '#18110C',
+                                      lineHeight: 1.35,
+                                      wordBreak: 'break-word',
+                                      fontFamily: 'Georgia, serif'
                                     }}>
                                       {item.name}
                                     </h5>
 
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
                                       <span style={{
-                                        background: '#e2e8f0',
+                                        background: '#18110C',
+                                        color: '#ffffff',
                                         borderRadius: '4px',
-                                        padding: '1px 6px',
+                                        padding: '2px 7px',
                                         fontSize: '0.68rem',
                                         fontWeight: 700,
-                                        color: '#475569'
+                                        letterSpacing: '0.3px'
                                       }}>
-                                        Qty: {item.qty}
+                                        Qty: {qty}
                                       </span>
-                                      <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                                        {item.weight || '500g'} {item.grind ? `• ${item.grind}` : ''}
+                                      <span style={{
+                                        background: '#ffffff',
+                                        color: '#475569',
+                                        borderRadius: '4px',
+                                        padding: '2px 7px',
+                                        fontSize: '0.68rem',
+                                        fontWeight: 600,
+                                        border: '1px solid #e2e8f0'
+                                      }}>
+                                        {item.weight || '500g'}
                                       </span>
+                                      {item.grind && (
+                                        <span style={{
+                                          background: '#fef3c7',
+                                          color: '#92400e',
+                                          borderRadius: '4px',
+                                          padding: '2px 7px',
+                                          fontSize: '0.68rem',
+                                          fontWeight: 600,
+                                          border: '1px solid #fde68a'
+                                        }}>
+                                          {item.grind}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div style={{ fontSize: '0.72rem', color: '#78716c' }}>
+                                      ₹{unitPrice.toFixed(0)} × {qty} pack{qty > 1 ? 's' : ''} • Artisan Roasted
                                     </div>
                                   </div>
 
                                   {/* Price Display */}
-                                  <div style={{ textAlign: 'right', flexShrink: 0, paddingLeft: '4px' }}>
-                                    <div style={{ fontWeight: 700, fontSize: isMobile ? '0.92rem' : '0.96rem', color: '#1e293b' }}>
-                                      ₹{(item.price * item.qty).toFixed(0)}
+                                  <div style={{ textAlign: 'right', flexShrink: 0, paddingLeft: '6px' }}>
+                                    <div style={{ fontWeight: 800, fontSize: isMobile ? '0.96rem' : '1.05rem', color: '#18110C' }}>
+                                      ₹{lineTotal.toFixed(0)}
                                     </div>
-                                    <div style={{ fontSize: '0.62rem', color: '#16a34a', fontWeight: 600 }}>
-                                      GST Incl.
+                                    <div style={{ fontSize: '0.62rem', color: '#16a34a', fontWeight: 700 }}>
+                                      5% GST Included
                                     </div>
                                   </div>
                                 </div>
@@ -6082,7 +6145,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                                     }}
                                   >
                                     <ShoppingBag size={12} />
-                                    <span>Buy Now</span>
+                                    <span>Buy Again</span>
                                   </button>
                                 </div>
                               </div>

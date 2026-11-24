@@ -267,18 +267,60 @@ export const cancelOrder = async (orderNumber) => {
 
 
 export const getMyOrders = async () => {
-  await delay(400);
   const activeUser = JSON.parse(localStorage.getItem(KEYS.ACTIVE_USER));
-  if (!activeUser) {
+  if (!activeUser || !activeUser.email) {
     return { data: [] };
   }
-  
+
+  const userEmail = activeUser.email.toLowerCase().trim();
+
+  // 1. Fetch cloud orders from Postgres / Neon API
+  let cloudOrders = [];
+  try {
+    const res = await fetch(`/api/orders?email=${encodeURIComponent(userEmail)}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && Array.isArray(json.orders)) {
+        cloudOrders = json.orders;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch cloud orders for user:', err);
+  }
+
+  // 2. Fetch local orders
   const allOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
-  const userOrders = allOrders.filter(
-    o => o.shippingEmail.toLowerCase() === activeUser.email.toLowerCase()
+  const userLocalOrders = allOrders.filter(
+    o => o && o.shippingEmail && o.shippingEmail.toLowerCase().trim() === userEmail
   );
-  
-  return { data: userOrders.reverse() }; // Newest orders first
+
+  // 3. Merge and deduplicate by orderNumber, prioritizing populated items
+  const orderMap = new Map();
+  cloudOrders.forEach(o => {
+    if (o && o.orderNumber) orderMap.set(o.orderNumber, o);
+  });
+
+  userLocalOrders.forEach(o => {
+    if (o && o.orderNumber) {
+      const existing = orderMap.get(o.orderNumber) || {};
+      const mergedItems = (Array.isArray(o.items) && o.items.length > 0)
+        ? o.items
+        : (Array.isArray(existing.items) && existing.items.length > 0 ? existing.items : []);
+      orderMap.set(o.orderNumber, {
+        ...existing,
+        ...o,
+        items: mergedItems
+      });
+    }
+  });
+
+  const merged = Array.from(orderMap.values()).sort((a, b) => {
+    const tA = new Date(a.createdAt || 0).getTime();
+    const tB = new Date(b.createdAt || 0).getTime();
+    return tB - tA;
+  });
+
+  return { data: merged };
 };
 
 export const createRazorpayOrder = async (amountInPaise, notes = {}) => {
