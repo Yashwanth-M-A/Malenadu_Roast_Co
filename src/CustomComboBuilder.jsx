@@ -103,8 +103,8 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
   const pepperPrice = activePepper.price;
   const originalTotal = coffeePrice + pepperPrice;
 
-  // 15% Combo Discount
-  const discountAmount = Math.round(originalTotal * 0.15);
+  // 5% Combo Discount
+  const discountAmount = Math.round(originalTotal * 0.05);
   const comboPrice = originalTotal - discountAmount;
   const isFreeDelivery = activeCoffeeVariant.label === '1kg' || comboPrice >= 799;
 
@@ -112,7 +112,7 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
   const getPayload = () => {
     const comboName = `Custom Combo: ${activeCoffee.name} + Tellicherry Pepper`;
     const weightLabel = `${activeCoffeeVariant.label} Coffee + ${activePepper.weight} Pepper`;
-    const desc = `${activeCoffee.name} (${activeCoffeeVariant.label}) paired with ${activePepper.name} (${activePepper.weight}). Includes 15% bundle discount. Dual-sealed in aroma barrier pouches.`;
+    const desc = `${activeCoffee.name} (${activeCoffeeVariant.label}) paired with ${activePepper.name} (${activePepper.weight}). Includes 5% bundle discount. Dual-sealed in aroma barrier pouches.`;
 
     return {
       id: `custom_combo_${activeCoffee.id}_${activeCoffeeVariant.label}_${activePepper.id}_${Date.now()}`,
@@ -126,7 +126,7 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
       specs: {
         coffee: `${activeCoffee.name} (${activeCoffeeVariant.label})`,
         pepper: `${activePepper.name} (${activePepper.weight})`,
-        savings: `Saved ₹${discountAmount} with 15% Combo Discount`
+        savings: `Saved ₹${discountAmount} with 5% Combo Discount`
       }
     };
   };
@@ -177,7 +177,7 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
           marginInline: 'auto',
           lineHeight: '1.5'
         }}>
-          Select 1 coffee roast and 1 pepper size below. A 15% bundle discount is automatically applied to your custom pair.
+          Select 1 coffee roast and 1 pepper size below. A 5% bundle discount is automatically applied to your custom pair.
         </p>
       </div>
 
@@ -575,7 +575,7 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
                 {activeCoffee.name} ({activeCoffeeVariant.label}) + {activePepper.name} ({activePepper.weight})
               </div>
               <div style={{ fontSize: '0.74rem', color: '#666666', marginTop: '2px' }}>
-                Dual-sealed fresh harvest pouches &bull; 15% discount applied
+                Dual-sealed fresh harvest pouches &bull; 5% discount applied
               </div>
             </div>
           </div>
@@ -593,7 +593,7 @@ export const CustomComboBuilder = ({ onAddToCart, onBuyNow }) => {
                 </span>
               </div>
               <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#166534', marginTop: '2px' }}>
-                You Save ₹{discountAmount} (15% Bundle Savings) &bull; Incl. 5% GST
+                You Save ₹{discountAmount} (5% Bundle Savings) &bull; Incl. 5% GST
               </div>
             </div>
 

@@ -13004,7 +13004,6 @@ const App = () => {
                         { label: 'Partnership', href: '#partner-with-us' },
                         { label: 'GST Compliance', href: '#gst-compliance' },
                         { label: 'FSSAI Verified', href: '#fssai-compliance' },
-                        { label: 'Store Admin', href: '#admin' },
                       ].map((link, i) => (
                         <li key={i} className="footer-link-item">
                           <span className="footer-link-arrow">›</span>
