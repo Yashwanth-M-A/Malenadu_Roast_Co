@@ -359,38 +359,6 @@ export const DEFAULT_PEPPER_PRODUCTS = [
         a: 'Whole peppercorns preserve their volatile oils and sharpness for over 12 months when stored in an airtight container away from moisture and direct sunlight.'
       }
     ]
-  },
-  {
-    id: 99,
-    name: 'Tellicherry Pepper (Payment Verification Pack)',
-    description: '500g Estate Sample • Special ₹8 Live Gateway Verification',
-    details: 'Pure Tellicherry sun-dried bold black pepper (500g). Configured for live Razorpay payment gateway verification with ₹0 delivery charge.',
-    rating: 5.0,
-    reviews: 99,
-    badge: '₹8 Payment Test',
-    image: '/assets/images/pepper_reserve_front.jpg',
-    images: [
-      '/assets/images/pepper_reserve_front.jpg',
-      '/assets/images/pepper_reserve_back.jpg'
-    ],
-    variants: [
-      { weight: '500g', price: '8', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' }
-    ],
-    freeShipping: true,
-    specs: {
-      grade: 'Tellicherry Whole Black Pepper (TGSEB)',
-      pack: '500g Artisan Pack',
-      price: '₹8.00 (5% GST Included)',
-      delivery: '100% FREE Delivery (₹0 Delivery Charge)',
-      purpose: 'Live Razorpay Payment Verification'
-    },
-    whySpecial: 'Handcrafted estate black pepper sample pack created strictly to test and verify live payment processing with an ₹8 charge and 100% free delivery.',
-    faqs: [
-      {
-        q: 'Is delivery free for this ₹8 test pack?',
-        a: 'Yes, delivery is 100% FREE with ₹0 shipping charge.'
-      }
-    ]
   }
 ].map(p => ({
   ...p,
@@ -488,12 +456,13 @@ const filter250g = (variants) => {
   return variants.filter(v => (v.weight || '').trim() !== '250g');
 };
 
-const DATA_VERSION = 'v8_pepper_payment_test_8rs_free_shipping';
+const DATA_VERSION = 'v9_official_catalog_live';
 
 // Helper: Merge rich specs & faqs into stored items, ensuring roaster specs are strictly authoritative
 const mergeProductMetadata = (storedList, defaultList) => {
   if (!Array.isArray(storedList)) return defaultList.map(d => ({ ...d, variants: filter250g(d.variants) }));
-  const merged = storedList.map(item => {
+  const sanitizedStored = storedList.filter(item => item && String(item.id) !== '99' && !String(item.name || '').includes('Payment Verification'));
+  const merged = sanitizedStored.map(item => {
     const defaultMatch = defaultList.find(d => String(d.id) === String(item.id) || d.name === item.name);
     if (!defaultMatch) {
       return {
@@ -562,7 +531,9 @@ export const getStoredProducts = () => {
   try {
     safeStorage.setItem('malenadu_inventory_products', JSON.stringify(initial));
     safeStorage.setItem('malenadu_inventory_version', DATA_VERSION);
-  } catch(e) {}
+  } catch(e) {
+    void e;
+  }
   return initial;
 };
 
