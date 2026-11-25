@@ -6631,15 +6631,6 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
       localStorage.setItem('malenadu_token', data.token);
       localStorage.setItem('malenadu_user', JSON.stringify(data));
 
-      if (data.phone) {
-        triggerAutomatedWhatsApp({
-          phone: data.phone,
-          name: data.name,
-          type: 'login',
-          autoOpen: false
-        }).catch(err => console.warn('Login WhatsApp notice:', err));
-      }
-
       onAuthSuccess(data);
       onClose();
     } catch (err) {
@@ -6792,16 +6783,6 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
           type: 'welcome',
           autoOpen: false
         }).catch(err => console.warn('Welcome WhatsApp notice:', err));
-      } else {
-        // Automatically dispatch Security Sign-in WhatsApp on login
-        if (data.phone) {
-          triggerAutomatedWhatsApp({
-            phone: data.phone,
-            name: data.name,
-            type: 'login',
-            autoOpen: false
-          }).catch(err => console.warn('Login WhatsApp notice:', err));
-        }
       }
 
       onAuthSuccess(data);

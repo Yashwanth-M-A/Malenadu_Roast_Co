@@ -226,8 +226,8 @@ export const triggerAutomatedWhatsApp = async ({
     status: logStatus
   });
 
-  // Auto-launch WhatsApp if requested or if server gateway did not dispatch
-  if ((autoOpen || !apiDispatched) && typeof window !== 'undefined') {
+  // Auto-launch WhatsApp ONLY if explicitly requested via autoOpen=true
+  if (Boolean(autoOpen) && typeof window !== 'undefined') {
     try {
       const win = window.open(waUrl, '_blank');
       if (!win) {
