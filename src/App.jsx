@@ -12048,6 +12048,7 @@ const App = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartToast, setCartToast] = useState(null);
   const cartToastTimeoutRef = useRef(null);
+  const [pendingAddToCart, setPendingAddToCart] = useState(null);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -12324,6 +12325,42 @@ const App = () => {
         localStorage.setItem(`malenadu_account_cart_${userEmail}`, JSON.stringify(merged));
         syncAccountCart(userEmail, merged);
 
+        // Fulfill pending add-to-cart item if customer clicked Add to Cart before signing in
+        if (pendingAddToCart?.product) {
+          const { product, weight, qty } = pendingAddToCart;
+          let price = product.price;
+          let image = product.image;
+          if (product.variants) {
+            const matchVar = product.variants.find(v => v.weight === weight);
+            if (matchVar) {
+              if (matchVar.price) price = matchVar.price;
+              if (matchVar.image) image = matchVar.image;
+            }
+          }
+          const compositeId = `${product.id}-${weight}`;
+          const existsIndex = merged.findIndex(m => m.id === compositeId);
+          if (existsIndex >= 0) {
+            merged[existsIndex] = {
+              ...merged[existsIndex],
+              qty: (Number(merged[existsIndex].qty) || 1) + qty
+            };
+          } else {
+            merged.push({ ...product, id: compositeId, weight, price, image, qty });
+          }
+
+          if (cartToastTimeoutRef.current) clearTimeout(cartToastTimeoutRef.current);
+          setCartToast({
+            name: product.name,
+            weight: weight,
+            qty: qty
+          });
+          cartToastTimeoutRef.current = setTimeout(() => {
+            setCartToast(null);
+          }, 3500);
+
+          setPendingAddToCart(null);
+        }
+
         // Clear guest cart now that it is adopted by user account
         localStorage.removeItem('malenadu_guest_cart');
         localStorage.removeItem('malenadu_cart');
@@ -12331,7 +12368,7 @@ const App = () => {
         console.warn('Cart account linking error:', e);
       }
     }
-    if (buyNowCart || cart.length > 0) {
+    if (buyNowCart) {
       setIsCheckoutOpen(true);
     }
   };
@@ -12437,6 +12474,15 @@ const App = () => {
   const handleAddToCart = (product, weightOverride, qtyOverride) => {
     if (!product) return;
     const weight = weightOverride || product.weight || product.variants?.[0]?.weight || '500g';
+    const qty = Number(qtyOverride) || 1;
+
+    // Direct customer to login before adding products to cart
+    if (!currentUser) {
+      setPendingAddToCart({ product, weight, qty });
+      setIsAuthOpen(true);
+      return;
+    }
+
     let price = product.price;
     let image = product.image;
     if (product.variants) {
@@ -12447,7 +12493,6 @@ const App = () => {
       }
     }
     const compositeId = `${product.id}-${weight}`;
-    const qty = Number(qtyOverride) || 1;
     setCart(prev => {
       const existing = prev.find(item => item.id === compositeId);
       if (existing) {
@@ -12579,7 +12624,10 @@ const App = () => {
 
       <AuthModal
         isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
+        onClose={() => {
+          setIsAuthOpen(false);
+          setPendingAddToCart(null);
+        }}
         onAuthSuccess={handleAuthSuccess}
       />
 
