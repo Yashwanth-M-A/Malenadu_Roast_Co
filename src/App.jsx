@@ -11981,6 +11981,13 @@ const PowderSprinkleEffect = ({ type }) => {
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // ——— Auth state (Declared first to avoid TDZ in cart effects) ——————————————
+  const [currentUser, setCurrentUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('malenadu_user')); }
+    catch { return null; }
+  });
+
   // E-commerce Cart Recovery: Restore saved cart across page reloads and user sessions
   const getInitialCart = () => {
     try {
@@ -12249,11 +12256,7 @@ const App = () => {
     setIsCheckoutOpen(true);
   };
 
-  // ——— Auth state  ————————————————————————————————————————————————————————————
-  const [currentUser, setCurrentUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('malenadu_user')); }
-    catch { return null; }
-  });
+  // ——— Auth Handlers —————————————————————————————————————————————————————————
 
   const handleAuthSuccess = (user) => {
     setCurrentUser(user);
