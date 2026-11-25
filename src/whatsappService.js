@@ -105,9 +105,6 @@ export const getAutomatedWhatsAppMessage = (type, params = {}) => {
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
-    case 'login':
-      return `☕ *Malenadu Roast Co. Account Alert*\n\nHello ${name}! A secure sign-in to your account was recorded at ${time} on ${date}.\n\nIf this was you, you're all set! If you did not authorize this, please contact roastery support immediately at +91 8217623335.\n\nHappy brewing! ☕`;
-
     case 'recurring_roast_alert':
     case 'harvest_drop':
       return `🌿 *Fresh Estate Roast Batch & Harvest Alert | Malenadu Roast Co.*\n\nHello ${name}! ☕\nOur master roasters have just completed this week's fresh small-batch roast in Chikkamagaluru:\n• *Estate Reserve Filter Coffee* (70:30, 80:20 & 85:15 blends)\n• *Tellicherry Bold Black Pepper* (Handpicked, Sun-dried)\n\nFreshly roasted in Chikkamagaluru and shipping pan-India.\nOrder your fresh harvest with priority shipping:\n👉 https://malenaduroastco.works/#products\n\n_Malenadu Roast Co. — Straight From the Estate to Your Cup._`;

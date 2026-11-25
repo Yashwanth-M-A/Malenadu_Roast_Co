@@ -468,7 +468,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
                 }}>
                   {(selectedVariant?.weight || '').includes('1kg') ? (
                     <span style={{ color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <Truck size={14} color="#16a34a" /> 🎉 100% FREE Express Delivery Unlocked (1kg Pack)
+                      <Truck size={14} color="#16a34a" /> 100% FREE Express Delivery Unlocked (1kg Pack)
                     </span>
                   ) : (
                     <span style={{ color: '#92400e', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>

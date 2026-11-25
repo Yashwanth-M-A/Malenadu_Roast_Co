@@ -120,10 +120,6 @@ export default async function handler(req, res) {
             break;
           }
 
-          case 'login':
-            message = `☕ *Malenadu Roast Co. Security Notice*\n\nHello ${customerName}! A secure sign-in to your Malenadu Roast Co. account was recorded at ${timestamp}.\n\nIf this was you, you're all set! If you did not authorize this, please contact roastery support immediately at +91 8217623335.\n\nHappy brewing! ☕`;
-            break;
-
           case 'recurring_roast_alert':
           case 'harvest_drop':
             message = `🌿 *Fresh Estate Roast Batch & Harvest Alert | Malenadu Roast Co.*\n\nHello ${customerName}! ☕\nOur master roasters have just completed this week's fresh small-batch roast in Chikkamagaluru:\n• *Estate Reserve Filter Coffee* (70:30, 80:20 & 85:15 blends)\n• *Tellicherry Bold Black Pepper* (Handpicked, Sun-dried)\n\nFreshly roasted in Chikkamagaluru and shipping pan-India.\nOrder your fresh harvest with priority shipping:\n👉 https://malenaduroastco.works/#products\n\n_Malenadu Roast Co. — Straight From the Estate to Your Cup._`;

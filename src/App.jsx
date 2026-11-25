@@ -9309,12 +9309,12 @@ const CheckoutModal = ({
                       {shippingFee === 0 ? '✓ Free Delivery' : `Save ₹${shippingInfo.standardFee} Shipping`}
                     </span>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: shippingFee === 0 ? '#166534' : '#92400e' }}>
-                      {shippingFee === 0 ? `🎉 SAVED ₹${shippingInfo.standardFee}` : `DELIVERY: ₹${shippingInfo.standardFee} (${shippingInfo.isKarnataka ? 'Karnataka' : 'Other States'})`}
+                      {shippingFee === 0 ? `SAVED ₹${shippingInfo.standardFee}` : `DELIVERY: ₹${shippingInfo.standardFee} (${shippingInfo.isKarnataka ? 'Karnataka' : 'Other States'})`}
                     </span>
                   </div>
 
                   <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', color: shippingFee === 0 ? '#065f46' : '#78350f', fontWeight: 800 }}>
-                    {shippingFee === 0 ? '🎉 100% FREE Delivery Unlocked!' : 'Add more items to unlock FREE Delivery'}
+                    {shippingFee === 0 ? 'Complimentary Free Delivery Unlocked' : 'Add more items to unlock FREE Delivery'}
                   </h3>
 
                   <p style={{ margin: 0, fontSize: '0.78rem', color: shippingFee === 0 ? '#047857' : '#92400e', lineHeight: 1.35 }}>
@@ -9556,7 +9556,7 @@ const CheckoutModal = ({
                       alignItems: 'center',
                       gap: '4px'
                     }}>
-                      {shippingFee === 0 ? '🎉 FREE Delivery Unlocked!' : `+₹${shippingFee} Delivery`}
+                      {shippingFee === 0 ? 'Free Delivery Unlocked' : `+₹${shippingFee} Delivery`}
                     </span>
                   </div>
 
