@@ -8,9 +8,21 @@ export const getInvoiceHtml = (order = {}, { showPrintButton = false } = {}) => 
   const orderNum = order.orderNumber || order._id || 'MN-ORDER';
   const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || Date.now().toString().slice(-6);
   const invoiceNumber = `INV-${cleanNum}`;
-  const orderDate = order.createdAt
-    ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-    : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const rawDate = order.createdAt ? new Date(order.createdAt) : new Date();
+  const validDate = isNaN(rawDate.getTime()) ? new Date() : rawDate;
+  const orderDateStr = validDate.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'Asia/Kolkata'
+  });
+  const orderTimeStr = validDate.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata'
+  });
+  const orderDateTime = `${orderDateStr} at ${orderTimeStr} IST`;
 
   const rawItems = (order.items && order.items.length > 0)
     ? order.items
@@ -123,8 +135,8 @@ export const getInvoiceHtml = (order = {}, { showPrintButton = false } = {}) => 
               TAX INVOICE
             </div>
             <div style="font-size: 13px; font-weight: 700; color: #0f172a;">Invoice #: ${invoiceNumber}</div>
-            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Order #: ${orderNum}</div>
-            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Date: ${orderDate}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Order #: <strong>${orderNum}</strong></div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Order Date & Time: <strong style="color: #0f172a;">${orderDateTime}</strong></div>
             <div style="font-size: 12px; color: #16a34a; font-weight: 700; margin-top: 3px;">Status: PAID (ONLINE)</div>
           </div>
         </div>

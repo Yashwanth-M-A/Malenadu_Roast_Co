@@ -7077,9 +7077,11 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                     const igst = isInterstate ? totalGst : '0.00';
                     const grandTotal = ord.totalAmount || subtotal;
 
-                    const dateStr = ord.createdAt
-                      ? new Date(ord.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                      : '25 Nov 2026, 01:01 AM';
+                    const rawDate = ord.createdAt ? new Date(ord.createdAt) : new Date();
+                    const validDate = isNaN(rawDate.getTime()) ? new Date() : rawDate;
+                    const datePart = validDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+                    const timePart = validDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+                    const dateStr = `${datePart} at ${timePart} IST`;
 
                     const isPaid = (ord.paymentStatus || '').toLowerCase() === 'paid' || (ord.paymentMethod || '').toLowerCase() === 'online';
 
@@ -7379,6 +7381,10 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                   const invoiceUrl = `${origin}/api/invoice?order=${orderNum}`;
                   const invoiceEmbedUrl = `${invoiceUrl}&embedded=true`;
 
+                  const mRaw = ord.createdAt ? new Date(ord.createdAt) : new Date();
+                  const mValid = isNaN(mRaw.getTime()) ? new Date() : mRaw;
+                  const modalOrderDateTime = `${mValid.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })} at ${mValid.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })} IST`;
+
                   return (
                     <div style={{
                       position: 'fixed',
@@ -7458,6 +7464,9 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 <span>{invoiceNum}</span>
                                 <span style={{ color: '#C8935A', fontWeight: 600, fontSize: isMobile ? '0.78rem' : '0.95rem' }}>#{orderNum}</span>
                               </h3>
+                              <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '1px' }}>
+                                Ordered: {modalOrderDateTime}
+                              </div>
                             </div>
                           </div>
 

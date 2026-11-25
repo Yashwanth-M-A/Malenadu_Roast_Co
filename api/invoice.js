@@ -70,11 +70,21 @@ export default async function handler(req, res) {
   }
 
   const invoiceNumber = `INV-${String(orderData.orderNumber).replace(/[^0-9]/g, '') || Date.now().toString().slice(-6)}`;
-  const orderDate = new Date(orderData.createdAt).toLocaleDateString('en-IN', {
+  const rawDate = orderData.createdAt ? new Date(orderData.createdAt) : new Date();
+  const validDate = isNaN(rawDate.getTime()) ? new Date() : rawDate;
+  const orderDateStr = validDate.toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'Asia/Kolkata'
   });
+  const orderTimeStr = validDate.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata'
+  });
+  const orderDateTime = `${orderDateStr} at ${orderTimeStr} IST`;
 
   const itemsList = (orderData.items && orderData.items.length > 0) 
     ? orderData.items 
@@ -789,7 +799,7 @@ export default async function handler(req, res) {
           <div class="badge-tax-inv">TAX INVOICE</div>
           <div class="inv-number">Invoice #: ${invoiceNumber}</div>
           <div class="inv-detail">Order #: <strong>${orderData.orderNumber}</strong></div>
-          <div class="inv-detail">Date: ${orderDate}</div>
+          <div class="inv-detail">Order Date & Time: <strong style="color: #0f172a;">${orderDateTime}</strong></div>
           <div>
             <span class="status-paid-pill">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">

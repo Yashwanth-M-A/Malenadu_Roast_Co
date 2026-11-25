@@ -8204,6 +8204,10 @@ const CheckoutModal = ({
               <span style={{ fontWeight: 800, fontSize: isMobile ? '1.45rem' : '1.65rem', color: '#18110C', letterSpacing: 1, fontFamily: '"Georgia", serif', display: 'block', margin: '4px 0' }}>
                 #{orderSuccess}
               </span>
+              <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                <Clock size={13} color="#8c6239" />
+                <span>Order Placed: <strong style={{ color: '#18110C' }}>{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })} at {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })} IST</strong></span>
+              </div>
               <p style={{ margin: '6px 0 0', fontSize: '0.82rem', color: '#475569', lineHeight: 1.5 }}>
                 A copy of your order summary and official <strong>Tax Invoice</strong> has been sent to <strong>{form.email}</strong>.
               </p>
