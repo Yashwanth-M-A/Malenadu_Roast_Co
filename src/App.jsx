@@ -384,7 +384,8 @@ const DroppingBeans = () => {
     beanImg.crossOrigin = 'anonymous';
     beanImg.src = '/assets/images/coffee_bean_real.webp';
 
-    beanImg.onload = () => {
+    const processBeanImage = () => {
+      if (processedBitmap) return;
       // Draw to offscreen canvas to access pixels
       const offscreen = document.createElement('canvas');
       offscreen.width = beanImg.naturalWidth;
@@ -417,7 +418,7 @@ const DroppingBeans = () => {
         });
       }
 
-      // BFS flood fill â€” make background pixels fully transparent
+      // BFS flood fill — make background pixels fully transparent
       while (queue.length > 0) {
         const pos = queue.pop();
         const i4 = pos * 4;
@@ -437,15 +438,13 @@ const DroppingBeans = () => {
         }
       }
 
-      // â”€â”€ Fringe erosion pass â”€â”€
-      // Any pixel adjacent to a transparent pixel that's still light â†’ fade it out
+      // Fringe erosion pass
       const result = new Uint8ClampedArray(data);
       for (let y = 1; y < H - 1; y++) {
         for (let x = 1; x < W - 1; x++) {
           const pos = y * W + x;
           const i4 = pos * 4;
-          if (data[i4 + 3] === 0) continue; // already transparent
-          // Check if any neighbor is transparent (background)
+          if (data[i4 + 3] === 0) continue;
           const hasTransparentNeighbor =
             data[((y - 1) * W + x) * 4 + 3] === 0 ||
             data[((y + 1) * W + x) * 4 + 3] === 0 ||
@@ -454,7 +453,6 @@ const DroppingBeans = () => {
           if (hasTransparentNeighbor) {
             const brightness = (data[i4] + data[i4 + 1] + data[i4 + 2]) / 3;
             if (brightness > 130) {
-              // Fade based on how bright/white this edge pixel is
               result[i4 + 3] = Math.round(Math.max(0, (1 - (brightness - 130) / 125)) * 255);
             }
           }
@@ -470,24 +468,38 @@ const DroppingBeans = () => {
       });
     };
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const beanCount = isMobile ? 12 : 28;
+    beanImg.onload = processBeanImage;
+    if (beanImg.complete && beanImg.naturalWidth) {
+      processBeanImage();
+    }
 
-    const beans = Array.from({ length: beanCount }, () => {
-      const size = 20 + Math.random() * (isMobile ? 22 : 30);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const beanCount = isMobile ? 18 : 34;
+
+    const beans = Array.from({ length: beanCount }, (_, idx) => {
+      const size = 22 + Math.random() * (isMobile ? 22 : 32);
+      const cWidth = canvas.width || window.innerWidth || 1200;
+      const cHeight = canvas.height || window.innerHeight || 800;
+
+      // Seed beans directly across the entire screen on load (0–1s instant visibility)
+      // and queue a stream right at the top so beans are actively dropping from the very first frame!
+      const initialY = idx < Math.floor(beanCount * 0.7)
+        ? Math.random() * cHeight * 0.95
+        : -10 - Math.random() * (cHeight * 0.35);
+
       return {
-        x: Math.random() * (canvas.width || window.innerWidth),
-        y: -80 - Math.random() * (canvas.height || window.innerHeight),
+        x: Math.random() * cWidth,
+        y: initialY,
         w: size,
         h: size * 0.75,
-        speedY: 0.6 + Math.random() * 1.0,
-        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: (isMobile ? 1.6 : 2.0) + Math.random() * (isMobile ? 1.8 : 2.5),
+        speedX: (Math.random() - 0.5) * 0.6,
         rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.018,
+        rotSpeed: (Math.random() - 0.5) * 0.025,
         wobble: Math.random() * Math.PI * 2,
-        wobbleAmp: 0.2 + Math.random() * 0.4,
-        wobbleSpeed: 0.01 + Math.random() * 0.014,
-        opacity: 0.65 + Math.random() * 0.35,
+        wobbleAmp: 0.3 + Math.random() * 0.5,
+        wobbleSpeed: 0.015 + Math.random() * 0.02,
+        opacity: 0.7 + Math.random() * 0.3,
       };
     });
     // Sort once upfront by size for depth ordering
@@ -513,8 +525,9 @@ const DroppingBeans = () => {
           b.x += b.speedX + Math.sin(b.wobble) * b.wobbleAmp;
           b.rotation += b.rotSpeed;
 
-          if (b.y > canvas.height + 60) {
-            b.y = -60;
+          // Respawn just above top of canvas for constant unbroken rainfall
+          if (b.y > canvas.height + 40) {
+            b.y = -20 - Math.random() * 50;
             b.x = Math.random() * canvas.width;
           }
 
