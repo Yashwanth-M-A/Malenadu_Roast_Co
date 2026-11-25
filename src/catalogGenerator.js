@@ -313,8 +313,8 @@ export const generateDigitalCatalog = () => {
               </p>
               <table class="pricing-table">
                 <tr><th>Pack Size</th><th>Price (Incl. 5% GST)</th></tr>
-                <tr><td>500 Grams (Popular)</td><td class="price">&#8377;459</td></tr>
-                <tr><td>1 Kilogram (Value)</td><td class="price">&#8377;849</td></tr>
+                <tr><td>500 Grams (Popular)</td><td class="price">&#8377;469</td></tr>
+                <tr><td>1 Kilogram (Value)</td><td class="price">&#8377;874</td></tr>
               </table>
             </div>
 
@@ -328,8 +328,8 @@ export const generateDigitalCatalog = () => {
               </p>
               <table class="pricing-table">
                 <tr><th>Pack Size</th><th>Price (Incl. 5% GST)</th></tr>
-                <tr><td>500 Grams</td><td class="price">&#8377;519</td></tr>
-                <tr><td>1 Kilogram</td><td class="price">&#8377;959</td></tr>
+                <tr><td>500 Grams</td><td class="price">&#8377;529</td></tr>
+                <tr><td>1 Kilogram</td><td class="price">&#8377;984</td></tr>
               </table>
             </div>
 
@@ -343,8 +343,8 @@ export const generateDigitalCatalog = () => {
               </p>
               <table class="pricing-table">
                 <tr><th>Pack Size</th><th>Price (Incl. 5% GST)</th></tr>
-                <tr><td>500 Grams</td><td class="price">&#8377;569</td></tr>
-                <tr><td>1 Kilogram</td><td class="price">&#8377;1,059</td></tr>
+                <tr><td>500 Grams</td><td class="price">&#8377;579</td></tr>
+                <tr><td>1 Kilogram</td><td class="price">&#8377;1,084</td></tr>
               </table>
             </div>
 

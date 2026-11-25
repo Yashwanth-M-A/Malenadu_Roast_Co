@@ -9,8 +9,8 @@ const COMBO_COFFEES = [
     badge: 'Signature 70:30',
     tag: 'Traditional Degree Filter Coffee',
     weights: [
-      { label: '500g', price: 459, image: '/assets/images/estate_reserve_front.jpg' },
-      { label: '1kg', price: 849, image: '/assets/images/estate_reserve_front.jpg' }
+      { label: '500g', price: 469, image: '/assets/images/estate_reserve_front.jpg' },
+      { label: '1kg', price: 874, image: '/assets/images/estate_reserve_front.jpg' }
     ]
   },
   {
@@ -19,8 +19,8 @@ const COMBO_COFFEES = [
     badge: 'Heritage 85:15',
     tag: 'Dark Roast Filter Coffee',
     weights: [
-      { label: '500g', price: 569, image: '/assets/images/imperial_heritage_front.jpg' },
-      { label: '1kg', price: 1059, image: '/assets/images/imperial_heritage_front.jpg' }
+      { label: '500g', price: 579, image: '/assets/images/imperial_heritage_front.jpg' },
+      { label: '1kg', price: 1084, image: '/assets/images/imperial_heritage_front.jpg' }
     ]
   },
   {
@@ -29,8 +29,8 @@ const COMBO_COFFEES = [
     badge: 'Rare Single Pearl',
     tag: 'Dense Estate Peaberry Roast',
     weights: [
-      { label: '500g', price: 699, image: '/assets/images/peaberry_grand_cru_front.jpg' },
-      { label: '1kg', price: 1329, image: '/assets/images/peaberry_grand_cru_front.jpg' }
+      { label: '500g', price: 709, image: '/assets/images/peaberry_grand_cru_front.jpg' },
+      { label: '1kg', price: 1354, image: '/assets/images/peaberry_grand_cru_front.jpg' }
     ]
   },
   {
@@ -39,8 +39,8 @@ const COMBO_COFFEES = [
     badge: '100% Arabica',
     tag: 'High-Elevation Medium Roast',
     weights: [
-      { label: '500g', price: 519, image: '/assets/images/highland_signature_front.jpg' },
-      { label: '1kg', price: 959, image: '/assets/images/highland_signature_front.jpg' }
+      { label: '500g', price: 529, image: '/assets/images/highland_signature_front.jpg' },
+      { label: '1kg', price: 984, image: '/assets/images/highland_signature_front.jpg' }
     ]
   },
   {
@@ -49,8 +49,8 @@ const COMBO_COFFEES = [
     badge: '100% Whole Beans',
     tag: 'Whole Roasted Coffee Beans',
     weights: [
-      { label: '500g', price: 729, image: '/assets/images/signature_beans_front.jpg' },
-      { label: '1kg', price: 1379, image: '/assets/images/signature_beans_front.jpg' }
+      { label: '500g', price: 739, image: '/assets/images/signature_beans_front.jpg' },
+      { label: '1kg', price: 1404, image: '/assets/images/signature_beans_front.jpg' }
     ]
   }
 ];

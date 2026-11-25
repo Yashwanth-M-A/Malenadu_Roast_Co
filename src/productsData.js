@@ -18,8 +18,8 @@ export const DEFAULT_COFFEE_PRODUCTS = [
       '/assets/images/estate_reserve_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '459', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' },
-      { weight: '1kg', price: '849', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' }
+      { weight: '500g', price: '469', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' },
+      { weight: '1kg', price: '874', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark Roast (Full City)',
@@ -84,8 +84,8 @@ export const DEFAULT_COFFEE_PRODUCTS = [
       '/assets/images/highland_signature_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '519', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' },
-      { weight: '1kg', price: '959', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' }
+      { weight: '500g', price: '529', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' },
+      { weight: '1kg', price: '984', image: '/assets/images/highland_signature_front.jpg', backImage: '/assets/images/highland_signature_back.jpg' }
     ],
     specs: {
       roast: 'Medium Roast',
@@ -142,8 +142,8 @@ export const DEFAULT_COFFEE_PRODUCTS = [
       '/assets/images/imperial_heritage_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '569', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' },
-      { weight: '1kg', price: '1059', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' }
+      { weight: '500g', price: '579', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' },
+      { weight: '1kg', price: '1084', image: '/assets/images/imperial_heritage_front.jpg', backImage: '/assets/images/imperial_heritage_back.jpg' }
     ],
     specs: {
       roast: 'Dark Roast (Vienna Roast)',
@@ -200,8 +200,8 @@ export const DEFAULT_COFFEE_PRODUCTS = [
       '/assets/images/peaberry_grand_cru_duo.webp'
     ],
     variants: [
-      { weight: '500g', price: '699', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' },
-      { weight: '1kg', price: '1329', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' }
+      { weight: '500g', price: '709', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' },
+      { weight: '1kg', price: '1354', image: '/assets/images/peaberry_grand_cru_front.jpg', backImage: '/assets/images/peaberry_grand_cru_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark (City+) Roast',
@@ -257,8 +257,8 @@ export const DEFAULT_COFFEE_PRODUCTS = [
       '/assets/images/signature_beans_duo.jpg'
     ],
     variants: [
-      { weight: '500g', price: '729', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' },
-      { weight: '1kg', price: '1379', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' }
+      { weight: '500g', price: '739', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' },
+      { weight: '1kg', price: '1404', image: '/assets/images/signature_beans_front.jpg', backImage: '/assets/images/signature_beans_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark Roast',
@@ -456,7 +456,7 @@ const filter250g = (variants) => {
   return variants.filter(v => (v.weight || '').trim() !== '250g');
 };
 
-const DATA_VERSION = 'v10_coffee_pricing_plus10';
+const DATA_VERSION = 'v11_pricing_500g_20_1kg_35';
 
 // Helper: Merge rich specs & faqs into stored items, ensuring roaster specs are strictly authoritative
 const mergeProductMetadata = (storedList, defaultList) => {
@@ -568,8 +568,8 @@ export const addStoreProduct = (category, productData) => {
     outOfStock: Boolean(productData.outOfStock),
     category: catKey,
     variants: productData.variants && productData.variants.length > 0 ? productData.variants : [
-      { weight: '500g', price: productData.price || '459', image: productData.image || '/assets/images/coffee_pack_new.webp' },
-      { weight: '1kg', price: String(Math.round(Number(productData.price || 459) * 1.85)), image: productData.image || '/assets/images/coffee_pack_new.webp' }
+      { weight: '500g', price: productData.price || '469', image: productData.image || '/assets/images/coffee_pack_new.webp' },
+      { weight: '1kg', price: String(Math.round(Number(productData.price || 469) * 1.85)), image: productData.image || '/assets/images/coffee_pack_new.webp' }
     ]
   };
 
