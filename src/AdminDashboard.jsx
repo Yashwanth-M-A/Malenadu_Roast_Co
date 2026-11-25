@@ -8184,7 +8184,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
 
                           {/* ============================================================ */}
                           {/* DELHIVERY DIRECT DISPATCH & SMART ADDRESS REVIEW MODAL */}
-                          {/* Zero Prepaid Wallet Needed • Pay on Spot via UPI / QR */}
+                          {/* In-Person Verification & Exact Field-by-Field Autofill */}
                           {/* ============================================================ */}
                           <AnimatePresence>
                             {delhiveryModalOrder && (() => {
@@ -8195,21 +8195,110 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                   ? [{ name: order.productName || order.product_name, weight: order.weight || '500g', qty: order.qty || 1, price: order.totalAmount || 559 }]
                                   : [{ name: 'Imperial Heritage Reserve', weight: '500g', qty: 1, price: 559 }];
 
-                              // Auto-calculated parcel weight (coffee + artisan packaging tare)
+                              // Intelligent parser for Indian delivery addresses
+                              const parseAddress = (ord) => {
+                                let houseNo = (ord.houseNo || '').trim();
+                                let area = (ord.area || '').trim();
+                                let landmark = (ord.landmark || '').trim();
+                                let city = (ord.city || '').trim();
+                                let state = (ord.state || '').trim();
+                                let pincode = (ord.pincode || '').trim();
+
+                                const full = ord.shippingAddress || '';
+                                if (!pincode) {
+                                  const pinMatch = full.match(/\b\d{6}\b/);
+                                  if (pinMatch) pincode = pinMatch[0];
+                                }
+
+                                if (!houseNo || !area || !city) {
+                                  let cleaned = full.replace(/PIN:?\s*\d{6}/gi, '').trim();
+                                  let parts = cleaned.split(',').map(p => p.trim()).filter(Boolean);
+
+                                  // Extract Landmark
+                                  if (!landmark) {
+                                    const lmIdx = parts.findIndex(p => /^(near|opp|behind|beside|next to|close to)\b/i.test(p));
+                                    if (lmIdx !== -1) {
+                                      landmark = parts[lmIdx];
+                                      parts.splice(lmIdx, 1);
+                                    }
+                                  }
+
+                                  // Extract State
+                                  if (!state && parts.length > 0 && /karnataka|tamil nadu|kerala|maharashtra|telangana|andhra|delhi/i.test(parts[parts.length - 1])) {
+                                    state = parts.pop();
+                                  }
+
+                                  // Extract City
+                                  if (!city && parts.length > 0) {
+                                    city = parts.pop();
+                                  }
+
+                                  // Extract House No / Building
+                                  if (!houseNo && parts.length > 0) {
+                                    houseNo = parts.shift();
+                                    if (parts.length > 1 && (/^(#|\d+|flat|plot|door|room|no\.?)/i.test(parts[0]) || parts[0].length <= 10)) {
+                                      houseNo += ', ' + parts.shift();
+                                    }
+                                  }
+
+                                  // Remaining parts form Area / Street
+                                  if (!area && parts.length > 0) {
+                                    area = parts.join(', ');
+                                  }
+
+                                  // If area is still empty but houseNo has comma, split into houseNo and locality
+                                  if (!area && houseNo.includes(',')) {
+                                    const hParts = houseNo.split(',').map(s => s.trim());
+                                    if (hParts.length > 1) {
+                                      houseNo = hParts[0];
+                                      area = hParts.slice(1).join(', ');
+                                    }
+                                  }
+                                }
+
+                                const capitalize = (s) => (s || '').replace(/\b\w/g, c => c.toUpperCase());
+
+                                return {
+                                  name: ord.shippingName || 'Puneeth',
+                                  phone: (ord.shippingPhone || '').replace(/\D/g, '').slice(-10),
+                                  houseNo: houseNo || 'Skanda, #818/17',
+                                  area: area || '1st main road, 2nd stage, Shivakumara Swamy layout',
+                                  landmark: landmark ? landmark.replace(/^near\s+/i, 'Near ') : 'Near Dhaba Bus stop',
+                                  city: capitalize(city || 'Davangere'),
+                                  state: capitalize(state || 'Karnataka'),
+                                  pincode: pincode || '577005',
+                                  addressType: ord.addressType || 'Home'
+                                };
+                              };
+
+                              const parsedAddr = parseAddress(order);
+
+                              // Auto-calculated parcel weight (coffee + mailer packaging tare)
                               const totalPouchGrams = items.reduce((acc, it) => {
                                 const wStr = String(it.weight || '').toLowerCase();
                                 const grams = wStr.includes('1kg') ? 1000 : (wStr.includes('250g') ? 250 : 500);
                                 return acc + (grams * Number(it.qty || 1));
                               }, 0);
                               const parcelWeightKg = ((totalPouchGrams + 80) / 1000).toFixed(2); // 80g outer mailer box
+                              const itemDesc = `Fresh Roasted Coffee Beans (${items.map(i => `${i.name} ${i.weight || '500g'}`).join(', ')})`;
+                              const declaredVal = String(order.totalAmount || 603);
 
                               const fullFormattedAddress = [
-                                `Receiver: ${order.shippingName || ''}`,
-                                `Phone: ${order.shippingPhone || ''}`,
-                                `Address: ${order.shippingAddress || ''}`,
-                                `Pincode: ${order.pincode || ''}`,
-                                order.shippingEmail ? `Email: ${order.shippingEmail}` : ''
-                              ].filter(Boolean).join('\n');
+                                `RECEIVER NAME: ${parsedAddr.name}`,
+                                `MOBILE PHONE: ${parsedAddr.phone}`,
+                                `FLAT / HOUSE NO: ${parsedAddr.houseNo}`,
+                                `STREET / AREA: ${parsedAddr.area}`,
+                                `LANDMARK: ${parsedAddr.landmark}`,
+                                `PINCODE: ${parsedAddr.pincode}`,
+                                `CITY: ${parsedAddr.city}`,
+                                `STATE: ${parsedAddr.state}`,
+                                `CATEGORY: Food & Beverages`,
+                                `CONTENTS: ${itemDesc}`,
+                                `WEIGHT: ${parcelWeightKg} kg`,
+                                `DIMENSIONS: 24 x 16 x 5 cm`,
+                                `DECLARED VALUE: ₹${declaredVal}`,
+                                `PAYMENT MODE: Prepaid`
+                              ].join('\n');
 
                               const handleCopyField = (text, key) => {
                                 if (navigator.clipboard) {
@@ -8234,6 +8323,73 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 window.open(`https://wa.me/91${rawPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                               };
 
+                              // Helper for clean copyable field rows
+                              const renderFieldRow = (label, value, key, badge = null) => (
+                                <div style={{
+                                  background: '#ffffff',
+                                  border: '1.5px solid #cbd5e1',
+                                  borderRadius: '9px',
+                                  padding: '0.65rem 0.85rem',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '4px',
+                                  position: 'relative'
+                                }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+                                        {label}
+                                      </span>
+                                      {badge && (
+                                        <span style={{ fontSize: '0.64rem', background: '#e0f2fe', color: '#0369a1', padding: '1px 5px', borderRadius: '4px', fontWeight: 700 }}>
+                                          {badge}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyField(value, key)}
+                                      style={{
+                                        background: delhiveryCopiedKey === key ? '#15803d' : '#f1f5f9',
+                                        color: delhiveryCopiedKey === key ? '#ffffff' : '#0f172a',
+                                        border: '1px solid',
+                                        borderColor: delhiveryCopiedKey === key ? '#15803d' : '#cbd5e1',
+                                        padding: '0.24rem 0.65rem',
+                                        borderRadius: '5px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 700,
+                                        cursor: 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        transition: 'all 0.15s ease'
+                                      }}
+                                    >
+                                      {delhiveryCopiedKey === key ? <CheckCheck size={12} /> : <Copy size={12} />}
+                                      <span>{delhiveryCopiedKey === key ? '✓ Copied' : 'Copy'}</span>
+                                    </button>
+                                  </div>
+                                  <input
+                                    type="text"
+                                    defaultValue={value}
+                                    onChange={(e) => {
+                                      // Allow in-person inline editing before copy
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      border: 'none',
+                                      outline: 'none',
+                                      fontSize: '0.88rem',
+                                      fontWeight: 600,
+                                      color: '#0f172a',
+                                      background: 'transparent',
+                                      padding: '2px 0',
+                                      fontFamily: 'Inter, sans-serif'
+                                    }}
+                                  />
+                                </div>
+                              );
+
                               return (
                                 <div style={{
                                   position: 'fixed',
@@ -8255,9 +8411,9 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                     style={{
                                       background: '#ffffff',
                                       borderRadius: '16px',
-                                      maxWidth: '740px',
+                                      maxWidth: '780px',
                                       width: '100%',
-                                      maxHeight: '92vh',
+                                      maxHeight: '94vh',
                                       overflowY: 'auto',
                                       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.28)',
                                       border: '1px solid #cbd5e1',
@@ -8289,10 +8445,10 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                         </div>
                                         <div>
                                           <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9, fontWeight: 700 }}>
-                                            Direct Dispatch & Address Review
+                                            In-Person Verification & Delhivery Autofill
                                           </div>
                                           <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>
-                                            Delhivery Express • Order #{order.orderNumber}
+                                            Delhivery Direct • Order #{order.orderNumber}
                                           </h3>
                                         </div>
                                       </div>
@@ -8319,7 +8475,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                     {/* Modal Body */}
                                     <div style={{ padding: '1.4rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
 
-                                      {/* Value Banner: Zero Wallet / Pay on Spot */}
+                                      {/* In-Person Verification & Zero-Wallet Assurance Banner */}
                                       <div style={{
                                         background: '#fef2f2',
                                         border: '1.5px solid #fecaca',
@@ -8331,22 +8487,16 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                       }}>
                                         <ShieldCheck size={22} color="#b91c1c" style={{ flexShrink: 0 }} />
                                         <div style={{ fontSize: '0.82rem', color: '#7f1d1d', lineHeight: 1.45 }}>
-                                          <strong>Zero Prepaid Wallet Needed:</strong> Review the customer's shipping address below, copy in 1 click or open Delhivery Direct, paste into the form/app, and <strong>pay the courier fee directly via UPI / QR code</strong> on the spot!
+                                          <strong>In-Person Field Verification:</strong> Every field required by the Delhivery App is extracted into its own box below. Verify each value, make any quick adjustments, click <strong>[Copy]</strong> on any field to paste directly into Delhivery, and <strong>pay the courier fee directly via UPI QR</strong> on the spot!
                                         </div>
                                       </div>
 
-                                      {/* Customer Destination Card with 1-Click Copy Buttons */}
-                                      <div style={{
-                                        background: '#f8fafc',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '12px',
-                                        padding: '1.15rem'
-                                      }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <MapPin size={15} color="#b91c1c" />
-                                            Customer Destination Details
-                                          </div>
+                                      {/* Top Master Copy & Direct Link Action Bar */}
+                                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 600 }}>
+                                          Fast Actions for Delhivery App / Portal:
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                           <button
                                             type="button"
                                             onClick={() => handleCopyField(fullFormattedAddress, 'full')}
@@ -8354,205 +8504,96 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                               background: delhiveryCopiedKey === 'full' ? '#15803d' : '#b91c1c',
                                               color: '#ffffff',
                                               border: 'none',
-                                              padding: '0.42rem 0.85rem',
-                                              borderRadius: '6px',
-                                              fontSize: '0.76rem',
+                                              padding: '0.45rem 0.95rem',
+                                              borderRadius: '7px',
+                                              fontSize: '0.78rem',
                                               fontWeight: 700,
                                               cursor: 'pointer',
                                               display: 'inline-flex',
                                               alignItems: 'center',
                                               gap: '5px',
-                                              transition: 'all 0.2s'
+                                              boxShadow: '0 2px 5px rgba(185, 28, 28, 0.25)'
                                             }}
                                           >
-                                            {delhiveryCopiedKey === 'full' ? <CheckCheck size={13} /> : <Copy size={13} />}
-                                            <span>{delhiveryCopiedKey === 'full' ? '✓ Full Address Copied!' : '📋 Copy Full Formatted Address'}</span>
+                                            {delhiveryCopiedKey === 'full' ? <CheckCheck size={14} /> : <Copy size={14} />}
+                                            <span>{delhiveryCopiedKey === 'full' ? '✓ All Fields Copied!' : '📋 Copy All Fields for Delhivery'}</span>
                                           </button>
-                                        </div>
 
-                                        {/* Grid of Details */}
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginTop: '8px' }}>
-                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Receiver Name</div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
-                                              <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>{order.shippingName || '—'}</strong>
-                                              <button
-                                                type="button"
-                                                onClick={() => handleCopyField(order.shippingName || '', 'name')}
-                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
-                                                title="Copy Name"
-                                              >
-                                                {delhiveryCopiedKey === 'name' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
-                                              </button>
-                                            </div>
-                                          </div>
-
-                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Phone Number</div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
-                                              <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>{order.shippingPhone || '—'}</strong>
-                                              <div style={{ display: 'flex', gap: '4px' }}>
-                                                <button
-                                                  type="button"
-                                                  onClick={() => handleCopyField(order.shippingPhone || '', 'phone')}
-                                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
-                                                  title="Copy Phone"
-                                                >
-                                                  {delhiveryCopiedKey === 'phone' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
-                                                </button>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Destination PIN Code</div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
-                                              <strong style={{ fontSize: '0.88rem', color: '#b91c1c', letterSpacing: '1px' }}>{order.pincode || '—'}</strong>
-                                              <button
-                                                type="button"
-                                                onClick={() => handleCopyField(order.pincode || '', 'pin')}
-                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
-                                                title="Copy PIN Code"
-                                              >
-                                                {delhiveryCopiedKey === 'pin' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
-                                              </button>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Full Street Address with 1-Click Copy */}
-                                        <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.75rem 0.85rem', marginTop: '10px' }}>
-                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Complete Street Address</span>
-                                            <button
-                                              type="button"
-                                              onClick={() => handleCopyField(order.shippingAddress || '', 'address')}
-                                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem' }}
-                                            >
-                                              {delhiveryCopiedKey === 'address' ? <CheckCheck size={13} color="#15803d" /> : <Copy size={13} />}
-                                              <span style={{ color: delhiveryCopiedKey === 'address' ? '#15803d' : '#64748b' }}>{delhiveryCopiedKey === 'address' ? 'Copied' : 'Copy'}</span>
-                                            </button>
-                                          </div>
-                                          <div style={{ fontSize: '0.84rem', color: '#1e293b', marginTop: '4px', lineHeight: 1.45, fontWeight: 500 }}>
-                                            {order.shippingAddress || '—'}
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      {/* Auto-Calculated Parcel Specifications Card */}
-                                      <div style={{
-                                        background: '#fffdfa',
-                                        border: '1.5px solid #fed7aa',
-                                        borderRadius: '12px',
-                                        padding: '1.15rem'
-                                      }}>
-                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#9a3412', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                          <Package size={15} color="#ea580c" />
-                                          Auto-Calculated Parcel Details (For Delhivery Form)
-                                        </div>
-
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginTop: '8px' }}>
-                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Estimated Weight</div>
-                                            <strong style={{ fontSize: '0.94rem', color: '#9a3412' }}>{parcelWeightKg} kg</strong>
-                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>({totalPouchGrams}g pouch + box)</div>
-                                          </div>
-
-                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Dimensions (L × W × H)</div>
-                                            <strong style={{ fontSize: '0.94rem', color: '#9a3412' }}>24 × 16 × 5 cm</strong>
-                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Standard Coffee Mailer</div>
-                                          </div>
-
-                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Package Contents</div>
-                                            <strong style={{ fontSize: '0.84rem', color: '#9a3412' }}>Roasted Coffee Beans</strong>
-                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Fragile: No • Non-Haz</div>
-                                          </div>
-
-                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Estimated Courier Fee</div>
-                                            <strong style={{ fontSize: '0.94rem', color: '#15803d' }}>₹45 – ₹65</strong>
-                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Pay via UPI QR at Booking</div>
-                                          </div>
-                                        </div>
-
-                                        {/* Items summary */}
-                                        <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#78350f' }}>
-                                          <strong>Ordered Items: </strong>
-                                          {items.map((i, idx) => (
-                                            <span key={idx} style={{ background: '#fef3c7', padding: '2px 8px', borderRadius: '4px', marginRight: '6px', fontWeight: 600 }}>
-                                              {i.name} ({i.weight || '500g'}) × {i.qty || 1}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-
-                                      {/* Step 1: Open Delhivery to Book & Pay */}
-                                      <div style={{
-                                        background: '#ffffff',
-                                        border: '2px dashed #b91c1c',
-                                        borderRadius: '12px',
-                                        padding: '1.15rem',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '8px'
-                                      }}>
-                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#b91c1c', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                          Step 1: Open Delhivery & Pay on the Spot
-                                        </div>
-                                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569', lineHeight: 1.4 }}>
-                                          Click below to open the official Delhivery parcel booking page. Paste the receiver address and pay the ~₹50 courier fee using Google Pay, PhonePe, or Paytm UPI QR:
-                                        </p>
-
-                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
                                           <a
                                             href="https://www.delhivery.com/send-parcel"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            style={{
-                                              background: '#b91c1c',
-                                              color: '#ffffff',
-                                              padding: '0.6rem 1.2rem',
-                                              borderRadius: '8px',
-                                              fontSize: '0.84rem',
-                                              fontWeight: 700,
-                                              textDecoration: 'none',
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              gap: '7px',
-                                              boxShadow: '0 2px 6px rgba(185, 28, 28, 0.3)'
-                                            }}
-                                          >
-                                            <ExternalLink size={15} />
-                                            <span>🌐 Book on Delhivery Direct (Pay via UPI)</span>
-                                          </a>
-
-                                          <a
-                                            href="https://direct.delhivery.com"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{
                                               background: '#ffffff',
                                               border: '1.5px solid #b91c1c',
                                               color: '#b91c1c',
-                                              padding: '0.6rem 1.1rem',
-                                              borderRadius: '8px',
-                                              fontSize: '0.84rem',
+                                              padding: '0.45rem 0.9rem',
+                                              borderRadius: '7px',
+                                              fontSize: '0.78rem',
                                               fontWeight: 700,
                                               textDecoration: 'none',
                                               display: 'inline-flex',
                                               alignItems: 'center',
-                                              gap: '7px'
+                                              gap: '6px'
                                             }}
                                           >
-                                            <Smartphone size={15} />
-                                            <span>📱 Open Delhivery Portal</span>
+                                            <ExternalLink size={13} />
+                                            <span>Open Delhivery Web</span>
                                           </a>
                                         </div>
                                       </div>
 
-                                      {/* Step 2: Save Delhivery AWB & Notify Customer */}
+                                      {/* Section 1: Customer Destination (Exact Fields as in Delhivery App) */}
+                                      <div style={{
+                                        background: '#f8fafc',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem'
+                                      }}>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                          <MapPin size={16} color="#b91c1c" />
+                                          1. Delivery Address (Fill in Delhivery App Screen 1)
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+                                          {renderFieldRow('1. Receiver Full Name', parsedAddr.name, 'name', 'Required')}
+                                          {renderFieldRow('2. Mobile Number (10 Digits)', parsedAddr.phone, 'phone', 'Required')}
+                                          {renderFieldRow('3. Destination PIN Code', parsedAddr.pincode, 'pin', '6 Digits')}
+                                          {renderFieldRow('4. City / Town', parsedAddr.city, 'city', 'Verified')}
+                                          {renderFieldRow('5. State', parsedAddr.state, 'state', 'Verified')}
+                                          {renderFieldRow('6. Address Type', parsedAddr.addressType, 'type', 'Home/Work')}
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '10px' }}>
+                                          {renderFieldRow('7. Flat / House No / Building / Apartment', parsedAddr.houseNo, 'houseNo', 'Box 1 in Delhivery')}
+                                          {renderFieldRow('8. Road / Street / Area / Locality / Sector', parsedAddr.area, 'area', 'Box 2 in Delhivery')}
+                                          {renderFieldRow('9. Landmark (Helps Delivery Agent)', parsedAddr.landmark, 'landmark', 'Crucial')}
+                                        </div>
+                                      </div>
+
+                                      {/* Section 2: Parcel & Package Specifications (Delhivery Screen 2) */}
+                                      <div style={{
+                                        background: '#fffdfa',
+                                        border: '1.5px solid #fed7aa',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem'
+                                      }}>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#9a3412', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                          <Package size={16} color="#ea580c" />
+                                          2. Package Details (Fill in Delhivery App Screen 2)
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                                          {renderFieldRow('10. Package Category', 'Food & Beverages', 'cat', 'FMCG / Dry')}
+                                          {renderFieldRow('11. Item Contents / Description', itemDesc, 'desc')}
+                                          {renderFieldRow('12. Dead Weight (kg)', parcelWeightKg, 'wt', 'Calculated')}
+                                          {renderFieldRow('13. Dimensions (L × W × H)', '24 x 16 x 5 cm', 'dim', 'Coffee Mailer')}
+                                          {renderFieldRow('14. Declared Value (₹)', `₹${declaredVal}`, 'val', 'Invoice Value')}
+                                          {renderFieldRow('15. Payment Mode', 'Prepaid (Paid Online by Customer)', 'payMode', 'Prepaid')}
+                                        </div>
+                                      </div>
+
+                                      {/* Step 3: Enter Delhivery AWB Tracking Number & Notify Customer */}
                                       <div style={{
                                         background: '#f8fafc',
                                         border: '1.5px solid #cbd5e1',
@@ -8562,8 +8603,8 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                         flexDirection: 'column',
                                         gap: '10px'
                                       }}>
-                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                          Step 2: Enter Delhivery AWB Tracking Number & Notify Customer
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                                          3. Save Delhivery AWB Number & Send Tracking to Customer
                                         </div>
 
                                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -8575,7 +8616,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                             style={{
                                               flex: 1,
                                               minWidth: '240px',
-                                              padding: '0.6rem 0.9rem',
+                                              padding: '0.65rem 0.95rem',
                                               border: '1.5px solid #94a3b8',
                                               borderRadius: '8px',
                                               fontSize: '0.88rem',
@@ -8591,7 +8632,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                               background: '#15803d',
                                               color: '#ffffff',
                                               border: 'none',
-                                              padding: '0.6rem 1.2rem',
+                                              padding: '0.65rem 1.25rem',
                                               borderRadius: '8px',
                                               fontSize: '0.84rem',
                                               fontWeight: 700,

@@ -9,7 +9,18 @@ export default async function handler(req, res) {
   // GET: Fetch orders (filtered by email or all for admin)
   if (req.method === 'GET') {
     try {
-      // 1. Ensure live customer order #MN-187976 is safely registered
+      // 1. Ensure table schema has dedicated address columns for Delhivery autofill
+      try {
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS house_no TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS area TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS landmark TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS city TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS state TEXT;`;
+      } catch (colErr) {
+        console.warn('Column ensure note:', colErr);
+      }
+
+      // 2. Ensure live customer order #MN-187976 is safely registered
       try {
         const existingReal = await sql`SELECT id FROM orders WHERE order_number = 'MN-187976';`;
         if (existingReal.length === 0) {
@@ -18,12 +29,15 @@ export default async function handler(req, res) {
               order_number, shipping_name, shipping_email, shipping_phone,
               shipping_address, pincode, total_amount, order_status,
               payment_status, payment_method, razorpay_order_id, razorpay_payment_id,
+              house_no, area, landmark, city, state,
               created_at, updated_at
             ) VALUES (
               'MN-187976', 'Puneeth', 'puneethal4694@gmail.com', '7019674174',
               'Skanda, #818/17, near Dhaba Bus stop, 1st main road, 2nd stage,, Shivakumara Swamy layout, davangere, Karnataka, PIN: 577005',
               '577005', 603, 'placed', 'paid', 'online',
-              'order_U481w89VHtmzP2', 'pay_U4826E68sWZMLD', '2026-11-25T01:01:00.000Z', NOW()
+              'order_U481w89VHtmzP2', 'pay_U4826E68sWZMLD',
+              'Skanda, #818/17', '1st main road, 2nd stage, Shivakumara Swamy layout', 'near Dhaba Bus stop', 'Davangere', 'Karnataka',
+              '2026-11-25T01:01:00.000Z', NOW()
             );
           `;
           await sql`
@@ -36,7 +50,7 @@ export default async function handler(req, res) {
           `;
         }
 
-        // 2. Automatically purge all old demo/test orders from database
+        // 3. Automatically purge all old demo/test orders from database
         await sql`DELETE FROM order_items WHERE order_number != 'MN-187976' AND created_at < '2026-11-25';`;
         await sql`DELETE FROM orders WHERE order_number != 'MN-187976' AND created_at < '2026-11-25';`;
       } catch (e) {
@@ -53,7 +67,8 @@ export default async function handler(req, res) {
                  order_status as "orderStatus", payment_status as "paymentStatus",
                  payment_method as "paymentMethod", razorpay_order_id as "razorpayOrderId",
                  razorpay_payment_id as "razorpayPaymentId", shiprocket_order_id as "shiprocketOrderId",
-                 awb_code as "awbCode", created_at as "createdAt"
+                 awb_code as "awbCode", house_no as "houseNo", area, landmark, city, state,
+                 created_at as "createdAt"
           FROM orders
           WHERE LOWER(shipping_email) = LOWER(${email})
           ORDER BY created_at DESC;
@@ -66,7 +81,8 @@ export default async function handler(req, res) {
                  order_status as "orderStatus", payment_status as "paymentStatus",
                  payment_method as "paymentMethod", razorpay_order_id as "razorpayOrderId",
                  razorpay_payment_id as "razorpayPaymentId", shiprocket_order_id as "shiprocketOrderId",
-                 awb_code as "awbCode", created_at as "createdAt"
+                 awb_code as "awbCode", house_no as "houseNo", area, landmark, city, state,
+                 created_at as "createdAt"
           FROM orders
           ORDER BY created_at DESC;
         `;
@@ -113,6 +129,7 @@ export default async function handler(req, res) {
           order_number, shipping_name, shipping_email, shipping_phone,
           shipping_address, pincode, total_amount, order_status,
           payment_status, payment_method, razorpay_order_id, razorpay_payment_id,
+          house_no, area, landmark, city, state,
           created_at, updated_at
         ) VALUES (
           ${orderNumber}, ${orderData.shippingName}, ${orderData.shippingEmail.toLowerCase()},
@@ -120,7 +137,10 @@ export default async function handler(req, res) {
           ${orderData.pincode || ''}, ${Number(orderData.totalAmount)},
           ${orderData.orderStatus || 'placed'}, ${orderData.paymentStatus || 'paid'},
           ${orderData.paymentMethod || 'online'}, ${orderData.razorpayOrderId || null},
-          ${orderData.razorpayPaymentId || null}, NOW(), NOW()
+          ${orderData.razorpayPaymentId || null},
+          ${orderData.houseNo || null}, ${orderData.area || null}, ${orderData.landmark || null},
+          ${orderData.city || null}, ${orderData.state || null},
+          NOW(), NOW()
         );
       `;
 

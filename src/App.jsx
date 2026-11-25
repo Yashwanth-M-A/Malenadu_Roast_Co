@@ -8910,7 +8910,7 @@ const CheckoutModal = ({
                         />
                       </div>
                     </div>
-                    {/* Box 1: House no / Building / Apartment */}
+                    {/* Box 1: House no / Flat / Building / Apartment Name */}
                     <div>
                       <label style={{
                         display: 'block',
@@ -8920,7 +8920,7 @@ const CheckoutModal = ({
                         marginBottom: '6px',
                         letterSpacing: '-0.2px'
                       }}>
-                        House no / Building / Apartment <span style={{ color: '#dc2626' }}>*</span>
+                        Flat / House no / Building / Apartment Name <span style={{ color: '#dc2626' }}>*</span>
                       </label>
                       <div style={{
                         background: '#ffffff',
@@ -8930,7 +8930,7 @@ const CheckoutModal = ({
                       }}>
                         <input
                           type="text"
-                          placeholder="e.g. Flat 301, Emerald Heights / House #45"
+                          placeholder="e.g. Flat 301, Emerald Heights / Skanda, #818/17"
                           value={form.houseNo}
                           onChange={e => setForm({ ...form, houseNo: e.target.value })}
                           required
@@ -8950,7 +8950,7 @@ const CheckoutModal = ({
                       </div>
                     </div>
 
-                    {/* Box 2: Area, Sector, Street, Village */}
+                    {/* Box 2: Street / Road / Area / Locality / Sector */}
                     <div>
                       <label style={{
                         display: 'block',
@@ -8960,7 +8960,7 @@ const CheckoutModal = ({
                         marginBottom: '6px',
                         letterSpacing: '-0.2px'
                       }}>
-                        Area, Sector, Street, Village <span style={{ color: '#dc2626' }}>*</span>
+                        Street / Road / Area / Locality / Sector <span style={{ color: '#dc2626' }}>*</span>
                       </label>
                       <div style={{
                         background: '#ffffff',
@@ -8970,7 +8970,7 @@ const CheckoutModal = ({
                       }}>
                         <input
                           type="text"
-                          placeholder="e.g. 1st Main Road, 4th Cross, Malleshwaram"
+                          placeholder="e.g. 1st Main Road, 2nd Stage, Shivakumara Swamy Layout"
                           value={form.area}
                           onChange={e => setForm({ ...form, area: e.target.value })}
                           required
@@ -8990,18 +8990,21 @@ const CheckoutModal = ({
                       </div>
                     </div>
 
-                    {/* Box 3: Landmark */}
+                    {/* Box 3: Landmark (Prominent for Courier Delivery) */}
                     <div>
-                      <label style={{
-                        display: 'block',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        color: '#374151',
-                        marginBottom: '6px',
-                        letterSpacing: '-0.2px'
-                      }}>
-                        Landmark <span style={{ fontSize: '0.74rem', color: '#6b7280', fontWeight: 500 }}>(optional)</span>
-                      </label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <label style={{
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          color: '#374151',
+                          letterSpacing: '-0.2px'
+                        }}>
+                          Landmark
+                        </label>
+                        <span style={{ fontSize: '0.72rem', color: '#15803d', fontWeight: 700, background: '#dcfce7', padding: '1px 7px', borderRadius: '4px' }}>
+                          ⭐ Speeds up Courier Delivery
+                        </span>
+                      </div>
                       <div style={{
                         background: '#ffffff',
                         border: '1.5px solid #d1d5db',
@@ -9010,7 +9013,7 @@ const CheckoutModal = ({
                       }}>
                         <input
                           type="text"
-                          placeholder="e.g. Near Metro Station / Temple / Park"
+                          placeholder="e.g. Near Dhaba Bus Stop / Opposite Metro Station / Behind Temple"
                           value={form.landmark}
                           onChange={e => setForm({ ...form, landmark: e.target.value })}
                           style={{
