@@ -3691,12 +3691,6 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
   const [saveMsg, setSaveMsg] = useState('');
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
-  // Password Edit State
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({ newPassword: '', confirmPassword: '' });
-  const [passwordMsg, setPasswordMsg] = useState({ type: '', text: '' });
-  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   // Order Cancellation State (Strict 24h Window)
   const [cancellingOrder, setCancellingOrder] = useState(null);
@@ -4015,38 +4009,6 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
     }
   };
 
-  // Dedicated Password Change Handler
-  const handlePasswordUpdate = async (e) => {
-    e.preventDefault();
-    if (!passwordForm.newPassword || passwordForm.newPassword.length < 6) {
-      setPasswordMsg({ type: 'error', text: 'Password must be at least 6 characters long.' });
-      return;
-    }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordMsg({ type: 'error', text: 'Passwords do not match. Please verify.' });
-      return;
-    }
-
-    setIsSavingPassword(true);
-    setPasswordMsg({ type: '', text: '' });
-    try {
-      const { data } = await updateProfile({
-        ...profile,
-        password: passwordForm.newPassword
-      });
-      localStorage.setItem('malenadu_user', JSON.stringify(data));
-      setPasswordMsg({ type: 'success', text: 'Password updated successfully! Your new password is now active.' });
-      setPasswordForm({ newPassword: '', confirmPassword: '' });
-      setTimeout(() => {
-        setIsChangingPassword(false);
-        setPasswordMsg({ type: '', text: '' });
-      }, 2500);
-    } catch (err) {
-      setPasswordMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to update password. Please try again.' });
-    } finally {
-      setIsSavingPassword(false);
-    }
-  };
 
   // Strict 24-Hour Cancel Order Execution
   const handleExecuteCancel = async (orderNumber) => {
@@ -5194,7 +5156,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                       <span>Personal Information & Profile</span>
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.76rem', color: '#64748b' }}>
-                      Manage your personal details, verified email, and password security
+                      Manage your personal details and verified email
                     </p>
                   </div>
                   {!isEditing && (
@@ -5420,173 +5382,6 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                       <p style={{ fontWeight: 500, fontSize: '0.88rem', color: profile.address ? '#0f172a' : '#94a3b8', margin: 0, whiteSpace: 'pre-line', lineHeight: '1.45' }}>
                         {profile.address || 'No address added yet. Click "Edit Profile" to set your delivery address.'}
                       </p>
-                    </div>
-
-                    {/* Dedicated Password & Security Management Card */}
-                    <div style={{
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '9px',
-                      padding: '1rem',
-                      marginBottom: '1.25rem'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.72rem', fontWeight: 600, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            <Lock size={13} color="#C8935A" />
-                            <span>Security & Password</span>
-                          </div>
-                          <p style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a', margin: 0 }}>
-                            ••••••••••••
-                          </p>
-                          <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: '#64748b' }}>
-                            {currentUser?.provider === 'google'
-                              ? 'Google Linked Account — you can also set an estate password to login directly.'
-                              : 'Secured with password encryption'}
-                          </p>
-                        </div>
-
-                        {!isChangingPassword && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsChangingPassword(true);
-                              setPasswordMsg({ type: '', text: '' });
-                              setPasswordForm({ newPassword: '', confirmPassword: '' });
-                            }}
-                            style={{
-                              background: '#ffffff',
-                              border: '1.5px solid #C8935A',
-                              color: '#8c6239',
-                              borderRadius: '6px',
-                              padding: '0.4rem 0.85rem',
-                              fontSize: '0.76rem',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '5px'
-                            }}
-                          >
-                            <Lock size={13} />
-                            <span>Edit Password</span>
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Interactive Password Edit Drawer / Form */}
-                      {isChangingPassword && (
-                        <form onSubmit={handlePasswordUpdate} style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed #cbd5e1' }}>
-                          <h5 style={{ margin: '0 0 0.6rem', fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
-                            Change Your Password
-                          </h5>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
-                                New Password
-                              </label>
-                              <div style={{ position: 'relative' }}>
-                                <input
-                                  type={showPassword ? 'text' : 'password'}
-                                  value={passwordForm.newPassword}
-                                  onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                  placeholder="Min. 6 characters"
-                                  required
-                                  minLength={6}
-                                  style={{ width: '100%', padding: '0.55rem 2.2rem 0.55rem 0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', boxSizing: 'border-box' }}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
-                                >
-                                  <Eye size={15} />
-                                </button>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>
-                                Confirm New Password
-                              </label>
-                              <input
-                                type={showPassword ? 'text' : 'password'}
-                                value={passwordForm.confirmPassword}
-                                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                placeholder="Confirm new password"
-                                required
-                                minLength={6}
-                                style={{ width: '100%', padding: '0.55rem 0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', boxSizing: 'border-box' }}
-                              />
-                            </div>
-                          </div>
-
-                          {passwordMsg.text && (
-                            <div style={{
-                              padding: '0.55rem 0.8rem',
-                              borderRadius: '6px',
-                              fontSize: '0.76rem',
-                              fontWeight: 600,
-                              marginBottom: '0.8rem',
-                              background: passwordMsg.type === 'error' ? '#fef2f2' : '#f0fdf4',
-                              color: passwordMsg.type === 'error' ? '#dc2626' : '#166534',
-                              border: passwordMsg.type === 'error' ? '1px solid #fecaca' : '1px solid #bbf7d0',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px'
-                            }}>
-                              {passwordMsg.type === 'error' ? <AlertCircle size={14} /> : <CheckCircle size={14} />}
-                              <span>{passwordMsg.text}</span>
-                            </div>
-                          )}
-
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                              type="submit"
-                              disabled={isSavingPassword}
-                              style={{
-                                background: '#8c6239',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                padding: '0.45rem 1.1rem',
-                                fontSize: '0.78rem',
-                                fontWeight: 700,
-                                cursor: isSavingPassword ? 'wait' : 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '5px'
-                              }}
-                            >
-                              {isSavingPassword ? <Loader size={12} className="spin" /> : <Check size={13} />}
-                              <span>{isSavingPassword ? 'Updating...' : 'Save New Password'}</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={isSavingPassword}
-                              onClick={() => {
-                                setIsChangingPassword(false);
-                                setPasswordForm({ newPassword: '', confirmPassword: '' });
-                                setPasswordMsg({ type: '', text: '' });
-                              }}
-                              style={{
-                                background: '#fff',
-                                color: '#475569',
-                                border: '1px solid #cbd5e1',
-                                borderRadius: '6px',
-                                padding: '0.45rem 0.9rem',
-                                fontSize: '0.78rem',
-                                fontWeight: 600,
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </form>
-                      )}
                     </div>
 
                     <button
