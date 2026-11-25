@@ -317,8 +317,7 @@ export const DEFAULT_PEPPER_PRODUCTS = [
     image: '/assets/images/pepper_reserve_front.jpg',
     images: [
       '/assets/images/pepper_reserve_front.jpg',
-      '/assets/images/pepper_reserve_back.jpg',
-      '/assets/images/malenadu_full_lineup.jpg'
+      '/assets/images/pepper_reserve_back.jpg'
     ],
     variants: [
       { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
@@ -456,7 +455,7 @@ const filter250g = (variants) => {
   return variants.filter(v => (v.weight || '').trim() !== '250g');
 };
 
-const DATA_VERSION = 'v11_pricing_500g_20_1kg_35';
+const DATA_VERSION = 'v12_pepper_remove_lineup_img';
 
 // Helper: Merge rich specs & faqs into stored items, ensuring roaster specs are strictly authoritative
 const mergeProductMetadata = (storedList, defaultList) => {
