@@ -50,6 +50,36 @@ export const EmailBrandIcon = ({ size = 16, style = {} }) => (
 
 
 // ==========================================================
+// CROSS-PLATFORM CUSTOMER EMAIL COMPOSER (MOBILE + DESKTOP)
+// ==========================================================
+export const openCustomerEmailComposer = ({ email, subject, body }) => {
+  if (!email) {
+    alert('Customer email address not found.');
+    return;
+  }
+
+  const isMobileDevice = typeof window !== 'undefined' && (
+    window.innerWidth < 768 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '')
+  );
+
+  if (isMobileDevice) {
+    // Mobile browsers (Android Chrome, iOS Safari, etc.):
+    // mail.google.com/?view=cm redirects to the mobile web inbox without composing.
+    // Standard mailto: protocol natively opens the Gmail app or device mail client
+    // pre-populating To, Subject, and pre-formatted body message ready to send.
+    const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  } else {
+    // Laptop / Desktop browsers:
+    // Opens dedicated full-screen Gmail compose tab directly from malenaduroast@gmail.com
+    const gmailUrl = `https://mail.google.com/mail/u/malenaduroast@gmail.com/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(gmailUrl, '_blank');
+  }
+};
+
+
+// ==========================================================
 // TIMEZONE-SAFE CALENDAR DATE & RETENTION TIMELINE HELPERS
 // ==========================================================
 const getCalendarDaysAgo = (dateInput, refDate = new Date()) => {
@@ -1725,9 +1755,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       'Official Email: malenaduroast@gmail.com\n' +
       'Website: https://malenaduroastco.works';
 
-    // Strictly open Gmail directly from malenaduroast@gmail.com mailbox
-    const gmailUrl = 'https://mail.google.com/mail/u/malenaduroast@gmail.com/?view=cm&fs=1&to=' + encodeURIComponent(email) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody);
-    window.open(gmailUrl, '_blank');
+    // Cross-platform compose: Opens native Gmail app on mobile, and Gmail web tab on desktop
+    openCustomerEmailComposer({
+      email,
+      subject,
+      body: emailBody
+    });
   };
 
 
@@ -4419,9 +4452,13 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               'Malenadu Roast Co. Support\n' +
               'Email: malenaduroast@gmail.com';
 
-            const gmailUrl = 'https://mail.google.com/mail/u/malenaduroast@gmail.com/?view=cm&fs=1&to=' + encodeURIComponent(email) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-            window.open(gmailUrl, '_blank');
-            setLocalNotice('Opening Gmail as malenaduroast@gmail.com for ' + email + '...');
+            // Cross-platform compose: Opens native Gmail app on mobile, and Gmail web tab on desktop
+            openCustomerEmailComposer({
+              email,
+              subject,
+              body
+            });
+            setLocalNotice('Opening email composer for ' + email + '...');
             setTimeout(() => setLocalNotice(''), 5000);
           };
 
@@ -5824,8 +5861,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               alert('Customer email address not available.');
               return;
             }
-            const gmailUrl = `https://mail.google.com/mail/u/malenaduroast@gmail.com/?view=cm&fs=1&to=${encodeURIComponent(profile.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageText)}`;
-            window.open(gmailUrl, '_blank');
+            // Cross-platform compose: Opens native Gmail app on mobile, and Gmail web tab on desktop
+            openCustomerEmailComposer({
+              email: profile.email,
+              subject,
+              body: messageText
+            });
 
             const updated = {
               ...retentionFollowUps,
