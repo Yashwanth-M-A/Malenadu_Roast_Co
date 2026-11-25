@@ -6608,7 +6608,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                             Malenadu Estate Reserve
                           </div>
                           <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '1px' }}>
-                            <strong style={{ color: '#0F172A' }}>₹449</strong> (500g) • <span style={{ color: '#15803d', fontWeight: 600 }}>Unlocks Free Delivery</span>
+                            <strong style={{ color: '#0F172A' }}>₹459</strong> (500g) • <span style={{ color: '#15803d', fontWeight: 600 }}>Unlocks Free Delivery</span>
                           </div>
                         </div>
                       </div>
@@ -6619,7 +6619,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                           if (currentCoffee && updateQuantity) {
                             updateQuantity(currentCoffee.id, 1);
                           } else if (onAddToCart) {
-                            onAddToCart({ id: 1, name: 'Malenadu Estate Reserve', price: 449, weight: '500g', image: '/assets/images/estate_reserve_500g.webp' });
+                            onAddToCart({ id: 1, name: 'Malenadu Estate Reserve', price: 459, weight: '500g', image: '/assets/images/estate_reserve_500g.webp' });
                           }
                         }}
                         style={{
@@ -7518,7 +7518,7 @@ const CheckoutModal = ({
     id: 'addon-coffee-500g',
     productId: 1,
     name: 'Malenadu Estate Reserve (500g)',
-    price: 449,
+    price: 459,
     weight: '500g',
     qty: 1,
     category: 'coffee',
