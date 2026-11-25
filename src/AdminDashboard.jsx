@@ -7367,6 +7367,160 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                   })}
                 </div>
               )}
+
+              {/* In-View Official GST Tax Invoice Modal */}
+              <AnimatePresence>
+                {previewInvoiceModalOrder && (() => {
+                  const ord = previewInvoiceModalOrder;
+                  const orderNum = ord.orderNumber || ord._id;
+                  const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || '000000';
+                  const invoiceNum = `INV-${cleanNum}`;
+                  const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
+                  const invoiceUrl = `${origin}/api/invoice?order=${orderNum}`;
+
+                  return (
+                    <div style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'rgba(15, 23, 42, 0.75)',
+                      backdropFilter: 'blur(6px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 999999,
+                      padding: '1rem'
+                    }}>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                        style={{
+                          background: '#ffffff',
+                          borderRadius: '16px',
+                          width: '100%',
+                          maxWidth: '960px',
+                          maxHeight: '94vh',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                          overflow: 'hidden',
+                          border: '1.5px solid #C8935A'
+                        }}
+                      >
+                        {/* Modal Header */}
+                        <div style={{
+                          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                          color: '#ffffff',
+                          padding: '1rem 1.4rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          borderBottom: '2px solid #C8935A'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{
+                              width: '38px',
+                              height: '38px',
+                              borderRadius: '10px',
+                              background: 'rgba(200, 147, 90, 0.2)',
+                              border: '1px solid #C8935A',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}>
+                              <FileText size={20} color="#C8935A" />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#C8935A', fontWeight: 800 }}>
+                                Official GST Tax Invoice Preview
+                              </div>
+                              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
+                                {invoiceNum} • Order #{orderNum}
+                              </h3>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={() => generateTaxInvoice(ord)}
+                              style={{
+                                background: '#8c6239',
+                                border: 'none',
+                                color: '#ffffff',
+                                padding: '0.45rem 0.9rem',
+                                borderRadius: '8px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                              }}
+                            >
+                              <Download size={14} />
+                              <span>Download PDF</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => window.open(invoiceUrl, '_blank')}
+                              style={{
+                                background: 'rgba(255, 255, 255, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                color: '#ffffff',
+                                padding: '0.45rem 0.8rem',
+                                borderRadius: '8px',
+                                fontSize: '0.78rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              <ExternalLink size={14} />
+                              <span>Open in New Tab</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setPreviewInvoiceModalOrder(null)}
+                              style={{
+                                background: 'rgba(255, 255, 255, 0.15)',
+                                border: 'none',
+                                color: '#ffffff',
+                                borderRadius: '8px',
+                                width: '32px',
+                                height: '32px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Modal Iframe Content */}
+                        <div style={{ flex: 1, height: '75vh', background: '#f8fafc', position: 'relative' }}>
+                          <iframe
+                            src={invoiceUrl}
+                            title={`Invoice ${invoiceNum}`}
+                            style={{ width: '100%', height: '100%', border: 'none' }}
+                          />
+                        </div>
+                      </motion.div>
+                    </div>
+                  );
+                })()}
+              </AnimatePresence>
             </div>
           );
         })() : (
@@ -8959,162 +9113,6 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 </motion.div>
                               </div>
                             )}
-                          </AnimatePresence>
-
-                          {/* ============================================================ */}
-                          {/* OFFICIAL GST TAX INVOICE PREVIEW MODAL */}
-                          {/* ============================================================ */}
-                          <AnimatePresence>
-                            {previewInvoiceModalOrder && (() => {
-                              const ord = previewInvoiceModalOrder;
-                              const orderNum = ord.orderNumber || ord._id;
-                              const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || '000000';
-                              const invoiceNum = `INV-${cleanNum}`;
-                              const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
-                              const invoiceUrl = `${origin}/api/invoice?order=${orderNum}`;
-
-                              return (
-                                <div style={{
-                                  position: 'fixed',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  background: 'rgba(15, 23, 42, 0.75)',
-                                  backdropFilter: 'blur(6px)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  zIndex: 999999,
-                                  padding: '1rem'
-                                }}>
-                                  <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                                    style={{
-                                      background: '#ffffff',
-                                      borderRadius: '16px',
-                                      width: '100%',
-                                      maxWidth: '960px',
-                                      maxHeight: '94vh',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-                                      overflow: 'hidden',
-                                      border: '1.5px solid #C8935A'
-                                    }}
-                                  >
-                                    {/* Modal Header */}
-                                    <div style={{
-                                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                                      color: '#ffffff',
-                                      padding: '1rem 1.4rem',
-                                      display: 'flex',
-                                      justifyContent: 'space-between',
-                                      alignItems: 'center',
-                                      borderBottom: '2px solid #C8935A'
-                                    }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{
-                                          width: '38px',
-                                          height: '38px',
-                                          borderRadius: '10px',
-                                          background: 'rgba(200, 147, 90, 0.2)',
-                                          border: '1px solid #C8935A',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center'
-                                        }}>
-                                          <FileText size={20} color="#C8935A" />
-                                        </div>
-                                        <div>
-                                          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#C8935A', fontWeight: 800 }}>
-                                            Official GST Tax Invoice Preview
-                                          </div>
-                                          <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
-                                            {invoiceNum} • Order #{orderNum}
-                                          </h3>
-                                        </div>
-                                      </div>
-
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <button
-                                          type="button"
-                                          onClick={() => generateTaxInvoice(ord)}
-                                          style={{
-                                            background: '#8c6239',
-                                            border: 'none',
-                                            color: '#ffffff',
-                                            padding: '0.45rem 0.9rem',
-                                            borderRadius: '8px',
-                                            fontSize: '0.78rem',
-                                            fontWeight: 700,
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                          }}
-                                        >
-                                          <Download size={14} />
-                                          <span>Download PDF</span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => window.open(invoiceUrl, '_blank')}
-                                          style={{
-                                            background: 'rgba(255, 255, 255, 0.1)',
-                                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                                            color: '#ffffff',
-                                            padding: '0.45rem 0.8rem',
-                                            borderRadius: '8px',
-                                            fontSize: '0.78rem',
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '5px'
-                                          }}
-                                        >
-                                          <ExternalLink size={14} />
-                                          <span>Open in Tab</span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => setPreviewInvoiceModalOrder(null)}
-                                          style={{
-                                            background: 'rgba(255, 255, 255, 0.15)',
-                                            border: 'none',
-                                            color: '#ffffff',
-                                            borderRadius: '8px',
-                                            width: '32px',
-                                            height: '32px',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                          }}
-                                        >
-                                          <X size={18} />
-                                        </button>
-                                      </div>
-                                    </div>
-
-                                    {/* Modal Iframe Content */}
-                                    <div style={{ flex: 1, height: '75vh', background: '#f8fafc', position: 'relative' }}>
-                                      <iframe
-                                        src={invoiceUrl}
-                                        title={`Invoice ${invoiceNum}`}
-                                        style={{ width: '100%', height: '100%', border: 'none' }}
-                                      />
-                                    </div>
-                                  </motion.div>
-                                </div>
-                              );
-                            })()}
                           </AnimatePresence>
 
                           {/* ============================================================ */}
