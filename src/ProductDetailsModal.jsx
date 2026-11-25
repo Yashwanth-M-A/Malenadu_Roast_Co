@@ -82,7 +82,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
         price: currentPrice,
         weight: currentWeight,
         image: selectedVariant?.image || product.image
-      });
+      }, currentWeight);
     }
   };
 
@@ -93,7 +93,7 @@ export const ProductDetailsModal = ({ product, isOpen, onClose, onAddToCart, onB
         price: currentPrice,
         weight: currentWeight,
         image: selectedVariant?.image || product.image
-      });
+      }, currentWeight);
       onClose();
     }
   };

@@ -914,7 +914,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
       weight: currentWeight,
       image: currentImage || product.image
     };
-    if (onAddToCart) onAddToCart(finalProduct);
+    if (onAddToCart) onAddToCart(finalProduct, currentWeight);
   };
 
   const handleDirectBuyNow = (e) => {
@@ -925,7 +925,7 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
       weight: currentWeight,
       image: currentImage || product.image
     };
-    if (onBuyNow) onBuyNow(finalProduct);
+    if (onBuyNow) onBuyNow(finalProduct, currentWeight);
   };
 
   const handleOpenDetails = (e) => {
@@ -6536,8 +6536,13 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                               price: 319,
                               weight: '250g',
                               category: 'pepper',
-                              image: '/assets/images/pepper_reserve_250g.webp'
-                            });
+                              image: '/assets/images/pepper_reserve_front.jpg',
+                              variants: [
+                                { weight: '250g', price: '319' },
+                                { weight: '500g', price: '649' },
+                                { weight: '1kg', price: '1229' }
+                              ]
+                            }, '250g');
                           }
                         }}
                         style={{

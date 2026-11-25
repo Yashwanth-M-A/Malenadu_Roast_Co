@@ -72,7 +72,7 @@ const COMBO_PEPPERS = [
     badge: 'TGSEB Unpolished',
     weight: '500g',
     desc: 'Culinary Pantry Pack',
-    price: 609,
+    price: 649,
     image: '/assets/images/pepper_reserve_front.jpg'
   },
   {
@@ -81,7 +81,7 @@ const COMBO_PEPPERS = [
     badge: 'TGSEB Bold 1kg',
     weight: '1kg',
     desc: 'Annual Harvest Bag',
-    price: 1159,
+    price: 1229,
     image: '/assets/images/pepper_reserve_front.jpg'
   }
 ];

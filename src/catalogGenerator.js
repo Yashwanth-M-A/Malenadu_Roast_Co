@@ -358,8 +358,9 @@ export const generateDigitalCatalog = () => {
               </p>
               <table class="pricing-table">
                 <tr><th>Pack Size</th><th>Price (Incl. 5% GST)</th></tr>
-                <tr><td>500 Grams</td><td class="price">&#8377;609</td></tr>
-                <tr><td>1 Kilogram</td><td class="price">&#8377;1,159</td></tr>
+                <tr><td>250 Grams</td><td class="price">&#8377;319</td></tr>
+                <tr><td>500 Grams</td><td class="price">&#8377;649</td></tr>
+                <tr><td>1 Kilogram</td><td class="price">&#8377;1,229</td></tr>
               </table>
             </div>
           </div>

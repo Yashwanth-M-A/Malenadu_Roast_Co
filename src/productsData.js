@@ -309,6 +309,8 @@ export const DEFAULT_PEPPER_PRODUCTS = [
   {
     id: 4,
     name: 'Malenadu Pepper Reserve',
+    price: '319',
+    weight: '250g',
     description: 'Bold, Sharp, and Naturally Superior',
     details: 'Sourced from shade-canopy trees in the hills of Chikkamagaluru. Handpicked Tellicherry bold peppercorns, 100% naturally sun-dried with zero chemical polish, zero mineral oils, and exceptional natural piperine heat.',
     rating: 4.9,
@@ -321,8 +323,8 @@ export const DEFAULT_PEPPER_PRODUCTS = [
     ],
     variants: [
       { weight: '250g', price: '319', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
-      { weight: '500g', price: '609', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
-      { weight: '1kg', price: '1159', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' }
+      { weight: '500g', price: '649', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' },
+      { weight: '1kg', price: '1229', image: '/assets/images/pepper_reserve_front.jpg', backImage: '/assets/images/pepper_reserve_back.jpg' }
     ],
     specs: {
       grade: 'Tellicherry Garbled Special Extra Bold (TGSEB)',
@@ -449,32 +451,42 @@ const safeStorage = {
   setItem: (k, v) => { if (typeof window !== 'undefined' && window.localStorage) window.localStorage.setItem(k, v); }
 };
 
-// Helper: Filter out 250g variants
-const filter250g = (variants) => {
+// Helper: Filter out 250g variants (Only for Coffee products; Pepper MUST retain 250g)
+const filter250g = (variants, isPepper = false) => {
   if (!Array.isArray(variants)) return [];
+  if (isPepper) return variants;
   return variants.filter(v => (v.weight || '').trim() !== '250g');
 };
 
-const DATA_VERSION = 'v12_pepper_remove_lineup_img';
+const DATA_VERSION = 'v13_pepper_pricing_update';
 
 // Helper: Merge rich specs & faqs into stored items, ensuring roaster specs are strictly authoritative
-const mergeProductMetadata = (storedList, defaultList) => {
-  if (!Array.isArray(storedList)) return defaultList.map(d => ({ ...d, variants: filter250g(d.variants) }));
+const mergeProductMetadata = (storedList, defaultList, categoryKey = '') => {
+  const isPepperCategory = categoryKey === 'pepper';
+  if (!Array.isArray(storedList)) {
+    return defaultList.map(d => {
+      const isPep = isPepperCategory || (d.category === 'pepper') || (d.name || '').toLowerCase().includes('pepper');
+      return { ...d, variants: filter250g(d.variants, isPep) };
+    });
+  }
   const sanitizedStored = storedList.filter(item => item && String(item.id) !== '99' && !String(item.name || '').includes('Payment Verification'));
   const merged = sanitizedStored.map(item => {
     const defaultMatch = defaultList.find(d => String(d.id) === String(item.id) || d.name === item.name);
+    const isPep = isPepperCategory || (item.category === 'pepper') || (item.name || '').toLowerCase().includes('pepper') || (defaultMatch && ((defaultMatch.category === 'pepper') || (defaultMatch.name || '').toLowerCase().includes('pepper')));
     if (!defaultMatch) {
       return {
         ...item,
-        variants: filter250g(item.variants || [])
+        variants: filter250g(item.variants || [], isPep)
       };
     }
     // For estate products, roaster specs, badge, and ratio take strict precedence
-    const cleanVariants = filter250g(defaultMatch.variants || item.variants || []);
+    const cleanVariants = filter250g(defaultMatch.variants || item.variants || [], isPep);
     return {
       ...defaultMatch,
       ...item,
       name: defaultMatch.name,
+      price: defaultMatch.price !== undefined ? defaultMatch.price : item.price,
+      weight: defaultMatch.weight !== undefined ? defaultMatch.weight : item.weight,
       badge: defaultMatch.badge,
       description: defaultMatch.description,
       details: defaultMatch.details,
@@ -494,7 +506,8 @@ const mergeProductMetadata = (storedList, defaultList) => {
   defaultList.forEach(d => {
     const exists = merged.some(m => String(m.id) === String(d.id) || m.name === d.name);
     if (!exists) {
-      merged.push({ ...d, variants: filter250g(d.variants) });
+      const isPep = isPepperCategory || (d.category === 'pepper') || (d.name || '').toLowerCase().includes('pepper');
+      merged.push({ ...d, variants: filter250g(d.variants, isPep) });
     }
   });
 
@@ -511,9 +524,9 @@ export const getStoredProducts = () => {
       const parsed = JSON.parse(stored);
       if (parsed && Array.isArray(parsed.coffee) && Array.isArray(parsed.pepper) && Array.isArray(parsed.combos)) {
         return {
-          coffee: mergeProductMetadata(parsed.coffee, DEFAULT_COFFEE_PRODUCTS),
-          pepper: mergeProductMetadata(parsed.pepper, DEFAULT_PEPPER_PRODUCTS),
-          combos: mergeProductMetadata(parsed.combos, DEFAULT_COMBO_PRODUCTS)
+          coffee: mergeProductMetadata(parsed.coffee, DEFAULT_COFFEE_PRODUCTS, 'coffee'),
+          pepper: mergeProductMetadata(parsed.pepper, DEFAULT_PEPPER_PRODUCTS, 'pepper'),
+          combos: mergeProductMetadata(parsed.combos, DEFAULT_COMBO_PRODUCTS, 'combos')
         };
       }
     }
