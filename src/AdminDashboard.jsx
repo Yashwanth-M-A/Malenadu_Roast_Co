@@ -2784,6 +2784,28 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
             {/* Top Actions: Export CSV, Refresh, Storefront, Lock Portal */}
             <div className="admin-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
+                onClick={() => setAdminView('invoices')}
+                style={{
+                  background: adminView === 'invoices' ? '#8c6239' : '#FAF6F0',
+                  border: '1.5px solid #C8935A',
+                  color: adminView === 'invoices' ? '#ffffff' : '#8c6239',
+                  padding: '0.48rem 0.95rem',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 1px 3px rgba(200, 147, 90, 0.2)',
+                  transition: 'all 0.15s'
+                }}
+              >
+                <FileText size={15} color={adminView === 'invoices' ? '#ffffff' : '#C8935A'} />
+                <span>🧾 Tax Invoices</span>
+              </button>
+
+              <button
                 onClick={handleExportCSV}
                 style={{
                   background: '#ffffff',
@@ -7714,6 +7736,31 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                     </button>
                   );
                 })}
+
+                <button
+                  type="button"
+                  onClick={() => setAdminView('invoices')}
+                  style={{
+                    background: '#FAF6F0',
+                    color: '#8c6239',
+                    border: '1.5px solid #C8935A',
+                    padding: isMobile ? '0.4rem 0.75rem' : '0.45rem 0.95rem',
+                    borderRadius: '20px',
+                    fontSize: isMobile ? '0.75rem' : '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 1px 3px rgba(200, 147, 90, 0.15)'
+                  }}
+                  title="Switch to Official GST Tax Invoices Ledger"
+                >
+                  <FileText size={13} color="#C8935A" />
+                  <span>🧾 Tax Invoices Hub</span>
+                </button>
               </div>
 
               {/* Search Box */}
