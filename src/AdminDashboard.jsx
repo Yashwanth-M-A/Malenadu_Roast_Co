@@ -8360,6 +8360,8 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 handleCopyField(codeLines.join('\n'), 'autofill');
                               };
 
+                              const bookmarkletHref = "javascript:(function(){var inps=Array.from(document.querySelectorAll('input,textarea'));function f(re,v){if(!v)return;for(var i=0;i<inps.length;i++){var t=(inps[i].placeholder+' '+inps[i].name+' '+inps[i].id).toLowerCase();if(re.test(t)){inps[i].value=v;inps[i].dispatchEvent(new Event('input',{bubbles:true}));inps[i].dispatchEvent(new Event('change',{bubbles:true}));inps[i].style.background='#dcfce7';break;}}}f(/pickup.*pin/i,'577101');f(/delivery.*pin/i,'" + (parsedAddr.pincode || '') + "');f(/(recipient|receiver).*name|full.*name|^name/i,'" + (parsedAddr.name || '') + "');f(/(mobile|phone|contact)/i,'" + (parsedAddr.phone || '') + "');f(/(flat|house|building|apartment)/i,'" + (parsedAddr.houseNo || '') + "');f(/(street|road|area|locality|sector)/i,'" + (parsedAddr.area || '') + "');f(/landmark/i,'" + (parsedAddr.landmark || '') + "');f(/city|town/i,'" + (parsedAddr.city || '') + "');f(/state/i,'" + (parsedAddr.state || '') + "');f(/weight/i,'" + parcelWeightKg + "');f(/length/i,'24');f(/width/i,'16');f(/height/i,'5');f(/(declared|invoice|value)/i,'" + declaredVal + "');alert('✓ Malenadu Order #" + order.orderNumber + " Autofilled!');})();";
+
                               // Helper for clean copyable field rows
                               const renderFieldRow = (label, value, key, badge = null) => (
                                 <div style={{
@@ -8596,6 +8598,35 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                             {delhiveryCopiedKey === 'autofill' ? <CheckCheck size={14} /> : <Sparkles size={14} />}
                                             <span>{delhiveryCopiedKey === 'autofill' ? '✓ Autofill Script Copied!' : '🪄 1-Click Delhivery Autofill Script'}</span>
                                           </button>
+
+                                          {/* Draggable Bookmarklet */}
+                                          <a
+                                            href={bookmarkletHref}
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              handleCopyAutofillScript();
+                                              alert("✨ 1-Click Autofill Ready!\n\n1. Drag this button up to your Chrome Bookmarks Bar (Ctrl+Shift+B).\n2. When you are on Delhivery's Create Order page, just click this bookmark in your browser bar to autofill in 1 second!\n\n(The script is also copied to your clipboard!)");
+                                            }}
+                                            style={{
+                                              background: '#047857',
+                                              color: '#ffffff',
+                                              border: 'none',
+                                              padding: '0.45rem 0.95rem',
+                                              borderRadius: '7px',
+                                              fontSize: '0.78rem',
+                                              fontWeight: 700,
+                                              textDecoration: 'none',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '5px',
+                                              boxShadow: '0 2px 5px rgba(4, 120, 87, 0.25)',
+                                              cursor: 'grab'
+                                            }}
+                                            title="Drag this button to your Bookmarks Bar! Click it when on Delhivery to autofill."
+                                          >
+                                            <Sparkles size={14} />
+                                            <span>📌 Drag to Bookmarks (Autofill in 1-Click)</span>
+                                          </a>
 
                                           <a
                                             href="https://one.delhivery.com/"
