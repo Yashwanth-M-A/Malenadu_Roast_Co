@@ -503,6 +503,13 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
   const [delhiveryCopiedKey, setDelhiveryCopiedKey] = useState('');
   const [delhiverySavedSuccess, setDelhiverySavedSuccess] = useState(false);
 
+  // Dedicated Tax Invoices Section State
+  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState('');
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState('all'); // 'all' | 'paid' | 'pending'
+  const [invoiceSortOrder, setInvoiceSortOrder] = useState('newest'); // 'newest' | 'oldest' | 'amount_high' | 'amount_low'
+  const [previewInvoiceModalOrder, setPreviewInvoiceModalOrder] = useState(null);
+  const [invoiceCopiedKey, setInvoiceCopiedKey] = useState('');
+
   const toggleExpandLog = (id) => {
     setExpandedLogIds(prev => ({ ...prev, [id]: !prev[id] }));
   };
@@ -2901,6 +2908,30 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
             >
               <Package size={14} color={adminView === 'orders' ? '#C8935A' : '#64748b'} />
               <span>Orders ({orders.length})</span>
+            </button>
+
+            <button
+              onClick={() => setAdminView('invoices')}
+              style={{
+                padding: '0.45rem 0.85rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: adminView === 'invoices' ? '#ffffff' : 'transparent',
+                color: adminView === 'invoices' ? '#0f172a' : '#64748b',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: adminView === 'invoices' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.15s',
+                flexShrink: 0,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FileText size={14} color={adminView === 'invoices' ? '#C8935A' : '#64748b'} />
+              <span>Tax Invoices ({orders.length})</span>
             </button>
 
             <button
@@ -6615,6 +6646,707 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               )}
             </div>
           );
+        })() : adminView === 'invoices' ? (() => {
+          // ==========================================================
+          // OFFICIAL STATUTORY TAX INVOICE REGISTRY & REVENUE LEDGER
+          // ==========================================================
+          const totalInvoicedRevenue = orders.reduce((acc, o) => acc + (parseFloat(o.totalAmount) || 0), 0);
+          const totalGstCollected = orders.reduce((acc, o) => {
+            const sub = parseFloat(o.subtotal !== undefined && o.subtotal !== null ? o.subtotal : (o.totalAmount || 0));
+            const taxable = sub / 1.05;
+            return acc + (sub - taxable);
+          }, 0);
+          const paidInvoicesCount = orders.filter(o => (o.paymentStatus || '').toLowerCase() === 'paid' || (o.paymentMethod || '').toLowerCase() === 'online').length;
+          const aov = orders.length > 0 ? Math.round(totalInvoicedRevenue / orders.length) : 0;
+
+          const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
+
+          const filteredInvoices = orders.filter(ord => {
+            const q = invoiceSearchQuery.toLowerCase().trim();
+            const orderNum = String(ord.orderNumber || ord._id || '').toLowerCase();
+            const cleanNum = orderNum.replace(/[^0-9]/g, '');
+            const invNum = `inv-${cleanNum}`.toLowerCase();
+            const name = (ord.shippingName || '').toLowerCase();
+            const email = (ord.shippingEmail || '').toLowerCase();
+            const phone = (ord.shippingPhone || '').toLowerCase();
+            const city = (ord.city || '').toLowerCase();
+            const state = (ord.state || '').toLowerCase();
+            const pin = (ord.pincode || '').toLowerCase();
+
+            const matchesSearch = !q ||
+              orderNum.includes(q) ||
+              invNum.includes(q) ||
+              name.includes(q) ||
+              email.includes(q) ||
+              phone.includes(q) ||
+              city.includes(q) ||
+              state.includes(q) ||
+              pin.includes(q);
+
+            if (!matchesSearch) return false;
+
+            const isPaid = (ord.paymentStatus || '').toLowerCase() === 'paid' || (ord.paymentMethod || '').toLowerCase() === 'online';
+            if (invoiceStatusFilter === 'paid') return isPaid;
+            if (invoiceStatusFilter === 'pending') return !isPaid;
+            return true;
+          }).sort((a, b) => {
+            if (invoiceSortOrder === 'amount_high') return (parseFloat(b.totalAmount) || 0) - (parseFloat(a.totalAmount) || 0);
+            if (invoiceSortOrder === 'amount_low') return (parseFloat(a.totalAmount) || 0) - (parseFloat(b.totalAmount) || 0);
+            if (invoiceSortOrder === 'oldest') return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+          });
+
+          const handleCopyInvoiceLink = (orderNum) => {
+            const url = `${origin}/api/invoice?order=${orderNum}`;
+            navigator.clipboard.writeText(url).then(() => {
+              setInvoiceCopiedKey(orderNum);
+              setTimeout(() => setInvoiceCopiedKey(''), 2500);
+            });
+          };
+
+          const handleShareInvoiceWhatsApp = (ord) => {
+            const orderNum = ord.orderNumber || ord._id;
+            const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || '000000';
+            const invNum = `INV-${cleanNum}`;
+            const custName = ord.shippingName || 'Customer';
+            const rawPhone = (ord.shippingPhone || '').replace(/\D/g, '').slice(-10);
+            const total = ord.totalAmount || 0;
+            const invoiceUrl = `https://www.malenaduroastco.works/api/invoice?order=${orderNum}`;
+
+            const msg =
+              `*MALENADU ROAST CO. — OFFICIAL TAX INVOICE*\n\n` +
+              `Hello ${custName}!\n` +
+              `Thank you for your order with our Chikkamagaluru estate.\n\n` +
+              `📄 *Tax Invoice Number:* ${invNum}\n` +
+              `📦 *Order Reference:* #${orderNum}\n` +
+              `💰 *Invoice Total:* ₹${total} (Incl. 5% GST)\n` +
+              `📍 *Billed To:* ${ord.shippingAddress || 'Your Address'}\n\n` +
+              `🔗 *View / Download Your Official GST Tax Invoice:*\n${invoiceUrl}\n\n` +
+              `GSTIN: 29BQJPY7539L1ZN • FSSAI: 21226177001500\n` +
+              `*Malenadu Roast Co.* — Chikkamagaluru, Karnataka.`;
+
+            if (rawPhone && rawPhone.length === 10) {
+              window.open(`https://wa.me/91${rawPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+          };
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+              {/* Header Hero Banner */}
+              <div style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)',
+                color: '#ffffff',
+                borderRadius: '16px',
+                padding: '1.6rem 1.8rem',
+                border: '1.5px solid #C8935A',
+                boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: '-30px',
+                  right: '-30px',
+                  width: '180px',
+                  height: '180px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(200, 147, 90, 0.18) 0%, transparent 70%)',
+                  pointerEvents: 'none'
+                }} />
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', position: 'relative', zIndex: 1 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span style={{
+                        background: 'rgba(200, 147, 90, 0.25)',
+                        border: '1px solid #C8935A',
+                        color: '#f8fafc',
+                        fontSize: '0.7rem',
+                        fontWeight: 800,
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        letterSpacing: '0.8px',
+                        textTransform: 'uppercase'
+                      }}>
+                        Statutory Financial Records
+                      </span>
+                      <span style={{
+                        background: 'rgba(34, 197, 94, 0.2)',
+                        border: '1px solid rgba(74, 222, 128, 0.4)',
+                        color: '#4ade80',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        padding: '3px 9px',
+                        borderRadius: '20px'
+                      }}>
+                        ● GST Compliant
+                      </span>
+                    </div>
+
+                    <h2 style={{ margin: '0 0 6px 0', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px', color: '#ffffff' }}>
+                      Official GST Tax Invoices Ledger
+                    </h2>
+                    <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', maxWidth: '640px', lineHeight: 1.5 }}>
+                      Comprehensive tax ledger for all customer coffee and spice orders. Review, download PDF invoices, and send official GST tax receipts to customers in 1 click.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '10px',
+                      padding: '0.65rem 1rem',
+                      fontSize: '0.78rem'
+                    }}>
+                      <div style={{ color: '#94a3b8', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Official GSTIN</div>
+                      <strong style={{ color: '#ffffff', letterSpacing: '0.5px' }}>29BQJPY7539L1ZN</strong>
+                    </div>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '10px',
+                      padding: '0.65rem 1rem',
+                      fontSize: '0.78rem'
+                    }}>
+                      <div style={{ color: '#94a3b8', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>FSSAI License</div>
+                      <strong style={{ color: '#ffffff', letterSpacing: '0.5px' }}>21226177001500</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 Financial Stat Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem' }}>
+                {/* Stat 1 */}
+                <div style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '1.1rem 1.25rem',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CreditCard size={22} color="#059669" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Invoiced Sales</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
+                      ₹{totalInvoicedRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stat 2 */}
+                <div style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #fed7aa',
+                  borderRadius: '12px',
+                  padding: '1.1rem 1.25rem',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText size={22} color="#ea580c" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#9a3412', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>GST Collected (5%)</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#9a3412' }}>
+                      ₹{totalGstCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stat 3 */}
+                <div style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '1.1rem 1.25rem',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle size={22} color="#2563eb" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Invoices Generated</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
+                      {orders.length} <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 700 }}>({paidInvoicesCount} Paid)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stat 4 */}
+                <div style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '1.1rem 1.25rem',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#FAF6F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Building size={22} color="#C8935A" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Avg Invoice Value</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
+                      ₹{aov.toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search & Filter Toolbar */}
+              <div style={{
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '1rem 1.2rem',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              }}>
+                {/* Search Box */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#f8fafc',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '8px',
+                  padding: '0.5rem 0.85rem',
+                  flex: 1,
+                  minWidth: '260px'
+                }}>
+                  <Search size={16} color="#64748b" />
+                  <input
+                    type="text"
+                    value={invoiceSearchQuery}
+                    onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                    placeholder="Search by Invoice #, Order #, Customer, Phone, Email, City..."
+                    style={{
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      width: '100%',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: '#0f172a'
+                    }}
+                  />
+                  {invoiceSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setInvoiceSearchQuery('')}
+                      style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0 }}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Status Filter Tabs */}
+                <div style={{ display: 'flex', gap: '6px', background: '#f1f5f9', padding: '3px', borderRadius: '8px' }}>
+                  {[
+                    { id: 'all', label: `All (${orders.length})` },
+                    { id: 'paid', label: `Paid (${paidInvoicesCount})` },
+                    { id: 'pending', label: `Pending (${orders.length - paidInvoicesCount})` }
+                  ].map(tab => {
+                    const isSel = invoiceStatusFilter === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setInvoiceStatusFilter(tab.id)}
+                        style={{
+                          background: isSel ? '#ffffff' : 'transparent',
+                          color: isSel ? '#0f172a' : '#64748b',
+                          fontWeight: isSel ? 700 : 600,
+                          fontSize: '0.78rem',
+                          border: 'none',
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          boxShadow: isSel ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Sort Order */}
+                <select
+                  value={invoiceSortOrder}
+                  onChange={(e) => setInvoiceSortOrder(e.target.value)}
+                  style={{
+                    padding: '0.45rem 0.75rem',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: '#334155',
+                    background: '#ffffff',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="newest">Sort: Newest First</option>
+                  <option value="oldest">Sort: Oldest First</option>
+                  <option value="amount_high">Sort: Highest Amount</option>
+                  <option value="amount_low">Sort: Lowest Amount</option>
+                </select>
+              </div>
+
+              {/* Invoices Ledger Cards List */}
+              {filteredInvoices.length === 0 ? (
+                <div style={{
+                  background: '#ffffff',
+                  border: '1.5px dashed #cbd5e1',
+                  borderRadius: '12px',
+                  padding: '3rem 2rem',
+                  textAlign: 'center'
+                }}>
+                  <FileText size={42} color="#94a3b8" style={{ marginBottom: '10px' }} />
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#1e293b' }}>No Invoices Found</h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
+                    {invoiceSearchQuery ? `No invoices match "${invoiceSearchQuery}". Try clearing the search.` : 'No invoices generated yet.'}
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {filteredInvoices.map((ord) => {
+                    const orderNum = ord.orderNumber || ord._id;
+                    const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || '000000';
+                    const invoiceNum = `INV-${cleanNum}`;
+                    const items = (Array.isArray(ord.items) && ord.items.length > 0)
+                      ? ord.items
+                      : (ord.productName || ord.product_name)
+                        ? [{ name: ord.productName || ord.product_name, weight: ord.weight || '500g', qty: ord.qty || 1, price: ord.totalAmount || 559 }]
+                        : [{ name: 'Imperial Heritage Reserve', weight: '500g', qty: 1, price: 559 }];
+
+                    const computedSubtotal = items.reduce((acc, it) => acc + ((parseFloat(it.price) || 0) * (Number(it.qty) || 1)), 0);
+                    const subtotal = ord.subtotal !== undefined && ord.subtotal !== null ? parseFloat(ord.subtotal) : computedSubtotal;
+                    const taxableValue = (subtotal / 1.05).toFixed(2);
+                    const totalGst = (subtotal - parseFloat(taxableValue)).toFixed(2);
+
+                    const pinStr = String(ord.pincode || '').trim();
+                    const isInterstate = pinStr.length >= 2 && !['56', '57', '58', '59'].some(p => pinStr.startsWith(p));
+                    const cgst = isInterstate ? '0.00' : (parseFloat(totalGst) / 2).toFixed(2);
+                    const sgst = isInterstate ? '0.00' : (parseFloat(totalGst) / 2).toFixed(2);
+                    const igst = isInterstate ? totalGst : '0.00';
+                    const grandTotal = ord.totalAmount || subtotal;
+
+                    const dateStr = ord.createdAt
+                      ? new Date(ord.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                      : '25 Nov 2026, 01:01 AM';
+
+                    const isPaid = (ord.paymentStatus || '').toLowerCase() === 'paid' || (ord.paymentMethod || '').toLowerCase() === 'online';
+
+                    return (
+                      <div
+                        key={ord.id || orderNum}
+                        style={{
+                          background: '#ffffff',
+                          border: '1.5px solid #e2e8f0',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {/* Top Invoice Card Bar */}
+                        <div style={{
+                          background: '#f8fafc',
+                          padding: '0.85rem 1.25rem',
+                          borderBottom: '1px solid #e2e8f0',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: '10px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            <div style={{
+                              background: '#FAF6F0',
+                              border: '1.5px solid #C8935A',
+                              color: '#8c6239',
+                              fontSize: '0.78rem',
+                              fontWeight: 800,
+                              padding: '3px 10px',
+                              borderRadius: '6px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}>
+                              <FileText size={13} color="#C8935A" />
+                              <span>{invoiceNum}</span>
+                            </div>
+
+                            <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155' }}>
+                              Order #{orderNum}
+                            </span>
+
+                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                              • {dateStr}
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {isPaid ? (
+                              <span style={{
+                                background: '#dcfce7',
+                                color: '#15803d',
+                                border: '1px solid #86efac',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                padding: '3px 9px',
+                                borderRadius: '12px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}>
+                                <CheckCircle size={12} />
+                                Paid (Online / UPI)
+                              </span>
+                            ) : (
+                              <span style={{
+                                background: '#fef3c7',
+                                color: '#b45309',
+                                border: '1px solid #fde68a',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                padding: '3px 9px',
+                                borderRadius: '12px'
+                              }}>
+                                Payment Pending / COD
+                              </span>
+                            )}
+
+                            {ord.razorpayPaymentId && (
+                              <span style={{ fontSize: '0.72rem', color: '#64748b', background: '#f1f5f9', padding: '3px 7px', borderRadius: '4px', fontFamily: 'monospace' }}>
+                                RZP: {ord.razorpayPaymentId}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Invoice Card Content Body */}
+                        <div style={{ padding: '1.15rem 1.25rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.2rem', alignItems: 'flex-start' }}>
+                          {/* Col 1: Customer Billed To */}
+                          <div>
+                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', fontWeight: 700, marginBottom: '6px' }}>
+                              Billed To (Customer)
+                            </div>
+                            <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0f172a' }}>
+                              {ord.shippingName || 'Customer'}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '2px' }}>
+                              📞 {ord.shippingPhone || 'No phone'}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '1px' }}>
+                              ✉️ {ord.shippingEmail || 'No email'}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '4px', lineHeight: 1.4 }}>
+                              📍 {ord.houseNo ? `${ord.houseNo}, ${ord.area || ''}` : (ord.shippingAddress || '')}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginTop: '2px' }}>
+                              {ord.city || 'Davangere'}, {ord.state || 'Karnataka'} — PIN: {ord.pincode || '577005'}
+                            </div>
+                          </div>
+
+                          {/* Col 2: Products & Items */}
+                          <div>
+                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b', fontWeight: 700, marginBottom: '6px' }}>
+                              Coffee Items & Description
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {items.map((it, idx) => (
+                                <div key={idx} style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '0.8rem' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: '#1e293b' }}>
+                                    <span>{it.name || 'Imperial Heritage Reserve'}</span>
+                                    <span>₹{(parseFloat(it.price) || 559) * (Number(it.qty) || 1)}</span>
+                                  </div>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px' }}>
+                                    Weight: {it.weight || '500g'} • Qty: {it.qty || 1} • HSN: 0901
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Col 3: Tax & Total Breakdown */}
+                          <div style={{ background: '#FAF6F0', padding: '10px 14px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
+                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#8c6239', fontWeight: 800, marginBottom: '6px' }}>
+                              Tax & Financial Summary
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.8rem' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                                <span>Taxable Value (Base):</span>
+                                <span>₹{taxableValue}</span>
+                              </div>
+                              {isInterstate ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                                  <span>IGST (5.0%):</span>
+                                  <span>₹{igst}</span>
+                                </div>
+                              ) : (
+                                <>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                                    <span>CGST (2.5%):</span>
+                                    <span>₹{cgst}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                                    <span>SGST (2.5%):</span>
+                                    <span>₹{sgst}</span>
+                                  </div>
+                                </>
+                              )}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                                <span>Packaging & Delivery:</span>
+                                <span>{parseFloat(ord.shippingFee || 0) > 0 ? `₹${ord.shippingFee}` : 'FREE'}</span>
+                              </div>
+                              <div style={{ borderTop: '1.5px dashed #cbd5e1', paddingTop: '6px', marginTop: '4px', display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '0.98rem', color: '#0f172a' }}>
+                                <span>Grand Total:</span>
+                                <span style={{ color: '#8c6239' }}>₹{grandTotal}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Bottom Actions Bar */}
+                        <div style={{
+                          background: '#f8fafc',
+                          padding: '0.75rem 1.25rem',
+                          borderTop: '1px solid #e2e8f0',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: '8px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#64748b' }}>
+                            <ShieldCheck size={14} color="#16a34a" />
+                            <span>Signed & Sealed • Malenadu Roast Co., Chikkamagaluru</span>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {/* View Invoice */}
+                            <button
+                              type="button"
+                              onClick={() => setPreviewInvoiceModalOrder(ord)}
+                              style={{
+                                background: '#ffffff',
+                                border: '1.5px solid #C8935A',
+                                color: '#8c6239',
+                                padding: '0.45rem 0.85rem',
+                                borderRadius: '7px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              <Eye size={14} />
+                              <span>View Official Invoice</span>
+                            </button>
+
+                            {/* Download PDF */}
+                            <button
+                              type="button"
+                              onClick={() => generateTaxInvoice(ord)}
+                              style={{
+                                background: '#8c6239',
+                                border: 'none',
+                                color: '#ffffff',
+                                padding: '0.45rem 0.85rem',
+                                borderRadius: '7px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                boxShadow: '0 2px 4px rgba(140, 98, 57, 0.25)'
+                              }}
+                            >
+                              <Download size={14} />
+                              <span>Download PDF</span>
+                            </button>
+
+                            {/* WhatsApp Share */}
+                            <button
+                              type="button"
+                              onClick={() => handleShareInvoiceWhatsApp(ord)}
+                              style={{
+                                background: '#15803d',
+                                border: 'none',
+                                color: '#ffffff',
+                                padding: '0.45rem 0.85rem',
+                                borderRadius: '7px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              <WhatsAppBrandIcon size={14} />
+                              <span>Send on WhatsApp</span>
+                            </button>
+
+                            {/* Copy Invoice Link */}
+                            <button
+                              type="button"
+                              onClick={() => handleCopyInvoiceLink(orderNum)}
+                              style={{
+                                background: invoiceCopiedKey === orderNum ? '#15803d' : '#ffffff',
+                                border: '1.5px solid #cbd5e1',
+                                color: invoiceCopiedKey === orderNum ? '#ffffff' : '#475569',
+                                padding: '0.45rem 0.8rem',
+                                borderRadius: '7px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              {invoiceCopiedKey === orderNum ? <CheckCheck size={13} /> : <Copy size={13} />}
+                              <span>{invoiceCopiedKey === orderNum ? '✓ Copied' : 'Copy Link'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
         })() : (
           <div>
 
@@ -8180,6 +8912,162 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 </motion.div>
                               </div>
                             )}
+                          </AnimatePresence>
+
+                          {/* ============================================================ */}
+                          {/* OFFICIAL GST TAX INVOICE PREVIEW MODAL */}
+                          {/* ============================================================ */}
+                          <AnimatePresence>
+                            {previewInvoiceModalOrder && (() => {
+                              const ord = previewInvoiceModalOrder;
+                              const orderNum = ord.orderNumber || ord._id;
+                              const cleanNum = String(orderNum).replace(/[^0-9]/g, '') || '000000';
+                              const invoiceNum = `INV-${cleanNum}`;
+                              const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
+                              const invoiceUrl = `${origin}/api/invoice?order=${orderNum}`;
+
+                              return (
+                                <div style={{
+                                  position: 'fixed',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  background: 'rgba(15, 23, 42, 0.75)',
+                                  backdropFilter: 'blur(6px)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  zIndex: 999999,
+                                  padding: '1rem'
+                                }}>
+                                  <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                                    style={{
+                                      background: '#ffffff',
+                                      borderRadius: '16px',
+                                      width: '100%',
+                                      maxWidth: '960px',
+                                      maxHeight: '94vh',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                                      overflow: 'hidden',
+                                      border: '1.5px solid #C8935A'
+                                    }}
+                                  >
+                                    {/* Modal Header */}
+                                    <div style={{
+                                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                                      color: '#ffffff',
+                                      padding: '1rem 1.4rem',
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      borderBottom: '2px solid #C8935A'
+                                    }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{
+                                          width: '38px',
+                                          height: '38px',
+                                          borderRadius: '10px',
+                                          background: 'rgba(200, 147, 90, 0.2)',
+                                          border: '1px solid #C8935A',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center'
+                                        }}>
+                                          <FileText size={20} color="#C8935A" />
+                                        </div>
+                                        <div>
+                                          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#C8935A', fontWeight: 800 }}>
+                                            Official GST Tax Invoice Preview
+                                          </div>
+                                          <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
+                                            {invoiceNum} • Order #{orderNum}
+                                          </h3>
+                                        </div>
+                                      </div>
+
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => generateTaxInvoice(ord)}
+                                          style={{
+                                            background: '#8c6239',
+                                            border: 'none',
+                                            color: '#ffffff',
+                                            padding: '0.45rem 0.9rem',
+                                            borderRadius: '8px',
+                                            fontSize: '0.78rem',
+                                            fontWeight: 700,
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                          }}
+                                        >
+                                          <Download size={14} />
+                                          <span>Download PDF</span>
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => window.open(invoiceUrl, '_blank')}
+                                          style={{
+                                            background: 'rgba(255, 255, 255, 0.1)',
+                                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                                            color: '#ffffff',
+                                            padding: '0.45rem 0.8rem',
+                                            borderRadius: '8px',
+                                            fontSize: '0.78rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                          }}
+                                        >
+                                          <ExternalLink size={14} />
+                                          <span>Open in Tab</span>
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => setPreviewInvoiceModalOrder(null)}
+                                          style={{
+                                            background: 'rgba(255, 255, 255, 0.15)',
+                                            border: 'none',
+                                            color: '#ffffff',
+                                            borderRadius: '8px',
+                                            width: '32px',
+                                            height: '32px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                          }}
+                                        >
+                                          <X size={18} />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Modal Iframe Content */}
+                                    <div style={{ flex: 1, height: '75vh', background: '#f8fafc', position: 'relative' }}>
+                                      <iframe
+                                        src={invoiceUrl}
+                                        title={`Invoice ${invoiceNum}`}
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
+                                      />
+                                    </div>
+                                  </motion.div>
+                                </div>
+                              );
+                            })()}
                           </AnimatePresence>
 
                           {/* ============================================================ */}
