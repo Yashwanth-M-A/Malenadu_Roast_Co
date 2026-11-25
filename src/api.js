@@ -575,6 +575,55 @@ export const getAllUsers = async () => {
   }
 };
 
+// ============================================================
+// User Account Cart Synchronization (Linked with User Login)
+// ============================================================
+export const syncAccountCart = async (email, cart) => {
+  if (!email) return;
+  const cleanEmail = email.toLowerCase().trim();
+  try {
+    // 1. Persist to dedicated account localStorage
+    localStorage.setItem(`malenadu_user_cart_${cleanEmail}`, JSON.stringify(cart || []));
+
+    // 2. Persist to Neon DB in background
+    fetch('/api/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, cart: cart || [] })
+    }).catch(err => {
+      console.warn('Backend cart sync notice:', err.message);
+    });
+  } catch (e) {
+    console.warn('Account cart save error:', e);
+  }
+};
+
+export const fetchAccountCart = async (email) => {
+  if (!email) return [];
+  const cleanEmail = email.toLowerCase().trim();
+  try {
+    // Check local account cache first for instantaneous offline/reload recovery
+    const local = localStorage.getItem(`malenadu_user_cart_${cleanEmail}`);
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+
+    // Attempt DB fetch
+    const res = await fetch(`/api/users?email=${encodeURIComponent(cleanEmail)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.cart) && data.cart.length > 0) {
+        localStorage.setItem(`malenadu_user_cart_${cleanEmail}`, JSON.stringify(data.cart));
+        return data.cart;
+      }
+    }
+  } catch (e) {
+    console.warn('Account cart fetch notice:', e);
+  }
+  return [];
+};
+
 const api = {
   registerUser,
   loginUser,
@@ -590,7 +639,9 @@ const api = {
   simulatePayment,
   shipOrderWithShiprocket,
   trackShiprocketShipment,
-  checkPincodeServiceability
+  checkPincodeServiceability,
+  syncAccountCart,
+  fetchAccountCart
 };
 
 export default api;

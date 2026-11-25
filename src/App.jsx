@@ -17,7 +17,8 @@ import {
 } from './whatsappService.js';
 import {
   registerUser, loginUser, loginWithGoogle, updateProfile,
-  getMyOrders, cancelOrder, placeCODOrder, simulatePayment, createRazorpayOrder, verifyPayment
+  getMyOrders, cancelOrder, placeCODOrder, simulatePayment, createRazorpayOrder, verifyPayment,
+  syncAccountCart, fetchAccountCart
 } from './api.js';
 import { parseGoogleJwt, getGoogleClientId, getGoogleAvatarForEmail, launchGoogleOAuthPopup } from './googleAuthService.js';
 import LegalPolicyPage from './LegalPolicyPage.jsx';
@@ -11988,22 +11989,25 @@ const App = () => {
     catch { return null; }
   });
 
-  // E-commerce Cart Recovery: Restore saved cart across page reloads and user sessions
+  // E-commerce Account-Linked Cart: Dedicated cart per user account
   const getInitialCart = () => {
     try {
       const user = JSON.parse(localStorage.getItem('malenadu_user') || 'null');
       const userEmail = user?.email?.toLowerCase()?.trim();
       if (userEmail) {
-        const userCart = localStorage.getItem(`malenadu_cart_${userEmail}`);
-        if (userCart) {
-          const parsed = JSON.parse(userCart);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        // Logged-in user: Strictly load their account cart
+        const accountCart = localStorage.getItem(`malenadu_account_cart_${userEmail}`) || localStorage.getItem(`malenadu_cart_${userEmail}`);
+        if (accountCart) {
+          const parsed = JSON.parse(accountCart);
+          if (Array.isArray(parsed)) return parsed;
         }
+        return [];
       }
-      const guestCart = localStorage.getItem('malenadu_cart');
+      // Guest session: Load guest cart
+      const guestCart = localStorage.getItem('malenadu_guest_cart') || localStorage.getItem('malenadu_cart');
       if (guestCart) {
         const parsed = JSON.parse(guestCart);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) { }
     return [];
@@ -12064,16 +12068,33 @@ const App = () => {
     } catch (e) { }
   }, [buyNowCart]);
 
-  // Persist cart to localStorage across browser reloads & sync with active user profile
+  // Persist cart strictly to active user account (or guest storage) & sync with database
   useEffect(() => {
     try {
-      localStorage.setItem('malenadu_cart', JSON.stringify(cart));
       if (currentUser?.email) {
         const userEmail = currentUser.email.toLowerCase().trim();
-        localStorage.setItem(`malenadu_cart_${userEmail}`, JSON.stringify(cart));
+        // Persist to user's dedicated account storage
+        localStorage.setItem(`malenadu_account_cart_${userEmail}`, JSON.stringify(cart));
+        // Also sync to remote database in background
+        syncAccountCart(userEmail, cart);
+      } else {
+        // Guest user storage
+        localStorage.setItem('malenadu_guest_cart', JSON.stringify(cart));
       }
     } catch (e) { }
   }, [cart, currentUser]);
+
+  // On mount/login: if logged-in user cart is empty locally, fetch from backend database
+  useEffect(() => {
+    if (currentUser?.email && cart.length === 0) {
+      const userEmail = currentUser.email.toLowerCase().trim();
+      fetchAccountCart(userEmail).then(remoteCart => {
+        if (Array.isArray(remoteCart) && remoteCart.length > 0) {
+          setCart(remoteCart);
+        }
+      }).catch(() => {});
+    }
+  }, [currentUser]);
 
   // Persist wishlist across browser reloads
   useEffect(() => {
@@ -12088,9 +12109,14 @@ const App = () => {
       if (!buyNowCart) {
         setCart([]);
         try {
-          localStorage.removeItem('malenadu_cart');
           if (currentUser?.email) {
-            localStorage.removeItem(`malenadu_cart_${currentUser.email.toLowerCase().trim()}`);
+            const userEmail = currentUser.email.toLowerCase().trim();
+            localStorage.removeItem(`malenadu_account_cart_${userEmail}`);
+            localStorage.removeItem(`malenadu_cart_${userEmail}`);
+            syncAccountCart(userEmail, []);
+          } else {
+            localStorage.removeItem('malenadu_guest_cart');
+            localStorage.removeItem('malenadu_cart');
           }
         } catch (e) { }
       }
@@ -12258,31 +12284,52 @@ const App = () => {
 
   // ——— Auth Handlers —————————————————————————————————————————————————————————
 
-  const handleAuthSuccess = (user) => {
+  const handleAuthSuccess = async (user) => {
     setCurrentUser(user);
     setIsAuthOpen(false);
     if (user?.email) {
       const userEmail = user.email.toLowerCase().trim();
       try {
-        const storedUserCartRaw = localStorage.getItem(`malenadu_cart_${userEmail}`);
-        if (storedUserCartRaw) {
-          const storedUserCart = JSON.parse(storedUserCartRaw);
-          if (Array.isArray(storedUserCart) && storedUserCart.length > 0) {
-            setCart(prev => {
-              const merged = [...prev];
-              storedUserCart.forEach(item => {
-                const existing = merged.find(m => m.id === item.id);
-                if (existing) {
-                  existing.qty = Math.max(existing.qty, item.qty);
-                } else {
-                  merged.push(item);
-                }
-              });
-              return merged;
-            });
+        // 1. Any items added while browsing as guest
+        const guestCartRaw = localStorage.getItem('malenadu_guest_cart') || localStorage.getItem('malenadu_cart');
+        const guestItems = guestCartRaw ? JSON.parse(guestCartRaw) : [];
+
+        // 2. Existing items saved under this user account
+        let accountItems = [];
+        const localRaw = localStorage.getItem(`malenadu_account_cart_${userEmail}`) || localStorage.getItem(`malenadu_cart_${userEmail}`);
+        if (localRaw) {
+          accountItems = JSON.parse(localRaw);
+        } else {
+          // Attempt remote database fetch
+          const remoteItems = await fetchAccountCart(userEmail);
+          if (Array.isArray(remoteItems) && remoteItems.length > 0) {
+            accountItems = remoteItems;
           }
         }
-      } catch (e) { }
+
+        // 3. Intelligently merge guest items into account cart (Amazon / Flipkart pattern)
+        const merged = Array.isArray(accountItems) ? [...accountItems] : [];
+        if (Array.isArray(guestItems)) {
+          guestItems.forEach(gItem => {
+            const exists = merged.find(m => m.id === gItem.id);
+            if (exists) {
+              exists.qty = Math.max(exists.qty, gItem.qty);
+            } else {
+              merged.push(gItem);
+            }
+          });
+        }
+
+        setCart(merged);
+        localStorage.setItem(`malenadu_account_cart_${userEmail}`, JSON.stringify(merged));
+        syncAccountCart(userEmail, merged);
+
+        // Clear guest cart now that it is adopted by user account
+        localStorage.removeItem('malenadu_guest_cart');
+        localStorage.removeItem('malenadu_cart');
+      } catch (e) {
+        console.warn('Cart account linking error:', e);
+      }
     }
     if (buyNowCart || cart.length > 0) {
       setIsCheckoutOpen(true);
@@ -12291,12 +12338,16 @@ const App = () => {
 
   const handleLogout = () => {
     if (currentUser?.email) {
+      const userEmail = currentUser.email.toLowerCase().trim();
       try {
-        localStorage.setItem(`malenadu_cart_${currentUser.email.toLowerCase().trim()}`, JSON.stringify(cart));
+        localStorage.setItem(`malenadu_account_cart_${userEmail}`, JSON.stringify(cart));
+        syncAccountCart(userEmail, cart);
       } catch (e) { }
     }
     localStorage.removeItem('malenadu_user');
     setCurrentUser(null);
+    // Clear active cart on screen upon logout so next user/guest starts clean
+    setCart([]);
   };
 
   const handleOpenProfile = () => {
