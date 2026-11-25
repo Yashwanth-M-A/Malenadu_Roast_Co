@@ -7447,6 +7447,7 @@ const CheckoutModal = ({
       name: '',
       email: '',
       phone: '',
+      alternatePhone: '',
       country: 'India',
       houseNo: '',
       area: '',
@@ -7797,6 +7798,7 @@ const CheckoutModal = ({
     streetAddress: computedFullAddress,
     pincode: pincode || '',
     shippingPhone: form.phone,
+    alternatePhone: form.alternatePhone || '',
     addressType: form.addressType || 'Home',
     city: form.city || '',
     state: form.state || '',
@@ -8866,6 +8868,63 @@ const CheckoutModal = ({
                         {form.phone && (
                           <span style={{ fontSize: '0.74rem', color: form.phone.length === 10 ? '#16a34a' : '#b45309', fontWeight: 700, flexShrink: 0 }}>
                             {form.phone.length === 10 ? '✓ 10 digits' : `${form.phone.length}/10`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Alternate Mobile Number (Delhivery Courier Backup) */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <label style={{
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          color: '#374151',
+                          letterSpacing: '-0.2px'
+                        }}>
+                          Alternate Mobile Number
+                        </label>
+                        <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+                          (Optional • Courier Backup)
+                        </span>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: '#ffffff',
+                        border: '1.5px solid #d1d5db',
+                        borderRadius: 10,
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                        padding: '0 0.85rem'
+                      }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#475569', paddingRight: '10px', borderRight: '1.5px solid #e2e8f0', flexShrink: 0 }}>
+                          +91
+                        </span>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder="Backup mobile (if primary is busy/unanswered)"
+                          value={form.alternatePhone || ''}
+                          onChange={e => {
+                            const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                            setForm({ ...form, alternatePhone: digits });
+                          }}
+                          maxLength={10}
+                          style={{
+                            flex: 1,
+                            padding: '0.95rem 0.85rem',
+                            border: 'none',
+                            outline: 'none',
+                            fontSize: '0.94rem',
+                            color: '#111827',
+                            background: '#ffffff',
+                            boxSizing: 'border-box',
+                            fontFamily: 'Inter, sans-serif'
+                          }}
+                        />
+                        {form.alternatePhone && (
+                          <span style={{ fontSize: '0.74rem', color: form.alternatePhone.length === 10 ? '#16a34a' : '#b45309', fontWeight: 700, flexShrink: 0 }}>
+                            {form.alternatePhone.length === 10 ? '✓ 10 digits' : `${form.alternatePhone.length}/10`}
                           </span>
                         )}
                       </div>

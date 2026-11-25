@@ -8261,13 +8261,16 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 return {
                                   name: ord.shippingName || 'Puneeth',
                                   phone: (ord.shippingPhone || '').replace(/\D/g, '').slice(-10),
+                                  alternatePhone: (ord.alternatePhone || '').replace(/\D/g, '').slice(-10),
+                                  email: ord.shippingEmail || '',
                                   houseNo: houseNo || 'Skanda, #818/17',
                                   area: area || '1st main road, 2nd stage, Shivakumara Swamy layout',
                                   landmark: landmark ? landmark.replace(/^near\s+/i, 'Near ') : 'Near Dhaba Bus stop',
                                   city: capitalize(city || 'Davangere'),
                                   state: capitalize(state || 'Karnataka'),
                                   pincode: pincode || '577005',
-                                  addressType: ord.addressType || 'Home'
+                                  addressType: ord.addressType || 'Home',
+                                  deliveryInstructions: ord.deliveryInstructions || ''
                                 };
                               };
 
@@ -8690,17 +8693,20 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
 
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
                                           {renderFieldRow('1. Receiver Full Name', parsedAddr.name, 'name', 'Required')}
-                                          {renderFieldRow('2. Mobile Number (10 Digits)', parsedAddr.phone, 'phone', 'Required')}
+                                          {renderFieldRow('2. Mobile Number (10 Digits)', parsedAddr.phone, 'phone', 'Primary')}
+                                          {parsedAddr.alternatePhone && renderFieldRow('2b. Alternate Mobile Number', parsedAddr.alternatePhone, 'altPhone', 'Courier Backup')}
                                           {renderFieldRow('3. Destination PIN Code', parsedAddr.pincode, 'pin', '6 Digits')}
                                           {renderFieldRow('4. City / Town', parsedAddr.city, 'city', 'Verified')}
                                           {renderFieldRow('5. State', parsedAddr.state, 'state', 'Verified')}
                                           {renderFieldRow('6. Address Type', parsedAddr.addressType, 'type', 'Home/Work')}
+                                          {parsedAddr.email && renderFieldRow('6b. Email ID', parsedAddr.email, 'email', 'Tracking')}
                                         </div>
 
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '10px' }}>
                                           {renderFieldRow('7. Flat / House No / Building / Apartment', parsedAddr.houseNo, 'houseNo', 'Box 1 in Delhivery')}
                                           {renderFieldRow('8. Road / Street / Area / Locality / Sector', parsedAddr.area, 'area', 'Box 2 in Delhivery')}
                                           {renderFieldRow('9. Landmark (Helps Delivery Agent)', parsedAddr.landmark, 'landmark', 'Crucial')}
+                                          {parsedAddr.deliveryInstructions && renderFieldRow('9b. Special Delivery Instructions', parsedAddr.deliveryInstructions, 'instructions', 'Customer Note')}
                                         </div>
                                       </div>
 
@@ -8719,10 +8725,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
                                           {renderFieldRow('10. Package Category', 'Food & Beverages', 'cat', 'FMCG / Dry')}
                                           {renderFieldRow('11. Item Contents / Description', itemDesc, 'desc')}
-                                          {renderFieldRow('12. Dead Weight (kg)', parcelWeightKg, 'wt', 'Calculated')}
+                                          {renderFieldRow('12. Dead Weight (kg)', parcelWeightKg, 'wt', 'In Kg')}
+                                          {renderFieldRow('12b. Dead Weight (Grams)', `${Math.round(parseFloat(parcelWeightKg) * 1000)} gm`, 'wtGm', 'In Grams')}
                                           {renderFieldRow('13. Dimensions (L × W × H)', '24 x 16 x 5 cm', 'dim', 'Coffee Mailer')}
                                           {renderFieldRow('14. Declared Value (₹)', `₹${declaredVal}`, 'val', 'Invoice Value')}
                                           {renderFieldRow('15. Payment Mode', 'Prepaid (Paid Online by Customer)', 'payMode', 'Prepaid')}
+                                          {renderFieldRow('16. HSN Code', '0901', 'hsn', 'Coffee HSN')}
                                         </div>
                                       </div>
 
