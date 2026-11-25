@@ -17,6 +17,7 @@ export default async function handler(req, res) {
   const rawParam = (req.query?.order || req.query?.orderNumber || 'MN-ORDER').trim();
   const cleanOrderNum = rawParam.replace(/^#/, '');
   const prefixedOrderNum = cleanOrderNum.startsWith('MN-') ? cleanOrderNum : `MN-${cleanOrderNum}`;
+  const isEmbedded = req.query?.embedded === 'true' || req.query?.embed === '1';
 
   let orderData = {
     orderNumber: prefixedOrderNum,
@@ -703,10 +704,29 @@ export default async function handler(req, res) {
         width: 100% !important;
       }
     }
+
+    ${isEmbedded ? `
+    /* Embedded Preview Mode (Modal display) */
+    .top-action-bar {
+      display: none !important;
+    }
+    body {
+      background: #FFFFFF !important;
+    }
+    .invoice-wrapper {
+      margin: 8px auto !important;
+      padding: 0 4px !important;
+    }
+    .invoice-card {
+      box-shadow: none !important;
+      border: 1px solid #E2E8F0 !important;
+    }
+    ` : ''}
   </style>
 </head>
 <body>
 
+  ${!isEmbedded ? `
   <!-- Floating Sticky Action Bar -->
   <div class="top-action-bar">
     <div class="top-bar-left">
@@ -728,6 +748,16 @@ export default async function handler(req, res) {
         <span>Download PDF</span>
       </button>
       <button onclick="window.print()" class="btn-action btn-print">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Print</span>
+      </button>
+    </div>
+  </div>
+  ` : ''}
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 6 2 18 2 18 9"></polyline>
           <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>

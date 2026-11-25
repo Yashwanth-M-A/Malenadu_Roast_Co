@@ -7377,6 +7377,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                   const invoiceNum = `INV-${cleanNum}`;
                   const origin = typeof window !== 'undefined' && window.location ? window.location.origin : 'https://www.malenaduroastco.works';
                   const invoiceUrl = `${origin}/api/invoice?order=${orderNum}`;
+                  const invoiceEmbedUrl = `${invoiceUrl}&embedded=true`;
 
                   return (
                     <div style={{
@@ -7391,89 +7392,108 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       zIndex: 999999,
-                      padding: '1rem'
+                      padding: isMobile ? 0 : '1rem'
                     }}>
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                        initial={{ opacity: 0, scale: isMobile ? 1 : 0.96, y: isMobile ? 20 : 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96, y: 10 }}
+                        exit={{ opacity: 0, scale: isMobile ? 1 : 0.96, y: isMobile ? 20 : 10 }}
                         style={{
                           background: '#ffffff',
-                          borderRadius: '16px',
-                          width: '96vw',
-                          maxWidth: '1240px',
-                          height: '92vh',
+                          borderRadius: isMobile ? 0 : '16px',
+                          width: isMobile ? '100vw' : '96vw',
+                          maxWidth: isMobile ? '100vw' : '1240px',
+                          height: isMobile ? '100dvh' : '92vh',
                           display: 'flex',
                           flexDirection: 'column',
                           boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.5)',
                           overflow: 'hidden',
-                          border: '2px solid #C8935A'
+                          border: isMobile ? 'none' : '2px solid #C8935A'
                         }}
                       >
                         {/* Modal Header */}
                         <div style={{
                           background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
                           color: '#ffffff',
-                          padding: '1rem 1.4rem',
+                          padding: isMobile ? '0.65rem 0.85rem' : '1rem 1.4rem',
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          borderBottom: '2px solid #C8935A'
+                          borderBottom: '2px solid #C8935A',
+                          gap: '10px',
+                          flexShrink: 0
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '10px', minWidth: 0, flex: 1 }}>
                             <div style={{
-                              width: '38px',
-                              height: '38px',
-                              borderRadius: '10px',
+                              width: isMobile ? '32px' : '38px',
+                              height: isMobile ? '32px' : '38px',
+                              borderRadius: '8px',
                               background: 'rgba(200, 147, 90, 0.2)',
                               border: '1px solid #C8935A',
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'center'
+                              justifyContent: 'center',
+                              flexShrink: 0
                             }}>
-                              <FileText size={20} color="#C8935A" />
+                              <FileText size={isMobile ? 16 : 20} color="#C8935A" />
                             </div>
-                            <div>
-                              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#C8935A', fontWeight: 800 }}>
-                                Official GST Tax Invoice Preview
-                              </div>
-                              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
-                                {invoiceNum} • Order #{orderNum}
+                            <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                              {!isMobile && (
+                                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#C8935A', fontWeight: 800 }}>
+                                  Official GST Tax Invoice Preview
+                                </div>
+                              )}
+                              <h3 style={{
+                                margin: 0,
+                                fontSize: isMobile ? '0.92rem' : '1.15rem',
+                                fontWeight: 800,
+                                color: '#ffffff',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}>
+                                <span>{invoiceNum}</span>
+                                <span style={{ color: '#C8935A', fontWeight: 600, fontSize: isMobile ? '0.78rem' : '0.95rem' }}>#{orderNum}</span>
                               </h3>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '8px', flexShrink: 0 }}>
                             <button
                               type="button"
                               onClick={() => generateTaxInvoice(ord)}
+                              title="Download PDF"
                               style={{
                                 background: '#8c6239',
                                 border: 'none',
                                 color: '#ffffff',
-                                padding: '0.45rem 0.9rem',
+                                padding: isMobile ? '0.45rem 0.6rem' : '0.45rem 0.9rem',
                                 borderRadius: '8px',
                                 fontSize: '0.78rem',
                                 fontWeight: 700,
                                 cursor: 'pointer',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '6px',
+                                gap: '5px',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                               }}
                             >
-                              <Download size={14} />
-                              <span>Download PDF</span>
+                              <Download size={15} />
+                              {!isMobile && <span>Download PDF</span>}
                             </button>
 
                             <button
                               type="button"
                               onClick={() => window.open(invoiceUrl, '_blank')}
+                              title="Open Fullscreen in New Tab"
                               style={{
                                 background: 'rgba(255, 255, 255, 0.1)',
                                 border: '1px solid rgba(255, 255, 255, 0.2)',
                                 color: '#ffffff',
-                                padding: '0.45rem 0.8rem',
+                                padding: isMobile ? '0.45rem 0.6rem' : '0.45rem 0.8rem',
                                 borderRadius: '8px',
                                 fontSize: '0.78rem',
                                 fontWeight: 600,
@@ -7483,20 +7503,21 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 gap: '5px'
                               }}
                             >
-                              <ExternalLink size={14} />
-                              <span>Open in New Tab</span>
+                              <ExternalLink size={15} />
+                              {!isMobile && <span>Open in New Tab</span>}
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setPreviewInvoiceModalOrder(null)}
+                              title="Close Preview"
                               style={{
                                 background: 'rgba(255, 255, 255, 0.15)',
                                 border: 'none',
                                 color: '#ffffff',
                                 borderRadius: '8px',
-                                width: '32px',
-                                height: '32px',
+                                width: isMobile ? '34px' : '32px',
+                                height: isMobile ? '34px' : '32px',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -7509,9 +7530,16 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                         </div>
 
                         {/* Modal Iframe Content */}
-                        <div style={{ flex: 1, height: 'calc(92vh - 65px)', width: '100%', background: '#f8fafc', position: 'relative' }}>
+                        <div style={{
+                          flex: 1,
+                          height: isMobile ? 'calc(100dvh - 54px)' : 'calc(92vh - 65px)',
+                          width: '100%',
+                          background: '#f8fafc',
+                          position: 'relative',
+                          WebkitOverflowScrolling: 'touch'
+                        }}>
                           <iframe
-                            src={invoiceUrl}
+                            src={invoiceEmbedUrl}
                             title={`Invoice ${invoiceNum}`}
                             style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                           />
