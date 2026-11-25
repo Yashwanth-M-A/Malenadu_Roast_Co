@@ -7,6 +7,90 @@
 //   - Other States (Rest of India): ₹84 (Interstate Express Courier)
 // ============================================================
 
+// Authoritative pricing lookup for 500g and 1kg of all coffee varieties
+export const COFFEE_VARIETY_RATES = {
+  'estate': { 500: 469, 1000: 874, name: 'Malenadu Estate Reserve' },
+  'highland': { 500: 529, 1000: 984, name: 'Highland Signature Reserve' },
+  'heritage': { 500: 579, 1000: 1084, name: 'Imperial Heritage Reserve' },
+  'peaberry': { 500: 709, 1000: 1354, name: 'Peaberry Grand Cru Royale' },
+  'bean': { 500: 739, 1000: 1404, name: 'Malenadu Signature Beans' }
+};
+
+export const detectCoffeeVariety = (name = '') => {
+  const n = String(name || '').toLowerCase();
+  if (n.includes('peaberry')) return 'peaberry';
+  if (n.includes('heritage') || n.includes('85:15') || n.includes('85/15')) return 'heritage';
+  if (n.includes('highland') || n.includes('80:20') || n.includes('80/20')) return 'highland';
+  if (n.includes('bean') || n.includes('whole')) return 'bean';
+  if (n.includes('estate') || n.includes('70:30') || n.includes('70/30')) return 'estate';
+  return null;
+};
+
+// Calculates cart subtotal with smart 1kg bundling (2x 500g of same variety = 1kg price)
+export const calculateCartTotals = (cart) => {
+  if (!Array.isArray(cart) || cart.length === 0) {
+    return {
+      subtotal: 0,
+      originalSubtotal: 0,
+      bundleSavings: 0,
+      varietySavings: {}
+    };
+  }
+
+  let rawSubtotal = 0;
+  const variety500gCount = {};
+
+  cart.forEach(item => {
+    const qty = Number(item.qty) || 1;
+    const rawPrice = item.price;
+    const p = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice || 0).replace(/[^0-9.]/g, '')) || 0;
+    rawSubtotal += p * qty;
+
+    const nameLower = (item.name || '').toLowerCase();
+    const weightStr = (item.weight || item.selectedWeight || '').toLowerCase();
+    const is500g = weightStr.includes('500g');
+    const isCoffee = !nameLower.includes('pepper') && item.category !== 'pepper' && !nameLower.includes('combo');
+
+    if (isCoffee && is500g) {
+      const variety = detectCoffeeVariety(item.name);
+      if (variety && COFFEE_VARIETY_RATES[variety]) {
+        variety500gCount[variety] = (variety500gCount[variety] || 0) + qty;
+      }
+    }
+  });
+
+  let totalBundleSavings = 0;
+  const varietySavings = {};
+
+  Object.keys(variety500gCount).forEach(variety => {
+    const totalQty = variety500gCount[variety];
+    const pairs = Math.floor(totalQty / 2);
+    if (pairs > 0) {
+      const rates = COFFEE_VARIETY_RATES[variety];
+      const standardCost = 2 * rates[500];
+      const bundleCost = rates[1000];
+      const savingPerPair = standardCost - bundleCost;
+      const totalSaving = pairs * savingPerPair;
+
+      varietySavings[variety] = {
+        pairs,
+        totalSaving,
+        rates
+      };
+      totalBundleSavings += totalSaving;
+    }
+  });
+
+  const finalSubtotal = Math.max(0, rawSubtotal - totalBundleSavings);
+
+  return {
+    subtotal: finalSubtotal,
+    originalSubtotal: rawSubtotal,
+    bundleSavings: totalBundleSavings,
+    varietySavings
+  };
+};
+
 export const isKarnatakaPincode = (pincode) => {
   if (!pincode) return true; // Default to Karnataka (roastery home state)
   const clean = String(pincode).replace(/\D/g, '').trim();
@@ -20,6 +104,10 @@ export const getCartShippingDetails = (cart, pincode = '') => {
   if (!Array.isArray(cart) || cart.length === 0) {
     return {
       subtotal: 0,
+      originalSubtotal: 0,
+      bundleSavings: 0,
+      varietySavings: {},
+      bundledItems: [],
       totalGrams: 0,
       coffeeGrams: 0,
       pepperGrams: 0,
@@ -36,7 +124,7 @@ export const getCartShippingDetails = (cart, pincode = '') => {
     };
   }
 
-  let subtotal = 0;
+  const { subtotal, originalSubtotal, bundleSavings, varietySavings } = calculateCartTotals(cart);
   let totalGrams = 0;
   let coffeeGrams = 0;
   let pepperGrams = 0;
@@ -46,9 +134,6 @@ export const getCartShippingDetails = (cart, pincode = '') => {
 
   cart.forEach(item => {
     const qty = Number(item.qty) || 1;
-    const rawPrice = item.price;
-    const p = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice || 0).replace(/[^0-9.]/g, '')) || 0;
-    subtotal += p * qty;
 
     const nameLower = (item.name || '').toLowerCase();
     const weightStr = (item.weight || item.selectedWeight || '').toLowerCase();
@@ -99,8 +184,59 @@ export const getCartShippingDetails = (cart, pincode = '') => {
   const progressPct = isFreeShipping ? 100 : Math.min(95, Math.round((Math.max(coffeeGrams, totalGrams) / 1000) * 100));
   const gramsToFree = Math.max(0, 1000 - Math.max(coffeeGrams, totalGrams));
 
+  // Compute per-item bundled/effective pricing
+  const remainingPairedUnits = {};
+  Object.keys(varietySavings).forEach(v => {
+    remainingPairedUnits[v] = (varietySavings[v].pairs || 0) * 2;
+  });
+
+  const bundledItems = cart.map(item => {
+    const qty = Number(item.qty) || 1;
+    const rawPrice = item.price;
+    const standardUnitPrice = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice || 0).replace(/[^0-9.]/g, '')) || 0;
+    const nameLower = (item.name || '').toLowerCase();
+    const weightStr = (item.weight || item.selectedWeight || '').toLowerCase();
+    const is500g = weightStr.includes('500g');
+    const isCoffee = !nameLower.includes('pepper') && item.category !== 'pepper' && !nameLower.includes('combo');
+    const variety = isCoffee && is500g ? detectCoffeeVariety(item.name) : null;
+
+    if (variety && remainingPairedUnits[variety] > 0) {
+      const pairedForThis = Math.min(qty, remainingPairedUnits[variety]);
+      const unpairedForThis = qty - pairedForThis;
+      remainingPairedUnits[variety] -= pairedForThis;
+
+      const rates = COFFEE_VARIETY_RATES[variety];
+      const pairedUnitRate = rates[1000] / 2;
+      const totalItemPrice = (pairedForThis * pairedUnitRate) + (unpairedForThis * rates[500]);
+      const effectiveUnitPrice = totalItemPrice / qty;
+      const itemSavings = (qty * standardUnitPrice) - totalItemPrice;
+
+      return {
+        ...item,
+        effectiveUnitPrice,
+        effectiveTotalPrice: totalItemPrice,
+        isBundled: true,
+        bundleSavings: itemSavings,
+        pairedCount: pairedForThis
+      };
+    }
+
+    return {
+      ...item,
+      effectiveUnitPrice: standardUnitPrice,
+      effectiveTotalPrice: standardUnitPrice * qty,
+      isBundled: false,
+      bundleSavings: 0,
+      pairedCount: 0
+    };
+  });
+
   return {
     subtotal,
+    originalSubtotal,
+    bundleSavings,
+    varietySavings,
+    bundledItems,
     totalGrams,
     coffeeGrams,
     pepperGrams,

@@ -1,4 +1,4 @@
-import { getCartShippingDetails, isKarnatakaPincode } from './shippingService.js';
+import { getCartShippingDetails, isKarnatakaPincode, detectCoffeeVariety, COFFEE_VARIETY_RATES, calculateCartTotals } from './shippingService.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ShoppingCart, Sparkles, RotateCcw, Eye, Coffee, User, Search, Menu, X, Star, ShieldCheck,
@@ -6687,7 +6687,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                             Tellicherry Black Pepper
                           </div>
                           <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '1px' }}>
-                            <strong style={{ color: '#0F172A' }}>₹299</strong> (250g) • <span style={{ color: '#78716c' }}>Single-Estate Whole Spice</span>
+                            <strong style={{ color: '#0F172A' }}>₹319</strong> (250g) • <span style={{ color: '#78716c' }}>Single-Estate Whole Spice</span>
                           </div>
                         </div>
                       </div>
@@ -6698,7 +6698,7 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                             onAddToCart({
                               id: 4,
                               name: 'Malenadu Pepper Reserve',
-                              price: 299,
+                              price: 319,
                               weight: '250g',
                               category: 'pepper',
                               image: '/assets/images/pepper_reserve_250g.webp'
@@ -6736,17 +6736,36 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                   <p>Your cart is empty.</p>
                 </div>
               ) : (
-                cart.map(item => (
+                (shippingDetails.bundledItems || cart).map(item => (
                   <div key={item.id} className="cart-item">
                     <img src={item.image} alt={item.name} loading="lazy" />
                     <div className="cart-item-info">
                       <h4>{item.name}</h4>
                       <p className="cart-item-price">
-                        ₹{item.price}
-                        {item.weight && (
-                          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, marginLeft: '6px' }}>
-                            ({item.weight})
-                          </span>
+                        {item.isBundled ? (
+                          <>
+                            <span style={{ textDecoration: 'line-through', color: '#94a3b8', fontSize: '0.82rem', marginRight: '4px' }}>
+                              ₹{item.price}
+                            </span>
+                            <strong style={{ color: '#16a34a' }}>₹{item.effectiveUnitPrice.toFixed(0)}</strong>
+                            {item.weight && (
+                              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, marginLeft: '4px' }}>
+                                ({item.weight})
+                              </span>
+                            )}
+                            <span style={{ display: 'inline-block', fontSize: '0.68rem', background: '#dcfce7', color: '#15803d', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', marginLeft: '6px' }}>
+                              1kg Rate
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            ₹{item.price}
+                            {item.weight && (
+                              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500, marginLeft: '6px' }}>
+                                ({item.weight})
+                              </span>
+                            )}
+                          </>
                         )}
                       </p>
                       <div className="qty-controls">
@@ -6767,6 +6786,12 @@ const CartSidebar = ({ isOpen, onClose, cart, updateQuantity, onCheckout, onAddT
                   <span>Cart Subtotal</span>
                   <span style={{ fontWeight: 600, color: '#0f172a' }}>₹{shippingDetails.subtotal.toFixed(0)}</span>
                 </div>
+                {shippingDetails.bundleSavings > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#16a34a', fontWeight: 700, marginBottom: '4px', background: '#f0fdf4', border: '1px dashed #86efac', padding: '3px 8px', borderRadius: '4px' }}>
+                    <span>🎉 1kg Multi-Pack Rate Applied:</span>
+                    <span>Saved ₹{shippingDetails.bundleSavings.toFixed(0)}</span>
+                  </div>
+                )}
                 <div style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, marginBottom: '6px' }}>
                   ✓ Inclusive of 5% GST
                 </div>
@@ -7590,15 +7615,12 @@ const CheckoutModal = ({
     return isNaN(clean) ? 0 : clean;
   };
 
-  const subtotal = cart.reduce((acc, item) => {
-    const itemPrice = parseItemPrice(item.price);
-    const itemQty = Number(item.qty) || 1;
-    return acc + (itemPrice * itemQty);
-  }, 0);
-
+  const shippingInfo = getCartShippingDetails(cart, pincode);
+  const subtotal = shippingInfo.subtotal;
+  const bundleSavings = shippingInfo.bundleSavings || 0;
+  const varietySavings = shippingInfo.varietySavings || {};
   const taxableValue = (subtotal / 1.05).toFixed(2);
   const gstAmount = (subtotal - parseFloat(taxableValue)).toFixed(2);
-  const shippingInfo = getCartShippingDetails(cart, pincode);
   const shippingFee = shippingInfo.shippingFee;
   const totalPayable = subtotal + shippingFee;
 
@@ -7821,15 +7843,18 @@ const CheckoutModal = ({
     deliveryInstructions: form.deliveryInstructions || '',
     b2bGstin: null,
     b2bCompanyName: null,
-    items: cart.map(i => ({
-      productId: i.id,
-      id: i.id,
-      name: i.name,
-      price: parseFloat(i.price),
-      qty: i.qty,
-      weight: i.weight || '',
-      image: i.image || ''
-    })),
+    items: (shippingInfo.bundledItems || cart).map(i => {
+      const unitPrice = typeof i.effectiveUnitPrice === 'number' ? i.effectiveUnitPrice : (parseFloat(i.price) || 0);
+      return {
+        productId: i.productId || i.id,
+        id: i.id,
+        name: i.name,
+        price: unitPrice,
+        qty: i.qty,
+        weight: i.weight || '',
+        image: i.image || ''
+      };
+    }),
     subtotal: subtotal,
     gstAmount: parseFloat(gstAmount),
     shippingFee: shippingFee,
@@ -9389,9 +9414,9 @@ const CheckoutModal = ({
                         Fresh roastery grind • Unlocks Free Delivery
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>₹429</span>
-                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>₹499</span>
-                        <span style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 800 }}>14% OFF</span>
+                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>₹{COFFEE_ADDON.price}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>₹520</span>
+                        <span style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 800 }}>Special Offer</span>
                       </div>
                     </div>
 
@@ -9476,9 +9501,9 @@ const CheckoutModal = ({
                             Handpicked bold black pepper • Unlocks Free Delivery
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                            <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#166534' }}>₹299</span>
-                            <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>₹399</span>
-                            <span style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 800 }}>25% OFF</span>
+                            <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#166534' }}>₹{PEPPER_ADDON.price}</span>
+                            <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>₹370</span>
+                            <span style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 800 }}>Estate Direct</span>
                           </div>
                         </div>
 
@@ -9701,9 +9726,11 @@ const CheckoutModal = ({
                     🧾 Final Order & Tax Summary
                   </div>
 
-                  {cart.map(item => {
+                  {(shippingInfo.bundledItems || cart).map(item => {
                     const price = parseItemPrice(item.price);
                     const qty = Number(item.qty) || 1;
+                    const effectiveTotal = typeof item.effectiveTotalPrice === 'number' ? item.effectiveTotalPrice : (price * qty);
+
                     return (
                       <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, fontSize: '0.85rem', color: '#4b5563' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -9718,10 +9745,15 @@ const CheckoutModal = ({
                             <div style={{ fontWeight: 700, color: '#0f172a' }}>{item.name}</div>
                             <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
                               Qty: {qty} {item.weight ? `• Pack: ${item.weight}` : ''}
+                              {item.isBundled && (
+                                <span style={{ color: '#15803d', fontWeight: 700, marginLeft: '6px' }}>
+                                  (1kg Rate Applied: ₹{item.effectiveUnitPrice.toFixed(0)}/pk)
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
-                        <span style={{ fontWeight: 700, color: '#0f172a' }}>₹{(price * qty).toFixed(0)}</span>
+                        <span style={{ fontWeight: 700, color: '#0f172a' }}>₹{effectiveTotal.toFixed(0)}</span>
                       </div>
                     );
                   })}
@@ -9731,6 +9763,12 @@ const CheckoutModal = ({
                       <span>Items Subtotal (Incl. of 5% GST):</span>
                       <span style={{ fontWeight: 700, color: '#0f172a' }}>₹{subtotal.toFixed(0)}</span>
                     </div>
+                    {bundleSavings > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#16a34a', fontWeight: 700, marginBottom: 4, background: '#f0fdf4', border: '1px dashed #86efac', padding: '4px 8px', borderRadius: '4px' }}>
+                        <span>🎉 1kg Multi-Pack Rate Applied:</span>
+                        <span>-₹{bundleSavings.toFixed(0)}</span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#059669', marginBottom: 4, background: '#f0fdf4', padding: '3px 8px', borderRadius: '4px' }}>
                       <span>Inbuilt 5% GST (Taxable: ₹{taxableValue} + GST: ₹{gstAmount}):</span>
                       <span style={{ fontWeight: 600 }}>₹{gstAmount} (Included)</span>

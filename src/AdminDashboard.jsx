@@ -5766,7 +5766,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               email: email,
               productName: primaryItem,
               weight: weight,
-              totalAmount: order.totalAmount || order.total || 429,
+              totalAmount: order.totalAmount || order.total || 469,
               orderDateStr: orderDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
               isDelivered: deliv.isDelivered,
               deliveredAt: deliv.effectiveDeliveredAt,
