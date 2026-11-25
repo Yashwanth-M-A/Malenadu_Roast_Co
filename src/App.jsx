@@ -3455,9 +3455,9 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
     if (val.length === 6) {
       setAddressPincodeStatus({
         valid: true,
-        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
         eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
       });
     } else {
       setAddressPincodeStatus(null);
@@ -3596,9 +3596,9 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
       const isKar = isKarnatakaPincode(rawPin);
       setAddressPincodeStatus({
         valid: true,
-        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
         eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
       });
     } else {
       setAddressPincodeStatus(null);
@@ -7482,9 +7482,9 @@ const CheckoutModal = ({
         const isKar = isKarnatakaPincode(p);
         return {
           valid: true,
-          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
           eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
         };
       }
     } catch (e) { }
@@ -7644,9 +7644,9 @@ const CheckoutModal = ({
         const isKar = isKarnatakaPincode(pin);
         setPincodeStatus({
           valid: true,
-          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
           eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
         });
       }
       return;
@@ -7691,9 +7691,9 @@ const CheckoutModal = ({
         const isKar = isKarnatakaPincode(parsedPin);
         setPincodeStatus({
           valid: true,
-          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+          courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
           eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+          message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
         });
       }
     }
@@ -7769,9 +7769,9 @@ const CheckoutModal = ({
       const isKar = isKarnatakaPincode(val);
       setPincodeStatus({
         valid: true,
-        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹68)',
+        courier: isKar ? 'Karnataka Express Courier (₹44)' : 'Interstate Express Courier (₹84)',
         eta: isKar ? '1 – 2 Business Days' : '3 – 5 Business Days',
-        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹68 Delivery)'
+        message: isKar ? 'Karnataka Roastery Local Circle (₹44 Delivery)' : 'Interstate / Rest of India (₹84 Delivery)'
       });
 
       // Smart State auto-detection based on pincode circle
@@ -9727,7 +9727,7 @@ const CheckoutModal = ({
                       {shippingFee === 0 ? (
                         <span style={{ color: '#059669', fontWeight: 800 }}>FREE (Express Delivery)</span>
                       ) : (
-                        <span style={{ color: '#92400e', fontWeight: 700 }}>₹{shippingFee.toFixed(0)} <small style={{ color: '#6b7280' }}>({shippingInfo.isKarnataka ? 'Karnataka ₹44' : 'Interstate ₹68'})</small></span>
+                        <span style={{ color: '#92400e', fontWeight: 700 }}>₹{shippingFee.toFixed(0)} <small style={{ color: '#6b7280' }}>({shippingInfo.isKarnataka ? 'Karnataka ₹44' : 'Interstate ₹84'})</small></span>
                       )}
                     </div>
                   </div>

@@ -248,7 +248,7 @@ export const LegalPolicyPage = ({ type = 'privacy', onBack, onSelectPolicy }) =>
                 <li><strong>Orders Under 1kg (Pincode-Based Direct Courier Freight):</strong> Because fresh roastery shipments require dedicated aroma-lock packaging and rapid transit:
                   <ul>
                     <li><strong>Karnataka Pincodes (PIN starting with 56, 57, 58, 59):</strong> Flat nominal rate of <strong>₹44</strong> (local origin circle express courier).</li>
-                    <li><strong>Other Indian States (National / Interstate Delivery):</strong> Flat rate of <strong>₹68</strong> (national express air/surface courier).</li>
+                    <li><strong>Other Indian States (National / Interstate Delivery):</strong> Flat rate of <strong>₹84</strong> (national express air/surface courier).</li>
                   </ul>
                 </li>
                 <li><strong>Smart Free Shipping Recommendation:</strong> Customers ordering a 500g pack are encouraged to add a second 500g pack or handpicked Tellicherry Black Pepper to immediately unlock <strong>100% FREE Delivery</strong> and save all shipping charges.</li>

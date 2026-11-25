@@ -8984,7 +8984,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                             Postal PIN: {selectedOrderDossier.pincode}
                                           </span>
                                           <span style={{ fontSize: '0.74rem', color: '#15803d', fontWeight: 700 }}>
-                                            {isKarnatakaPincode(selectedOrderDossier.pincode) ? 'Karnataka Circle (₹44 Delivery)' : 'Interstate Circle (₹68 Delivery)'}
+                                            {isKarnatakaPincode(selectedOrderDossier.pincode) ? 'Karnataka Circle (₹44 Delivery)' : 'Interstate Circle (₹84 Delivery)'}
                                           </span>
                                         </div>
                                       )}

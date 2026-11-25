@@ -4,7 +4,7 @@
 // - 1kg+ Coffee (or cart >= ₹799, or Coffee + Pepper): 100% FREE Delivery
 // - Under 1kg:
 //   - Karnataka (pincodes starting with 56, 57, 58, 59): ₹44 (Local Origin Courier)
-//   - Other States (Rest of India): ₹68 (Interstate Express Courier)
+//   - Other States (Rest of India): ₹84 (Interstate Express Courier)
 // ============================================================
 
 export const isKarnatakaPincode = (pincode) => {
@@ -92,9 +92,9 @@ export const getCartShippingDetails = (cart, pincode = '') => {
 
   const isFreeShipping = hasSpecialFreeShippingItem || coffeeGrams >= 1000 || totalGrams >= 1000 || subtotal >= 799 || (coffeeGrams >= 500 && hasPepper);
   
-  // Pincode-based delivery rates: Karnataka = ₹44, Other States = ₹68
+  // Pincode-based delivery rates: Karnataka = ₹44, Other States = ₹84
   const isKarnataka = isKarnatakaPincode(pincode);
-  const standardFee = isKarnataka ? 44 : 68;
+  const standardFee = isKarnataka ? 44 : 84;
   const shippingFee = isFreeShipping ? 0 : standardFee;
   const progressPct = isFreeShipping ? 100 : Math.min(95, Math.round((Math.max(coffeeGrams, totalGrams) / 1000) * 100));
   const gramsToFree = Math.max(0, 1000 - Math.max(coffeeGrams, totalGrams));
