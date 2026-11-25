@@ -503,7 +503,9 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | 'today' | 'month'
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | 'today' | 'month' | 'custom'
+  const [customSelectedDate, setCustomSelectedDate] = useState('');
+  const [showDailyBreakdown, setShowDailyBreakdown] = useState(true);
   const [shippingOrderId, setShippingOrderId] = useState(null);
   const [selectedOrderDossier, setSelectedOrderDossier] = useState(null);
   const [registeredUsers, setRegisteredUsers] = useState([]);
@@ -1813,7 +1815,49 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
   };
 
 
-  // Filtered orders with both time horizon (All / Today / This Month) and status
+  // Group all orders by exact calendar date in IST for daily tracking
+  const dailyOrdersBreakdown = React.useMemo(() => {
+    const dayMap = {};
+    orders.forEach(o => {
+      const rawDate = o.createdAt || o.orderDate || o.created_at;
+      if (!rawDate) return;
+      const d = new Date(rawDate);
+      if (isNaN(d.getTime())) return;
+      const isoDay = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // YYYY-MM-DD
+      const displayDay = d.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Asia/Kolkata'
+      });
+      const weekday = d.toLocaleDateString('en-IN', { weekday: 'short', timeZone: 'Asia/Kolkata' });
+      const isToday = isOrderToday(rawDate);
+
+      if (!dayMap[isoDay]) {
+        dayMap[isoDay] = {
+          isoDay,
+          displayDay,
+          weekday,
+          isToday,
+          count: 0,
+          revenue: 0,
+          statusBreakdown: { placed: 0, packed: 0, shipped: 0, delivered: 0, cancelled: 0 },
+          orders: []
+        };
+      }
+      dayMap[isoDay].count += 1;
+      dayMap[isoDay].revenue += (parseFloat(o.totalAmount) || 0);
+      const st = (o.orderStatus || o.status || 'placed').toLowerCase();
+      if (dayMap[isoDay].statusBreakdown[st] !== undefined) {
+        dayMap[isoDay].statusBreakdown[st] += 1;
+      }
+      dayMap[isoDay].orders.push(o);
+    });
+
+    return Object.values(dayMap).sort((a, b) => b.isoDay.localeCompare(a.isoDay));
+  }, [orders]);
+
+  // Filtered orders with both time horizon (All / Today / This Month / Specific Day) and status
   const filteredOrders = orders.filter(order => {
     const rawDate = order.createdAt || order.orderDate || order.created_at;
     let timeMatch = true;
@@ -1821,6 +1865,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       timeMatch = isOrderToday(rawDate);
     } else if (timeFilter === 'month') {
       timeMatch = isOrderThisMonth(rawDate);
+    } else if (timeFilter === 'custom' && customSelectedDate) {
+      if (!rawDate) return false;
+      const d = new Date(rawDate);
+      if (isNaN(d.getTime())) return false;
+      const orderDayIST = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+      timeMatch = orderDayIST === customSelectedDate;
     }
 
     const statusMatch = selectedFilter === 'all' || (order.orderStatus || order.status || 'placed').toLowerCase() === selectedFilter;
@@ -8014,6 +8064,203 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
               </div>
             </div>
 
+            {/* Daily Order Tracking & Day-by-Day Calendar Ledger */}
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '14px',
+              padding: isMobile ? '1rem 0.85rem' : '1.25rem 1.5rem',
+              marginBottom: isMobile ? '1.25rem' : '1.75rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+            }}>
+              {/* Ledger Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: '10px',
+                marginBottom: '1rem',
+                borderBottom: '1px solid #f1f5f9',
+                paddingBottom: '0.75rem'
+              }}>
+                <div>
+                  <h4 style={{
+                    margin: 0,
+                    fontSize: isMobile ? '0.95rem' : '1.05rem',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <Calendar size={18} color="#C8935A" />
+                    <span>Daily Order Tracking & Date History</span>
+                  </h4>
+                  <p style={{ margin: '3px 0 0', fontSize: '0.76rem', color: '#64748b' }}>
+                    Track exact order counts and revenue for each day • Click any day or pick a date to filter orders
+                  </p>
+                </div>
+
+                {/* Right: Date Picker Selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#f8fafc', border: '1px solid #cbd5e1', padding: '4px 8px', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#475569' }}>Pick Date:</span>
+                    <input
+                      type="date"
+                      value={customSelectedDate}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setCustomSelectedDate(val);
+                        if (val) {
+                          setTimeFilter('custom');
+                        } else {
+                          setTimeFilter('all');
+                        }
+                      }}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: '#0f172a',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    />
+                  </div>
+                  {timeFilter === 'custom' && (
+                    <button
+                      type="button"
+                      onClick={() => { setTimeFilter('all'); setCustomSelectedDate(''); }}
+                      style={{
+                        background: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        color: '#b91c1c',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Clear Date ×
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowDailyBreakdown(prev => !prev)}
+                    style={{
+                      background: '#f1f5f9',
+                      border: '1px solid #e2e8f0',
+                      color: '#475569',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.74rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {showDailyBreakdown ? 'Hide Days ▲' : 'Show Days ▼'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Day Cards Row / Horizontal List */}
+              {showDailyBreakdown && (
+                <div>
+                  {dailyOrdersBreakdown.length === 0 ? (
+                    <div style={{ fontSize: '0.82rem', color: '#94a3b8', fontStyle: 'italic', padding: '0.5rem 0' }}>
+                      No date records available yet.
+                    </div>
+                  ) : (
+                    <div style={{
+                      display: 'flex',
+                      gap: '0.75rem',
+                      overflowX: 'auto',
+                      paddingBottom: '8px',
+                      WebkitOverflowScrolling: 'touch',
+                      scrollbarWidth: 'thin'
+                    }}>
+                      {dailyOrdersBreakdown.map(day => {
+                        const isSelected = timeFilter === 'custom' && customSelectedDate === day.isoDay;
+                        return (
+                          <div
+                            key={day.isoDay}
+                            onClick={() => {
+                              if (isSelected) {
+                                setTimeFilter('all');
+                                setCustomSelectedDate('');
+                              } else {
+                                setTimeFilter('custom');
+                                setCustomSelectedDate(day.isoDay);
+                              }
+                            }}
+                            style={{
+                              flex: '0 0 auto',
+                              minWidth: isMobile ? '155px' : '175px',
+                              background: isSelected ? '#fefce8' : (day.isToday ? '#f0fdf4' : '#faf8f5'),
+                              border: isSelected ? '2px solid #C8935A' : (day.isToday ? '1.5px solid #86efac' : '1px solid #e8decb'),
+                              borderRadius: '10px',
+                              padding: '0.75rem 0.85rem',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                              boxShadow: isSelected ? '0 4px 12px rgba(200, 147, 90, 0.2)' : '0 1px 3px rgba(0,0,0,0.02)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#0f172a' }}>
+                                {day.displayDay}
+                              </span>
+                              {day.isToday && (
+                                <span style={{
+                                  background: '#16a34a',
+                                  color: '#ffffff',
+                                  fontSize: '0.6rem',
+                                  fontWeight: 800,
+                                  padding: '1px 5px',
+                                  borderRadius: '4px',
+                                  textTransform: 'uppercase'
+                                }}>
+                                  TODAY
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '6px' }}>
+                              {day.weekday}
+                            </div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '2px 0' }}>
+                              {day.count} {day.count === 1 ? 'Order' : 'Orders'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', marginBottom: '8px' }}>
+                              ₹{day.revenue.toFixed(0)} <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.68rem' }}>sales</span>
+                            </div>
+                            <button
+                              type="button"
+                              style={{
+                                width: '100%',
+                                padding: '4px 0',
+                                background: isSelected ? '#C8935A' : '#ffffff',
+                                color: isSelected ? '#ffffff' : '#8c6239',
+                                border: isSelected ? 'none' : '1px solid #cbd5e1',
+                                borderRadius: '6px',
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              {isSelected ? 'Selected ✓' : 'View Orders →'}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Filter Tabs & Search Bar */}
             <div style={{
               background: '#ffffff',
@@ -8053,7 +8300,11 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                   {[
                     { id: 'all', label: `All (${orders.length})` },
                     { id: 'today', label: `⚡ Today (${todayOrdersCount})` },
-                    { id: 'month', label: `📆 This Month (${monthOrdersCount})` }
+                    { id: 'month', label: `📆 This Month (${monthOrdersCount})` },
+                    ...(timeFilter === 'custom' && customSelectedDate ? [{
+                      id: 'custom',
+                      label: `📅 ${customSelectedDate} (${filteredOrders.length})`
+                    }] : [])
                   ].map(t => {
                     const isAct = timeFilter === t.id;
                     return (
@@ -8163,6 +8414,45 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                 <Search size={14} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
               </div>
             </div>
+
+            {/* Active Specific Date Filter Banner */}
+            {timeFilter === 'custom' && customSelectedDate && (
+              <div style={{
+                background: '#fefce8',
+                border: '1.5px solid #fde047',
+                borderRadius: '10px',
+                padding: '0.65rem 1rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: '#854d0e', fontWeight: 600 }}>
+                  <Calendar size={16} color="#ca8a04" />
+                  <span>
+                    Tracking orders for date: <strong>{customSelectedDate}</strong> — <strong>{filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'}</strong> found • Day Total: <strong>₹{filteredOrders.reduce((sum, o) => sum + (parseFloat(o.totalAmount) || 0), 0).toFixed(0)}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setTimeFilter('all'); setCustomSelectedDate(''); }}
+                  style={{
+                    background: '#854d0e',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Clear Date Filter ×
+                </button>
+              </div>
+            )}
 
             {/* Orders Card / List */}
             < div style={{
