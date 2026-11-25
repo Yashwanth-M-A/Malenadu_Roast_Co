@@ -7385,8 +7385,8 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: 'rgba(15, 23, 42, 0.75)',
-                      backdropFilter: 'blur(6px)',
+                      background: 'rgba(15, 23, 42, 0.85)',
+                      backdropFilter: 'blur(8px)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -7394,20 +7394,20 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                       padding: '1rem'
                     }}>
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                        initial={{ opacity: 0, scale: 0.96, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                        exit={{ opacity: 0, scale: 0.96, y: 10 }}
                         style={{
                           background: '#ffffff',
                           borderRadius: '16px',
-                          width: '100%',
-                          maxWidth: '960px',
-                          maxHeight: '94vh',
+                          width: '96vw',
+                          maxWidth: '1240px',
+                          height: '92vh',
                           display: 'flex',
                           flexDirection: 'column',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                          boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.5)',
                           overflow: 'hidden',
-                          border: '1.5px solid #C8935A'
+                          border: '2px solid #C8935A'
                         }}
                       >
                         {/* Modal Header */}
@@ -7509,11 +7509,11 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                         </div>
 
                         {/* Modal Iframe Content */}
-                        <div style={{ flex: 1, height: '75vh', background: '#f8fafc', position: 'relative' }}>
+                        <div style={{ flex: 1, height: 'calc(92vh - 65px)', width: '100%', background: '#f8fafc', position: 'relative' }}>
                           <iframe
                             src={invoiceUrl}
                             title={`Invoice ${invoiceNum}`}
-                            style={{ width: '100%', height: '100%', border: 'none' }}
+                            style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                           />
                         </div>
                       </motion.div>
