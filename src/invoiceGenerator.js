@@ -39,9 +39,13 @@ export const getInvoiceHtml = (order = {}, { showPrintButton = false } = {}) => 
     ? parseFloat(order.subtotal)
     : computedItemsSubtotal;
 
+  const discountAmount = parseFloat(order.discountAmount || order.discount || 0);
+  const couponCode = order.couponCode || (discountAmount > 0 ? 'FLAT100' : null);
+  const netSubtotal = Math.max(0, itemsSubtotal - discountAmount);
+
   // The product card prices already include 5% GST
-  const taxableValue = (itemsSubtotal / 1.05).toFixed(2);
-  const gstTotal = (itemsSubtotal - parseFloat(taxableValue)).toFixed(2);
+  const taxableValue = (netSubtotal / 1.05).toFixed(2);
+  const gstTotal = (netSubtotal - parseFloat(taxableValue)).toFixed(2);
 
   // Interstate check: Karnataka pincodes start with 56, 57, 58, 59
   const pinStr = String(order.pincode || '').trim();
@@ -54,11 +58,11 @@ export const getInvoiceHtml = (order = {}, { showPrintButton = false } = {}) => 
   let shippingFee = 0;
   if (order.shippingFee !== undefined && order.shippingFee !== null && !isNaN(parseFloat(order.shippingFee))) {
     shippingFee = parseFloat(order.shippingFee);
-  } else if (order.totalAmount && parseFloat(order.totalAmount) > itemsSubtotal) {
-    shippingFee = parseFloat((parseFloat(order.totalAmount) - itemsSubtotal).toFixed(2));
+  } else if (order.totalAmount && parseFloat(order.totalAmount) > netSubtotal) {
+    shippingFee = parseFloat((parseFloat(order.totalAmount) - netSubtotal).toFixed(2));
   }
 
-  const grandTotal = itemsSubtotal + shippingFee;
+  const grandTotal = netSubtotal + shippingFee;
 
   const customerName = order.shippingName || order.customerName || order.name || 'Valued Customer';
   const customerAddress = order.shippingAddress || order.address || (order.pincode ? `Direct Delivery, PIN: ${order.pincode}` : 'Direct Roastery Dispatch, India');
@@ -202,6 +206,16 @@ export const getInvoiceHtml = (order = {}, { showPrintButton = false } = {}) => 
               <td style="padding: 5px 0; color: #475569; font-weight: 600;">Gross Product Subtotal:</td>
               <td style="padding: 5px 0; text-align: right; font-weight: 700; color: #0f172a;">₹${itemsSubtotal.toFixed(2)}</td>
             </tr>
+            ${discountAmount > 0 ? `
+              <tr>
+                <td style="padding: 5px 0; color: #16a34a; font-weight: 700;">Coupon Discount (${couponCode || 'Promo'}):</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: 700; color: #16a34a;">-₹${discountAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 5px 0; color: #475569; font-weight: 700;">Net Product Subtotal:</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: 700; color: #0f172a;">₹${netSubtotal.toFixed(2)}</td>
+              </tr>
+            ` : ''}
             <tr>
               <td style="padding: 4px 0; color: #64748b;">Base Taxable Value (Excl. Tax):</td>
               <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #334155;">₹${taxableValue}</td>

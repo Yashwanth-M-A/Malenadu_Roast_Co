@@ -100,9 +100,13 @@ export default async function handler(req, res) {
     ? parseFloat(orderData.subtotal)
     : computedItemsSubtotal;
 
-  const totalAmount = parseFloat(orderData.totalAmount || itemsSubtotal);
-  const taxableValue = (itemsSubtotal / 1.05).toFixed(2);
-  const gstTotal = (itemsSubtotal - parseFloat(taxableValue)).toFixed(2);
+  const discountAmount = parseFloat(orderData.discountAmount || orderData.discount || 0);
+  const couponCode = orderData.couponCode || (discountAmount > 0 ? 'FLAT100' : null);
+  const netSubtotal = Math.max(0, itemsSubtotal - discountAmount);
+
+  const totalAmount = parseFloat(orderData.totalAmount || (netSubtotal + (orderData.shippingFee || 0)));
+  const taxableValue = (netSubtotal / 1.05).toFixed(2);
+  const gstTotal = (netSubtotal - parseFloat(taxableValue)).toFixed(2);
 
   // Interstate check: Karnataka pincodes start with 56, 57, 58, 59
   const pinStr = String(orderData.pincode || '').trim();
@@ -114,10 +118,10 @@ export default async function handler(req, res) {
   let shippingFee = 0;
   if (orderData.shippingFee !== undefined && orderData.shippingFee !== null && !isNaN(parseFloat(orderData.shippingFee))) {
     shippingFee = parseFloat(orderData.shippingFee);
-  } else if (totalAmount > itemsSubtotal) {
-    shippingFee = parseFloat((totalAmount - itemsSubtotal).toFixed(2));
+  } else if (totalAmount > netSubtotal) {
+    shippingFee = parseFloat((totalAmount - netSubtotal).toFixed(2));
   }
-  const grandTotal = itemsSubtotal + shippingFee;
+  const grandTotal = netSubtotal + shippingFee;
 
   const itemsRows = itemsList.map((item, idx) => {
     const qty = Number(item.qty || 1);
@@ -875,6 +879,16 @@ export default async function handler(req, res) {
             <span>Gross Product Subtotal:</span>
             <strong>₹${itemsSubtotal.toFixed(2)}</strong>
           </div>
+          ${discountAmount > 0 ? `
+            <div class="summary-row" style="color: #16a34a; font-weight: 700;">
+              <span>Coupon Discount (${couponCode || 'Promo'}):</span>
+              <span>-₹${discountAmount.toFixed(2)}</span>
+            </div>
+            <div class="summary-row">
+              <span>Net Product Subtotal:</span>
+              <strong>₹${netSubtotal.toFixed(2)}</strong>
+            </div>
+          ` : ''}
           <div class="summary-row">
             <span>Base Taxable Value (Excl. Tax):</span>
             <span>₹${taxableValue}</span>

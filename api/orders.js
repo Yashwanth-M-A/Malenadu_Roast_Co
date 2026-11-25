@@ -19,6 +19,8 @@ export default async function handler(req, res) {
         await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS alternate_phone TEXT;`;
         await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS address_type TEXT;`;
         await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_instructions TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS coupon_code TEXT;`;
+        await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0;`;
       } catch (colErr) {
         console.warn('Column ensure note:', colErr);
       }
@@ -72,6 +74,7 @@ export default async function handler(req, res) {
                  razorpay_payment_id as "razorpayPaymentId", shiprocket_order_id as "shiprocketOrderId",
                  awb_code as "awbCode", house_no as "houseNo", area, landmark, city, state,
                  alternate_phone as "alternatePhone", address_type as "addressType", delivery_instructions as "deliveryInstructions",
+                 coupon_code as "couponCode", discount_amount as "discountAmount",
                  created_at as "createdAt"
           FROM orders
           WHERE LOWER(shipping_email) = LOWER(${email})
@@ -87,6 +90,7 @@ export default async function handler(req, res) {
                  razorpay_payment_id as "razorpayPaymentId", shiprocket_order_id as "shiprocketOrderId",
                  awb_code as "awbCode", house_no as "houseNo", area, landmark, city, state,
                  alternate_phone as "alternatePhone", address_type as "addressType", delivery_instructions as "deliveryInstructions",
+                 coupon_code as "couponCode", discount_amount as "discountAmount",
                  created_at as "createdAt"
           FROM orders
           ORDER BY created_at DESC;
@@ -136,6 +140,7 @@ export default async function handler(req, res) {
           payment_status, payment_method, razorpay_order_id, razorpay_payment_id,
           house_no, area, landmark, city, state,
           alternate_phone, address_type, delivery_instructions,
+          coupon_code, discount_amount,
           created_at, updated_at
         ) VALUES (
           ${orderNumber}, ${orderData.shippingName}, ${orderData.shippingEmail.toLowerCase()},
@@ -148,6 +153,7 @@ export default async function handler(req, res) {
           ${orderData.city || null}, ${orderData.state || null},
           ${orderData.alternatePhone || null}, ${orderData.addressType || 'Home'},
           ${orderData.deliveryInstructions || null},
+          ${orderData.couponCode || null}, ${Number(orderData.discountAmount || 0)},
           NOW(), NOW()
         );
       `;

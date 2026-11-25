@@ -253,3 +253,62 @@ export const getCartShippingDetails = (cart, pincode = '') => {
   };
 };
 
+// ============================================================
+// E-Commerce Coupon Engine
+// Flat ₹100 OFF on orders >= ₹2,000 (FLAT100 / MALENADU100)
+// ============================================================
+export const AVAILABLE_COUPONS = {
+  'FLAT100': {
+    code: 'FLAT100',
+    discount: 100,
+    minSubtotal: 2000,
+    title: 'Flat ₹100 OFF',
+    description: 'Get ₹100 instant discount on orders of ₹2,000 and above.'
+  },
+  'MALENADU100': {
+    code: 'MALENADU100',
+    discount: 100,
+    minSubtotal: 2000,
+    title: 'Malenadu Estate ₹100 OFF',
+    description: 'Get ₹100 instant discount on orders of ₹2,000 and above.'
+  }
+};
+
+export const validateCoupon = (rawCode, currentSubtotal) => {
+  if (!rawCode) {
+    return { valid: false, error: 'Please enter a coupon code.' };
+  }
+  const cleanCode = String(rawCode).trim().toUpperCase();
+  const coupon = AVAILABLE_COUPONS[cleanCode];
+
+  if (!coupon) {
+    return {
+      valid: false,
+      error: 'Invalid coupon code. Use FLAT100 to get ₹100 off on orders above ₹2,000.'
+    };
+  }
+
+  const sub = Number(currentSubtotal) || 0;
+  if (sub < coupon.minSubtotal) {
+    const needed = (coupon.minSubtotal - sub).toFixed(0);
+    return {
+      valid: false,
+      error: `Coupon ${coupon.code} requires a minimum order value of ₹${coupon.minSubtotal.toLocaleString('en-IN')}. Add ₹${needed} more to apply!`,
+      neededAmount: coupon.minSubtotal - sub,
+      coupon
+    };
+  }
+
+  return {
+    valid: true,
+    coupon: {
+      code: coupon.code,
+      discount: coupon.discount,
+      minSubtotal: coupon.minSubtotal,
+      title: coupon.title,
+      description: coupon.description
+    }
+  };
+};
+
+

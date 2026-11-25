@@ -8993,6 +8993,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
 
                                           {/* Grand Total & Tax Info */}
                                           <div style={{ borderTop: '1.5px solid #f1f5f9', paddingTop: '8px' }}>
+                                            {order.discountAmount > 0 && (
+                                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#16a34a', fontWeight: 700, marginBottom: '2px' }}>
+                                                <span>Coupon Discount ({order.couponCode || 'FLAT100'}):</span>
+                                                <span>-₹{Number(order.discountAmount).toFixed(0)}</span>
+                                              </div>
+                                            )}
                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#64748b', marginBottom: '2px' }}>
                                               <span>5% GST & Shipping:</span>
                                               <span>{order.shippingFee === 0 || !order.shippingFee ? 'FREE Delivery (5% GST Incl.)' : `₹${order.shippingFee} Delivery`}</span>
@@ -9532,6 +9538,12 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                           <span>Subtotal:</span>
                                           <span>₹{Number(selectedOrderDossier.subtotal || (selectedOrderDossier.totalAmount - (selectedOrderDossier.shippingFee || 0))).toFixed(0)}</span>
                                         </div>
+                                        {selectedOrderDossier.discountAmount > 0 && (
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#16a34a', fontWeight: 700 }}>
+                                            <span>Coupon Discount ({selectedOrderDossier.couponCode || 'FLAT100'}):</span>
+                                            <span>-₹{Number(selectedOrderDossier.discountAmount).toFixed(0)}</span>
+                                          </div>
+                                        )}
                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#64748b' }}>
                                           <span>5% GST Included:</span>
                                           <span>₹{Number(selectedOrderDossier.gstAmount || (selectedOrderDossier.totalAmount * 0.05 / 1.05)).toFixed(0)}</span>
