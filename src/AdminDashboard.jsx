@@ -498,6 +498,10 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
   const [deliveryDateModalOrder, setDeliveryDateModalOrder] = useState(null);
   const [customDeliveryDateInput, setCustomDeliveryDateInput] = useState('');
   const [customDemoDeliveries, setCustomDemoDeliveries] = useState({});
+  const [delhiveryModalOrder, setDelhiveryModalOrder] = useState(null);
+  const [delhiveryAwbInput, setDelhiveryAwbInput] = useState('');
+  const [delhiveryCopiedKey, setDelhiveryCopiedKey] = useState('');
+  const [delhiverySavedSuccess, setDelhiverySavedSuccess] = useState(false);
 
   const toggleExpandLog = (id) => {
     setExpandedLogIds(prev => ({ ...prev, [id]: !prev[id] }));
@@ -1573,6 +1577,64 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     } finally {
       setShippingOrderId(null);
     }
+  };
+
+  const handleSaveDelhiveryAwb = async (order, awbCode) => {
+    if (!awbCode || !awbCode.trim()) {
+      alert('Please enter a valid Delhivery AWB / Waybill Tracking Number.');
+      return;
+    }
+    const cleanAwb = awbCode.trim();
+    const targetOrderNum = order.orderNumber || order._id;
+
+    // 1. Update in local state
+    setOrders(prev => prev.map(o => {
+      if ((o.orderNumber && o.orderNumber === targetOrderNum) || (o._id && o._id === targetOrderNum)) {
+        return {
+          ...o,
+          awbCode: cleanAwb,
+          courier: 'Delhivery Express',
+          orderStatus: 'shipped',
+          status: 'shipped'
+        };
+      }
+      return o;
+    }));
+
+    // 2. Update in localStorage
+    try {
+      const allOrders = JSON.parse(localStorage.getItem('malenadu_orders') || '[]');
+      const idx = allOrders.findIndex(o => (o.orderNumber && o.orderNumber === targetOrderNum) || (o._id && o._id === targetOrderNum));
+      if (idx !== -1) {
+        allOrders[idx].awbCode = cleanAwb;
+        allOrders[idx].courier = 'Delhivery Express';
+        allOrders[idx].orderStatus = 'shipped';
+        allOrders[idx].status = 'shipped';
+        localStorage.setItem('malenadu_orders', JSON.stringify(allOrders));
+      }
+    } catch (e) {
+      void e;
+    }
+
+    // 3. Update in cloud database (Neon Postgres)
+    try {
+      await fetch(`/api/orders?orderNumber=${encodeURIComponent(targetOrderNum)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: targetOrderNum,
+          awbCode: cleanAwb,
+          courier: 'Delhivery Express',
+          orderStatus: 'shipped',
+          status: 'shipped'
+        })
+      });
+    } catch (e) {
+      void e;
+    }
+
+    setDelhiverySavedSuccess(true);
+    setTimeout(() => setDelhiverySavedSuccess(false), 4000);
   };
 
   const handleExportCSV = () => {
@@ -4779,6 +4841,35 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 </button>
                               )}
 
+                              {/* Delhivery Express Dispatch & Review (Pay-on-Spot / Zero Wallet Needed) */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDelhiveryModalOrder(order);
+                                  setDelhiveryAwbInput(order.awbCode || '');
+                                }}
+                                style={{
+                                  background: '#b91c1c',
+                                  color: '#ffffff',
+                                  border: 'none',
+                                  padding: '0.52rem 0.6rem',
+                                  borderRadius: '7px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                  boxShadow: '0 2px 5px rgba(185, 28, 28, 0.25)',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                title="Review Address & Book on Delhivery (Pay on Spot via UPI QR)"
+                              >
+                                <Truck size={14} />
+                                <span>Delhivery</span>
+                              </button>
+
                               {/* 4. GST Tax Invoice */}
                               <button
                                 type="button"
@@ -7474,17 +7565,21 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                           <span>{copiedKey === `dossier-${order.orderNumber}` ? '✓ Dossier Copied!' : 'Copy Packing Info'}</span>
                                         </button>
 
-                                        {/* Shiprocket Automated Logistics Action */}
+                                        {/* Shiprocket & Delhivery Automated Logistics Action */}
                                         {(order.awbCode && !String(order.awbCode).toLowerCase().includes('pending')) ? (
                                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                                             <a
-                                              href={`https://shiprocket.co/tracking/${order.awbCode}`}
+                                              href={
+                                                (String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12)
+                                                  ? `https://www.delhivery.com/track/package/${order.awbCode}`
+                                                  : `https://shiprocket.co/tracking/${order.awbCode}`
+                                              }
                                               target="_blank"
                                               rel="noopener noreferrer"
                                               style={{
-                                                background: '#eff6ff',
-                                                border: '1.5px solid #93c5fd',
-                                                color: '#1d4ed8',
+                                                background: (String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12) ? '#fef2f2' : '#eff6ff',
+                                                border: `1.5px solid ${(String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12) ? '#fca5a5' : '#93c5fd'}`,
+                                                color: (String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12) ? '#b91c1c' : '#1d4ed8',
                                                 padding: '0.5rem 0.9rem',
                                                 borderRadius: '6px',
                                                 fontSize: '0.8rem',
@@ -7495,8 +7590,8 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                                 gap: '6px'
                                               }}
                                             >
-                                              <Truck size={15} color="#1d4ed8" />
-                                              <span>Track (${order.awbCode})</span>
+                                              <Truck size={15} color={(String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12) ? '#b91c1c' : '#1d4ed8'} />
+                                              <span>Track {(String(order.courier || '').toLowerCase().includes('delhivery') || String(order.awbCode).length >= 12) ? 'Delhivery' : 'Shiprocket'} ({order.awbCode})</span>
                                             </a>
                                             {order.labelUrl && (
                                               <a
@@ -7519,29 +7614,58 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                             )}
                                           </div>
                                         ) : (
-                                          <button
-                                            type="button"
-                                            disabled={shippingOrderId === (order._id || order.orderNumber)}
-                                            onClick={() => handleShiprocketDispatch(order)}
-                                            style={{
-                                              background: '#7c3aed',
-                                              border: 'none',
-                                              color: '#ffffff',
-                                              padding: '0.5rem 1rem',
-                                              borderRadius: '6px',
-                                              fontSize: '0.8rem',
-                                              fontWeight: 700,
-                                              cursor: shippingOrderId === (order._id || order.orderNumber) ? 'wait' : 'pointer',
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              gap: '6px',
-                                              boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
-                                              transition: 'all 0.15s'
-                                            }}
-                                          >
-                                            <Truck size={15} />
-                                            <span>{shippingOrderId === (order._id || order.orderNumber) ? 'Generating AWB...' : 'Ship with Shiprocket'}</span>
-                                          </button>
+                                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                            <button
+                                              type="button"
+                                              disabled={shippingOrderId === (order._id || order.orderNumber)}
+                                              onClick={() => handleShiprocketDispatch(order)}
+                                              style={{
+                                                background: '#7c3aed',
+                                                border: 'none',
+                                                color: '#ffffff',
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '6px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 700,
+                                                cursor: shippingOrderId === (order._id || order.orderNumber) ? 'wait' : 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
+                                                transition: 'all 0.15s'
+                                              }}
+                                            >
+                                              <Truck size={15} />
+                                              <span>{shippingOrderId === (order._id || order.orderNumber) ? 'Generating AWB...' : 'Shiprocket'}</span>
+                                            </button>
+
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setDelhiveryModalOrder(order);
+                                                setDelhiveryAwbInput(order.awbCode || '');
+                                              }}
+                                              style={{
+                                                background: '#b91c1c',
+                                                border: 'none',
+                                                color: '#ffffff',
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '6px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                boxShadow: '0 2px 6px rgba(185, 28, 28, 0.25)',
+                                                transition: 'all 0.15s'
+                                              }}
+                                              title="Review Address & Book on Delhivery (Pay on Spot via UPI QR)"
+                                            >
+                                              <Truck size={15} />
+                                              <span>Delhivery Direct</span>
+                                            </button>
+                                          </div>
                                         )}
 
                                         <button
@@ -8056,6 +8180,516 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                 </motion.div>
                               </div>
                             )}
+                          </AnimatePresence>
+
+                          {/* ============================================================ */}
+                          {/* DELHIVERY DIRECT DISPATCH & SMART ADDRESS REVIEW MODAL */}
+                          {/* Zero Prepaid Wallet Needed • Pay on Spot via UPI / QR */}
+                          {/* ============================================================ */}
+                          <AnimatePresence>
+                            {delhiveryModalOrder && (() => {
+                              const order = delhiveryModalOrder;
+                              const items = (Array.isArray(order.items) && order.items.length > 0)
+                                ? order.items
+                                : (order.productName || order.product_name)
+                                  ? [{ name: order.productName || order.product_name, weight: order.weight || '500g', qty: order.qty || 1, price: order.totalAmount || 559 }]
+                                  : [{ name: 'Imperial Heritage Reserve', weight: '500g', qty: 1, price: 559 }];
+
+                              // Auto-calculated parcel weight (coffee + artisan packaging tare)
+                              const totalPouchGrams = items.reduce((acc, it) => {
+                                const wStr = String(it.weight || '').toLowerCase();
+                                const grams = wStr.includes('1kg') ? 1000 : (wStr.includes('250g') ? 250 : 500);
+                                return acc + (grams * Number(it.qty || 1));
+                              }, 0);
+                              const parcelWeightKg = ((totalPouchGrams + 80) / 1000).toFixed(2); // 80g outer mailer box
+
+                              const fullFormattedAddress = [
+                                `Receiver: ${order.shippingName || ''}`,
+                                `Phone: ${order.shippingPhone || ''}`,
+                                `Address: ${order.shippingAddress || ''}`,
+                                `Pincode: ${order.pincode || ''}`,
+                                order.shippingEmail ? `Email: ${order.shippingEmail}` : ''
+                              ].filter(Boolean).join('\n');
+
+                              const handleCopyField = (text, key) => {
+                                if (navigator.clipboard) {
+                                  navigator.clipboard.writeText(text);
+                                  setDelhiveryCopiedKey(key);
+                                  setTimeout(() => setDelhiveryCopiedKey(''), 2500);
+                                }
+                              };
+
+                              const handleSendWhatsAppTracking = () => {
+                                const activeAwb = (delhiveryAwbInput || order.awbCode || '').trim();
+                                const rawPhone = (order.shippingPhone || '').replace(/\D/g, '').slice(-10);
+                                const itemsList = items.map(i => `${i.name} (${i.weight || '500g'}) × ${i.qty || 1}`).join(', ');
+                                const msg =
+                                  `Namaskara *${order.shippingName}*! 👋\n\n` +
+                                  `Your Malenadu Coffee Order *#${order.orderNumber}* is dispatched via *Delhivery Express*! 🚀✨\n\n` +
+                                  `📦 *Items:* ${itemsList}\n` +
+                                  `🚚 *Delhivery AWB Tracking Number:* *${activeAwb}*\n\n` +
+                                  `🔍 *Live Tracking Link:*\nhttps://www.delhivery.com/track/package/${activeAwb}\n\n` +
+                                  `Freshly roasted in the hills of Chikkamagaluru.\n` +
+                                  `*Malenadu Roast Co.*`;
+                                window.open(`https://wa.me/91${rawPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                              };
+
+                              return (
+                                <div style={{
+                                  position: 'fixed',
+                                  inset: 0,
+                                  background: 'rgba(15, 23, 42, 0.75)',
+                                  backdropFilter: 'blur(6px)',
+                                  zIndex: 10000,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  padding: '1rem',
+                                  overflowY: 'auto'
+                                }}>
+                                  <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                                    transition={{ duration: 0.2 }}
+                                    style={{
+                                      background: '#ffffff',
+                                      borderRadius: '16px',
+                                      maxWidth: '740px',
+                                      width: '100%',
+                                      maxHeight: '92vh',
+                                      overflowY: 'auto',
+                                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.28)',
+                                      border: '1px solid #cbd5e1',
+                                      display: 'flex',
+                                      flexDirection: 'column'
+                                    }}
+                                  >
+                                    {/* Header with Delhivery Branding */}
+                                    <div style={{
+                                      padding: '1.25rem 1.5rem',
+                                      background: 'linear-gradient(135deg, #991b1b, #b91c1c)',
+                                      color: '#ffffff',
+                                      borderTopLeftRadius: '16px',
+                                      borderTopRightRadius: '16px',
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center'
+                                    }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{
+                                          background: '#ffffff',
+                                          borderRadius: '8px',
+                                          padding: '6px 8px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center'
+                                        }}>
+                                          <Truck size={20} color="#b91c1c" />
+                                        </div>
+                                        <div>
+                                          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9, fontWeight: 700 }}>
+                                            Direct Dispatch & Address Review
+                                          </div>
+                                          <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>
+                                            Delhivery Express • Order #{order.orderNumber}
+                                          </h3>
+                                        </div>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => setDelhiveryModalOrder(null)}
+                                        style={{
+                                          background: 'rgba(255, 255, 255, 0.2)',
+                                          border: 'none',
+                                          color: '#ffffff',
+                                          borderRadius: '8px',
+                                          width: '32px',
+                                          height: '32px',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center'
+                                        }}
+                                      >
+                                        <X size={18} />
+                                      </button>
+                                    </div>
+
+                                    {/* Modal Body */}
+                                    <div style={{ padding: '1.4rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+
+                                      {/* Value Banner: Zero Wallet / Pay on Spot */}
+                                      <div style={{
+                                        background: '#fef2f2',
+                                        border: '1.5px solid #fecaca',
+                                        borderRadius: '10px',
+                                        padding: '0.85rem 1rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px'
+                                      }}>
+                                        <ShieldCheck size={22} color="#b91c1c" style={{ flexShrink: 0 }} />
+                                        <div style={{ fontSize: '0.82rem', color: '#7f1d1d', lineHeight: 1.45 }}>
+                                          <strong>Zero Prepaid Wallet Needed:</strong> Review the customer's shipping address below, copy in 1 click or open Delhivery Direct, paste into the form/app, and <strong>pay the courier fee directly via UPI / QR code</strong> on the spot!
+                                        </div>
+                                      </div>
+
+                                      {/* Customer Destination Card with 1-Click Copy Buttons */}
+                                      <div style={{
+                                        background: '#f8fafc',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem'
+                                      }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <MapPin size={15} color="#b91c1c" />
+                                            Customer Destination Details
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleCopyField(fullFormattedAddress, 'full')}
+                                            style={{
+                                              background: delhiveryCopiedKey === 'full' ? '#15803d' : '#b91c1c',
+                                              color: '#ffffff',
+                                              border: 'none',
+                                              padding: '0.42rem 0.85rem',
+                                              borderRadius: '6px',
+                                              fontSize: '0.76rem',
+                                              fontWeight: 700,
+                                              cursor: 'pointer',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '5px',
+                                              transition: 'all 0.2s'
+                                            }}
+                                          >
+                                            {delhiveryCopiedKey === 'full' ? <CheckCheck size={13} /> : <Copy size={13} />}
+                                            <span>{delhiveryCopiedKey === 'full' ? '✓ Full Address Copied!' : '📋 Copy Full Formatted Address'}</span>
+                                          </button>
+                                        </div>
+
+                                        {/* Grid of Details */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginTop: '8px' }}>
+                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Receiver Name</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
+                                              <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>{order.shippingName || '—'}</strong>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleCopyField(order.shippingName || '', 'name')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
+                                                title="Copy Name"
+                                              >
+                                                {delhiveryCopiedKey === 'name' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
+                                              </button>
+                                            </div>
+                                          </div>
+
+                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Phone Number</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
+                                              <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>{order.shippingPhone || '—'}</strong>
+                                              <div style={{ display: 'flex', gap: '4px' }}>
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleCopyField(order.shippingPhone || '', 'phone')}
+                                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
+                                                  title="Copy Phone"
+                                                >
+                                                  {delhiveryCopiedKey === 'phone' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Destination PIN Code</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
+                                              <strong style={{ fontSize: '0.88rem', color: '#b91c1c', letterSpacing: '1px' }}>{order.pincode || '—'}</strong>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleCopyField(order.pincode || '', 'pin')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px' }}
+                                                title="Copy PIN Code"
+                                              >
+                                                {delhiveryCopiedKey === 'pin' ? <CheckCheck size={14} color="#15803d" /> : <Copy size={14} />}
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Full Street Address with 1-Click Copy */}
+                                        <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.75rem 0.85rem', marginTop: '10px' }}>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Complete Street Address</span>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleCopyField(order.shippingAddress || '', 'address')}
+                                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem' }}
+                                            >
+                                              {delhiveryCopiedKey === 'address' ? <CheckCheck size={13} color="#15803d" /> : <Copy size={13} />}
+                                              <span style={{ color: delhiveryCopiedKey === 'address' ? '#15803d' : '#64748b' }}>{delhiveryCopiedKey === 'address' ? 'Copied' : 'Copy'}</span>
+                                            </button>
+                                          </div>
+                                          <div style={{ fontSize: '0.84rem', color: '#1e293b', marginTop: '4px', lineHeight: 1.45, fontWeight: 500 }}>
+                                            {order.shippingAddress || '—'}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* Auto-Calculated Parcel Specifications Card */}
+                                      <div style={{
+                                        background: '#fffdfa',
+                                        border: '1.5px solid #fed7aa',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem'
+                                      }}>
+                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#9a3412', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                          <Package size={15} color="#ea580c" />
+                                          Auto-Calculated Parcel Details (For Delhivery Form)
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginTop: '8px' }}>
+                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Estimated Weight</div>
+                                            <strong style={{ fontSize: '0.94rem', color: '#9a3412' }}>{parcelWeightKg} kg</strong>
+                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>({totalPouchGrams}g pouch + box)</div>
+                                          </div>
+
+                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Dimensions (L × W × H)</div>
+                                            <strong style={{ fontSize: '0.94rem', color: '#9a3412' }}>24 × 16 × 5 cm</strong>
+                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Standard Coffee Mailer</div>
+                                          </div>
+
+                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Package Contents</div>
+                                            <strong style={{ fontSize: '0.84rem', color: '#9a3412' }}>Roasted Coffee Beans</strong>
+                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Fragile: No • Non-Haz</div>
+                                          </div>
+
+                                          <div style={{ background: '#ffffff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.65rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#78350f' }}>Estimated Courier Fee</div>
+                                            <strong style={{ fontSize: '0.94rem', color: '#15803d' }}>₹45 – ₹65</strong>
+                                            <div style={{ fontSize: '0.66rem', color: '#a1a1aa' }}>Pay via UPI QR at Booking</div>
+                                          </div>
+                                        </div>
+
+                                        {/* Items summary */}
+                                        <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#78350f' }}>
+                                          <strong>Ordered Items: </strong>
+                                          {items.map((i, idx) => (
+                                            <span key={idx} style={{ background: '#fef3c7', padding: '2px 8px', borderRadius: '4px', marginRight: '6px', fontWeight: 600 }}>
+                                              {i.name} ({i.weight || '500g'}) × {i.qty || 1}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {/* Step 1: Open Delhivery to Book & Pay */}
+                                      <div style={{
+                                        background: '#ffffff',
+                                        border: '2px dashed #b91c1c',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '8px'
+                                      }}>
+                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#b91c1c', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                          Step 1: Open Delhivery & Pay on the Spot
+                                        </div>
+                                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569', lineHeight: 1.4 }}>
+                                          Click below to open the official Delhivery parcel booking page. Paste the receiver address and pay the ~₹50 courier fee using Google Pay, PhonePe, or Paytm UPI QR:
+                                        </p>
+
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                          <a
+                                            href="https://www.delhivery.com/send-parcel"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                              background: '#b91c1c',
+                                              color: '#ffffff',
+                                              padding: '0.6rem 1.2rem',
+                                              borderRadius: '8px',
+                                              fontSize: '0.84rem',
+                                              fontWeight: 700,
+                                              textDecoration: 'none',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '7px',
+                                              boxShadow: '0 2px 6px rgba(185, 28, 28, 0.3)'
+                                            }}
+                                          >
+                                            <ExternalLink size={15} />
+                                            <span>🌐 Book on Delhivery Direct (Pay via UPI)</span>
+                                          </a>
+
+                                          <a
+                                            href="https://direct.delhivery.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                              background: '#ffffff',
+                                              border: '1.5px solid #b91c1c',
+                                              color: '#b91c1c',
+                                              padding: '0.6rem 1.1rem',
+                                              borderRadius: '8px',
+                                              fontSize: '0.84rem',
+                                              fontWeight: 700,
+                                              textDecoration: 'none',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '7px'
+                                            }}
+                                          >
+                                            <Smartphone size={15} />
+                                            <span>📱 Open Delhivery Portal</span>
+                                          </a>
+                                        </div>
+                                      </div>
+
+                                      {/* Step 2: Save Delhivery AWB & Notify Customer */}
+                                      <div style={{
+                                        background: '#f8fafc',
+                                        border: '1.5px solid #cbd5e1',
+                                        borderRadius: '12px',
+                                        padding: '1.15rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '10px'
+                                      }}>
+                                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                          Step 2: Enter Delhivery AWB Tracking Number & Notify Customer
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                          <input
+                                            type="text"
+                                            value={delhiveryAwbInput}
+                                            onChange={(e) => setDelhiveryAwbInput(e.target.value)}
+                                            placeholder="Enter 12–14 digit Delhivery AWB (e.g. 1409823456789)"
+                                            style={{
+                                              flex: 1,
+                                              minWidth: '240px',
+                                              padding: '0.6rem 0.9rem',
+                                              border: '1.5px solid #94a3b8',
+                                              borderRadius: '8px',
+                                              fontSize: '0.88rem',
+                                              fontWeight: 600,
+                                              outline: 'none'
+                                            }}
+                                          />
+
+                                          <button
+                                            type="button"
+                                            onClick={() => handleSaveDelhiveryAwb(order, delhiveryAwbInput)}
+                                            style={{
+                                              background: '#15803d',
+                                              color: '#ffffff',
+                                              border: 'none',
+                                              padding: '0.6rem 1.2rem',
+                                              borderRadius: '8px',
+                                              fontSize: '0.84rem',
+                                              fontWeight: 700,
+                                              cursor: 'pointer',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '6px',
+                                              boxShadow: '0 2px 6px rgba(21, 128, 61, 0.25)'
+                                            }}
+                                          >
+                                            <Check size={16} />
+                                            <span>{delhiverySavedSuccess ? '✓ AWB Saved Live!' : 'Save AWB & Mark Shipped'}</span>
+                                          </button>
+                                        </div>
+
+                                        {/* Live Tracking Actions once AWB is provided */}
+                                        {(delhiveryAwbInput || order.awbCode) && (
+                                          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                            <button
+                                              type="button"
+                                              onClick={handleSendWhatsAppTracking}
+                                              style={{
+                                                background: '#25D366',
+                                                color: '#ffffff',
+                                                border: 'none',
+                                                padding: '0.55rem 1.1rem',
+                                                borderRadius: '8px',
+                                                fontSize: '0.82rem',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                boxShadow: '0 2px 6px rgba(37, 211, 102, 0.3)'
+                                              }}
+                                            >
+                                              <WhatsAppBrandIcon size={16} />
+                                              <span>💬 Send Delhivery Tracking on WhatsApp</span>
+                                            </button>
+
+                                            <a
+                                              href={`https://www.delhivery.com/track/package/${(delhiveryAwbInput || order.awbCode).trim()}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              style={{
+                                                background: '#ffffff',
+                                                border: '1.5px solid #cbd5e1',
+                                                color: '#1e293b',
+                                                padding: '0.55rem 1rem',
+                                                borderRadius: '8px',
+                                                fontSize: '0.82rem',
+                                                fontWeight: 700,
+                                                textDecoration: 'none',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px'
+                                              }}
+                                            >
+                                              <ExternalLink size={14} />
+                                              <span>Track Live on Delhivery.com</span>
+                                            </a>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Modal Footer */}
+                                    <div style={{
+                                      padding: '1.1rem 1.5rem',
+                                      background: '#f8fafc',
+                                      borderTop: '1px solid #e2e8f0',
+                                      borderBottomLeftRadius: '16px',
+                                      borderBottomRightRadius: '16px',
+                                      display: 'flex',
+                                      justifyContent: 'flex-end',
+                                      gap: '10px'
+                                    }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => setDelhiveryModalOrder(null)}
+                                        style={{
+                                          background: '#ffffff',
+                                          border: '1.5px solid #cbd5e1',
+                                          color: '#475569',
+                                          padding: '0.55rem 1.2rem',
+                                          borderRadius: '8px',
+                                          fontSize: '0.82rem',
+                                          fontWeight: 600,
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        Close
+                                      </button>
+                                    </div>
+                                  </motion.div>
+                                </div>
+                              );
+                            })()}
                           </AnimatePresence>
                         </div>
                       )}

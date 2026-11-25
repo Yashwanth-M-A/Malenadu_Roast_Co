@@ -35,6 +35,21 @@ const seedDefaultData = () => {
     localStorage.setItem(KEYS.USERS, JSON.stringify(users));
     if (!localStorage.getItem(KEYS.ORDERS)) {
       localStorage.setItem(KEYS.ORDERS, JSON.stringify([]));
+    } else {
+      // Automatically purge legacy demo orders from client localStorage on boot
+      try {
+        const storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
+        if (Array.isArray(storedOrders) && storedOrders.length > 0) {
+          const cleaned = storedOrders.filter(
+            o => o && (o.orderNumber === 'MN-187976' || new Date(o.createdAt || 0) >= new Date('2026-11-25T00:00:00Z'))
+          );
+          if (cleaned.length !== storedOrders.length) {
+            localStorage.setItem(KEYS.ORDERS, JSON.stringify(cleaned));
+          }
+        }
+      } catch (e) {
+        void e;
+      }
     }
   } catch (e) {
     console.error('Error seeding localStorage database:', e);

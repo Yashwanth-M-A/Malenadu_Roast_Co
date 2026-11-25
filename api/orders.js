@@ -149,7 +149,8 @@ export default async function handler(req, res) {
   // PATCH: Update order status (packed, shipped, delivered, cancelled)
   if (req.method === 'PATCH') {
     try {
-      const { orderNumber, orderStatus, paymentStatus, awbCode } = req.body;
+      const orderNumber = req.body?.orderNumber || req.query?.orderNumber;
+      const { orderStatus, paymentStatus, awbCode } = req.body || {};
       if (!orderNumber) return res.status(400).json({ error: 'Order number required' });
 
       await sql`
