@@ -11981,11 +11981,41 @@ const PowderSprinkleEffect = ({ type }) => {
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  // E-commerce Cart Recovery: Restore saved cart across page reloads and user sessions
+  const getInitialCart = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('malenadu_user') || 'null');
+      const userEmail = user?.email?.toLowerCase()?.trim();
+      if (userEmail) {
+        const userCart = localStorage.getItem(`malenadu_cart_${userEmail}`);
+        if (userCart) {
+          const parsed = JSON.parse(userCart);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+      const guestCart = localStorage.getItem('malenadu_cart');
+      if (guestCart) {
+        const parsed = JSON.parse(guestCart);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) { }
+    return [];
+  };
+
+  const [cart, setCart] = useState(getInitialCart);
+
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const saved = localStorage.getItem('malenadu_wishlist');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
   const [appliedCoupon, setAppliedCouponState] = useState(() => {
     try {
-      const saved = sessionStorage.getItem('malenadu_applied_coupon');
+      const saved = sessionStorage.getItem('malenadu_applied_coupon') || localStorage.getItem('malenadu_applied_coupon');
       return saved ? JSON.parse(saved) : null;
     } catch (e) {
       return null;
@@ -11997,8 +12027,10 @@ const App = () => {
     try {
       if (coupon) {
         sessionStorage.setItem('malenadu_applied_coupon', JSON.stringify(coupon));
+        localStorage.setItem('malenadu_applied_coupon', JSON.stringify(coupon));
       } else {
         sessionStorage.removeItem('malenadu_applied_coupon');
+        localStorage.removeItem('malenadu_applied_coupon');
       }
     } catch (e) { }
   };
@@ -12024,6 +12056,41 @@ const App = () => {
       else sessionStorage.removeItem('malenadu_buynow_cart');
     } catch (e) { }
   }, [buyNowCart]);
+
+  // Persist cart to localStorage across browser reloads & sync with active user profile
+  useEffect(() => {
+    try {
+      localStorage.setItem('malenadu_cart', JSON.stringify(cart));
+      if (currentUser?.email) {
+        const userEmail = currentUser.email.toLowerCase().trim();
+        localStorage.setItem(`malenadu_cart_${userEmail}`, JSON.stringify(cart));
+      }
+    } catch (e) { }
+  }, [cart, currentUser]);
+
+  // Persist wishlist across browser reloads
+  useEffect(() => {
+    try {
+      localStorage.setItem('malenadu_wishlist', JSON.stringify(wishlist));
+    } catch (e) { }
+  }, [wishlist]);
+
+  // Clear cart upon successful order completion
+  useEffect(() => {
+    const handleOrderPlaced = () => {
+      if (!buyNowCart) {
+        setCart([]);
+        try {
+          localStorage.removeItem('malenadu_cart');
+          if (currentUser?.email) {
+            localStorage.removeItem(`malenadu_cart_${currentUser.email.toLowerCase().trim()}`);
+          }
+        } catch (e) { }
+      }
+    };
+    window.addEventListener('malenadu_order_placed', handleOrderPlaced);
+    return () => window.removeEventListener('malenadu_order_placed', handleOrderPlaced);
+  }, [buyNowCart, currentUser]);
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [activeDetailsProduct, setActiveDetailsProduct] = useState(null);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
@@ -12191,12 +12258,40 @@ const App = () => {
   const handleAuthSuccess = (user) => {
     setCurrentUser(user);
     setIsAuthOpen(false);
+    if (user?.email) {
+      const userEmail = user.email.toLowerCase().trim();
+      try {
+        const storedUserCartRaw = localStorage.getItem(`malenadu_cart_${userEmail}`);
+        if (storedUserCartRaw) {
+          const storedUserCart = JSON.parse(storedUserCartRaw);
+          if (Array.isArray(storedUserCart) && storedUserCart.length > 0) {
+            setCart(prev => {
+              const merged = [...prev];
+              storedUserCart.forEach(item => {
+                const existing = merged.find(m => m.id === item.id);
+                if (existing) {
+                  existing.qty = Math.max(existing.qty, item.qty);
+                } else {
+                  merged.push(item);
+                }
+              });
+              return merged;
+            });
+          }
+        }
+      } catch (e) { }
+    }
     if (buyNowCart || cart.length > 0) {
       setIsCheckoutOpen(true);
     }
   };
 
   const handleLogout = () => {
+    if (currentUser?.email) {
+      try {
+        localStorage.setItem(`malenadu_cart_${currentUser.email.toLowerCase().trim()}`, JSON.stringify(cart));
+      } catch (e) { }
+    }
     localStorage.removeItem('malenadu_user');
     setCurrentUser(null);
   };
