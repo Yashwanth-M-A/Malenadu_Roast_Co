@@ -72,8 +72,10 @@ export const openCustomerEmailComposer = ({ email, subject, body }) => {
     window.location.href = mailtoUrl;
   } else {
     // Laptop / Desktop browsers:
-    // Opens dedicated full-screen Gmail compose tab directly from malenaduroast@gmail.com
-    const gmailUrl = `https://mail.google.com/mail/u/malenaduroast@gmail.com/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    // Strictly locks the sender account to malenaduroast@gmail.com on any desktop or laptop,
+    // ensuring official store emails are never accidentally sent from personal accounts even
+    // when multiple Google accounts are logged in simultaneously.
+    const gmailUrl = `https://mail.google.com/mail/u/malenaduroast@gmail.com/?authuser=malenaduroast@gmail.com&view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(gmailUrl, '_blank');
   }
 };
