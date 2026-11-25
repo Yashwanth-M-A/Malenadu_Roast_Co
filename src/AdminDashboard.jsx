@@ -8481,8 +8481,25 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                           <Truck size={20} color="#b91c1c" />
                                         </div>
                                         <div>
-                                          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9, fontWeight: 700 }}>
-                                            In-Person Verification & Delhivery Autofill
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9, fontWeight: 700 }}>
+                                              In-Person Verification & Delhivery Autofill
+                                            </div>
+                                            <span style={{
+                                              background: 'rgba(34, 197, 94, 0.25)',
+                                              border: '1px solid rgba(74, 222, 128, 0.5)',
+                                              color: '#ffffff',
+                                              fontSize: '0.68rem',
+                                              fontWeight: 700,
+                                              padding: '2px 8px',
+                                              borderRadius: '12px',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '5px'
+                                            }}>
+                                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
+                                              API Connected • MALENADUROASTCOB2B
+                                            </span>
                                           </div>
                                           <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>
                                             Delhivery Direct • Order #{order.orderNumber}
@@ -8581,13 +8598,37 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                           </button>
 
                                           <a
+                                            href="https://one.delhivery.com/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                              background: '#b91c1c',
+                                              border: '1.5px solid #b91c1c',
+                                              color: '#ffffff',
+                                              padding: '0.45rem 0.9rem',
+                                              borderRadius: '7px',
+                                              fontSize: '0.78rem',
+                                              fontWeight: 700,
+                                              textDecoration: 'none',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '6px',
+                                              boxShadow: '0 2px 5px rgba(185, 28, 28, 0.25)'
+                                            }}
+                                            title="Open Delhivery One Business Portal"
+                                          >
+                                            <ExternalLink size={14} />
+                                            <span>Open Delhivery One</span>
+                                          </a>
+
+                                          <a
                                             href="https://www.delhivery.com/send-parcel"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{
                                               background: '#ffffff',
-                                              border: '1.5px solid #b91c1c',
-                                              color: '#b91c1c',
+                                              border: '1.5px solid #cbd5e1',
+                                              color: '#475569',
                                               padding: '0.45rem 0.9rem',
                                               borderRadius: '7px',
                                               fontSize: '0.78rem',
