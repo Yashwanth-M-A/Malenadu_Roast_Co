@@ -12050,6 +12050,8 @@ const App = () => {
     } catch (e) { }
   };
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartToast, setCartToast] = useState(null);
+  const cartToastTimeoutRef = useRef(null);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -12351,7 +12353,17 @@ const App = () => {
       }
       return [...prev, { ...product, id: compositeId, weight, price, image, qty }];
     });
-    setIsCartOpen(true);
+
+    // Provide unobtrusive confirmation feedback toast without auto-opening the cart drawer
+    if (cartToastTimeoutRef.current) clearTimeout(cartToastTimeoutRef.current);
+    setCartToast({
+      name: product.name,
+      weight: weight,
+      qty: qty
+    });
+    cartToastTimeoutRef.current = setTimeout(() => {
+      setCartToast(null);
+    }, 3500);
   };
 
   const updateQuantity = (id, delta) => {
@@ -13456,6 +13468,93 @@ const App = () => {
         isOpen={isCatalogModalOpen}
         onClose={() => setIsCatalogModalOpen(false)}
       />
+
+      {/* Floating Add to Cart Confirmation Toast (Non-intrusive) */}
+      <AnimatePresence>
+        {cartToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            style={{
+              position: 'fixed',
+              bottom: '24px',
+              right: '24px',
+              zIndex: 99999,
+              background: '#18110C',
+              color: '#FDFBF7',
+              borderRadius: '12px',
+              padding: '12px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              boxShadow: '0 12px 36px rgba(0,0,0,0.35)',
+              border: '1.5px solid #C8935A',
+              maxWidth: 'calc(100vw - 32px)'
+            }}
+          >
+            <div style={{
+              width: '26px',
+              height: '26px',
+              borderRadius: '50%',
+              background: '#16a34a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Check size={16} color="#ffffff" strokeWidth={3} />
+            </div>
+            <div style={{ fontSize: '0.85rem', lineHeight: 1.3 }}>
+              <span style={{ color: '#E8CA80', fontWeight: 700 }}>Added to Cart:</span>{' '}
+              <span style={{ fontWeight: 600 }}>{cartToast.name}</span>{' '}
+              <span style={{ color: '#A1A1AA', fontSize: '0.78rem' }}>({cartToast.weight})</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCartToast(null);
+                setIsCartOpen(true);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #C8935A 0%, #A36B32 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 14px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 8px rgba(200, 147, 90, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <ShoppingCart size={13} />
+              <span>View Cart</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCartToast(null)}
+              aria-label="Close notification"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#A1A1AA',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
