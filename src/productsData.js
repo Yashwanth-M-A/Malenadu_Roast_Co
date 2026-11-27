@@ -14,12 +14,13 @@ export const DEFAULT_COFFEE_PRODUCTS = [
     image: '/assets/images/estate_reserve_front.jpg',
     images: [
       '/assets/images/estate_reserve_front.jpg',
+      '/assets/images/estate_reserve_1kg.webp',
       '/assets/images/estate_reserve_back.jpg',
       '/assets/images/estate_reserve_duo.jpg'
     ],
     variants: [
       { weight: '500g', price: '469', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' },
-      { weight: '1kg', price: '874', image: '/assets/images/estate_reserve_front.jpg', backImage: '/assets/images/estate_reserve_back.jpg' }
+      { weight: '1kg', price: '874', image: '/assets/images/estate_reserve_1kg.webp', backImage: '/assets/images/estate_reserve_back.jpg' }
     ],
     specs: {
       roast: 'Medium-Dark Roast (Full City)',
