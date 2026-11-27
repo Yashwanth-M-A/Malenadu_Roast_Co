@@ -588,7 +588,25 @@ const DroppingBeans = () => {
   );
 };
 
-const Hero = ({ onOrderNow }) => {
+const Hero = ({ onOrderNow, onSelectCategory }) => {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const navigateToSection = (categoryId) => {
+    if (onSelectCategory) {
+      onSelectCategory(categoryId);
+    }
+    window.location.hash = categoryId;
+    const targetEl = document.getElementById(categoryId) || document.getElementById('products');
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -691,48 +709,99 @@ const Hero = ({ onOrderNow }) => {
             <motion.p
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7 } } }}
               style={{
-                color: 'rgba(255,255,255,0.82)',
+                color: 'rgba(255,255,255,0.86)',
                 fontSize: '1.05rem',
-                maxWidth: '480px',
-                marginBottom: '2.8rem',
-                lineHeight: '1.9',
+                maxWidth: '520px',
+                marginBottom: '2.5rem',
+                lineHeight: '1.85',
                 fontFamily: 'Inter, system-ui, sans-serif',
                 fontWeight: 400,
+                textShadow: '0 2px 10px rgba(0,0,0,0.4)',
               }}
             >
-              Sustainably grown, freshly roasted, and crafted to give you the best filter coffee experience straight from the hills of Malenadu.
+              Estate-grown coffee and authentic spices, carefully selected from the heart of Malenadu.
             </motion.p>
 
-            {/* CTA Row: Button */}
+            {/* CTA Row: Two Responsive Action Buttons */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-              style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}
+              style={{
+                display: 'flex',
+                gap: '1.1rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                width: '100%',
+                maxWidth: '560px'
+              }}
             >
+              {/* Button 1: SHOP COFFEE (Warm Roastery Gold & Dark Brown) */}
               <motion.button
-                whileHover={{ y: -3, scale: 1.02, boxShadow: '0 15px 30px rgba(0,0,0,0.3)' }}
+                type="button"
+                whileHover={{ y: -3, scale: 1.02, boxShadow: '0 14px 28px rgba(200, 147, 90, 0.42)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => { const el = document.getElementById('coffee'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
+                onClick={() => navigateToSection('coffee')}
                 style={{
-                  display: 'flex',
+                  flex: isMobile ? '1 1 100%' : '0 0 auto',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
-                  background: 'linear-gradient(135deg, #C8935A, #E8CA80)',
-                  color: '#1a1a1a',
-                  padding: '0 2.5rem',
-                  borderRadius: '4px',
+                  background: 'linear-gradient(135deg, #C8935A 0%, #E8CA80 100%)',
+                  color: '#18110C',
+                  padding: '0 2.1rem',
+                  borderRadius: '6px',
                   height: '52px',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  letterSpacing: '2px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  letterSpacing: '1.8px',
                   textTransform: 'uppercase',
-                  border: 'none',
+                  border: '1.5px solid #E8CA80',
                   cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif',
-                  transition: 'all 0.3s',
+                  boxShadow: '0 8px 22px rgba(200, 147, 90, 0.3)',
+                  transition: 'box-shadow 0.25s ease, transform 0.2s ease',
                 }}
               >
-                Explore Our Collection
+                <Coffee size={17} strokeWidth={2.4} color="#18110C" />
+                <span>Shop Coffee</span>
+              </motion.button>
+
+              {/* Button 2: EXPLORE SPICES (Dark Forest Green, Gold & Warm Cream) */}
+              <motion.button
+                type="button"
+                whileHover={{
+                  y: -3,
+                  scale: 1.02,
+                  boxShadow: '0 14px 28px rgba(18, 42, 24, 0.55)',
+                  borderColor: '#E8CA80',
+                  background: 'linear-gradient(135deg, #24462E 0%, #122819 100%)'
+                }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigateToSection('pepper')}
+                style={{
+                  flex: isMobile ? '1 1 100%' : '0 0 auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  background: 'linear-gradient(135deg, #1A3822 0%, #0D2013 100%)',
+                  color: '#FAF3E3',
+                  padding: '0 2.1rem',
+                  borderRadius: '6px',
+                  height: '52px',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  letterSpacing: '1.8px',
+                  textTransform: 'uppercase',
+                  border: '1.5px solid #C8935A',
+                  cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                  boxShadow: '0 8px 22px rgba(10, 25, 15, 0.45)',
+                  transition: 'all 0.25s ease',
+                }}
+              >
+                <Leaf size={17} strokeWidth={2.2} color="#E8CA80" />
+                <span>Explore Spices</span>
               </motion.button>
             </motion.div>
 
@@ -12963,7 +13032,10 @@ const App = () => {
         </Suspense>
       ) : (
         <>
-          <Hero onOrderNow={() => { setCurrentPage('order'); window.scrollTo(0, 0); }} />
+          <Hero
+            onOrderNow={() => { setCurrentPage('order'); window.scrollTo(0, 0); }}
+            onSelectCategory={setActiveCategory}
+          />
           <PromotionalCarousel />
 
 
