@@ -1,5 +1,5 @@
 import { getCartShippingDetails, isKarnatakaPincode, detectCoffeeVariety, COFFEE_VARIETY_RATES, calculateCartTotals, AVAILABLE_COUPONS, validateCoupon } from './shippingService.js';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import {
   ShoppingCart, Sparkles, RotateCcw, Eye, Coffee, User, Search, Menu, X, Star, ShieldCheck,
   Leaf, Truck, CreditCard, Phone, Mail, Heart, Plus, Minus, Trash2, PlayCircle, Download, FileText,
@@ -21,16 +21,27 @@ import {
   syncAccountCart, fetchAccountCart
 } from './api.js';
 import { parseGoogleJwt, getGoogleClientId, getGoogleAvatarForEmail, launchGoogleOAuthPopup } from './googleAuthService.js';
-import LegalPolicyPage from './LegalPolicyPage.jsx';
-import AdminDashboard from './AdminDashboard.jsx';
-import { generateTaxInvoice } from './invoiceGenerator.js';
-import { DeviceMessagingModal } from './DeviceMessagingModal.jsx';
-import { ProductDetailsModal } from './ProductDetailsModal.jsx';
-import { generateDigitalCatalog } from './catalogGenerator.js';
 import { getStoredProducts } from './productsData.js';
-import { CustomComboBuilder } from './CustomComboBuilder.jsx';
 import { getReviewsForProduct, getHiddenReviewIds, HOMEPAGE_STATIC_TESTIMONIALS } from './productReviewsData.js';
-import { CommercialPartnershipPage, CommercialPartnershipTeaser } from './CommercialPartnershipPage.jsx';
+import { CommercialPartnershipTeaser } from './CommercialPartnershipTeaser.jsx';
+
+// Code-split heavy routes & modals for instant sub-second initial page rendering
+const AdminDashboard = lazy(() => import('./AdminDashboard.jsx'));
+const LegalPolicyPage = lazy(() => import('./LegalPolicyPage.jsx'));
+const CommercialPartnershipPage = lazy(() => import('./CommercialPartnershipPage.jsx'));
+const CustomComboBuilder = lazy(() => import('./CustomComboBuilder.jsx').then(m => ({ default: m.CustomComboBuilder })));
+const ProductDetailsModal = lazy(() => import('./ProductDetailsModal.jsx').then(m => ({ default: m.ProductDetailsModal })));
+const DeviceMessagingModal = lazy(() => import('./DeviceMessagingModal.jsx').then(m => ({ default: m.DeviceMessagingModal })));
+
+// On-demand Tax Invoice Generator (Loaded dynamically only when user clicks Download)
+const handleDownloadTaxInvoice = async (order) => {
+  try {
+    const { generateTaxInvoice } = await import('./invoiceGenerator.js');
+    await generateTaxInvoice(order);
+  } catch (err) {
+    console.error('Invoice download failed:', err);
+  }
+};
 
 // Master toggle for Cash on Delivery (COD) payment method
 // Set to true to re-enable COD at checkout; set to false for online prepaid orders only
@@ -5563,7 +5574,7 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
                         <div style={{ textAlign: isMobile ? 'right' : 'right' }}>
                           <button
                             type="button"
-                            onClick={() => generateTaxInvoice(invoiceOrder)}
+                            onClick={() => handleDownloadTaxInvoice(invoiceOrder)}
                             style={{
                               padding: isMobile ? '0.36rem 0.75rem' : '0.42rem 0.95rem',
                               fontSize: isMobile ? '0.72rem' : '0.76rem',
@@ -8381,7 +8392,7 @@ const CheckoutModal = ({
 
               <button
                 type="button"
-                onClick={() => generateTaxInvoice(placedOrderObj)}
+                onClick={() => handleDownloadTaxInvoice(placedOrderObj)}
                 style={{
                   padding: isMobile ? '0.75rem 1rem' : '0.65rem 1.15rem',
                   fontSize: '0.82rem',
@@ -12764,15 +12775,19 @@ const App = () => {
         onAuthSuccess={handleAuthSuccess}
       />
 
-      <ProductDetailsModal
-        isOpen={Boolean(activeDetailsProduct)}
-        product={activeDetailsProduct}
-        onClose={() => setActiveDetailsProduct(null)}
-        onAddToCart={handleAddToCart}
-        onBuyNow={handleBuyNow}
-        onImageClick={setFullscreenImage}
-        onShareProduct={handleShareProduct}
-      />
+      {Boolean(activeDetailsProduct) && (
+        <Suspense fallback={null}>
+          <ProductDetailsModal
+            isOpen={Boolean(activeDetailsProduct)}
+            product={activeDetailsProduct}
+            onClose={() => setActiveDetailsProduct(null)}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+            onImageClick={setFullscreenImage}
+            onShareProduct={handleShareProduct}
+          />
+        </Suspense>
+      )}
 
       {/* Luxury Product Share Modal */}
       {activeShareProduct && (
@@ -12910,20 +12925,41 @@ const App = () => {
           onShareProduct={handleShareProduct}
         />
       ) : currentPage === 'admin' ? (
-        <AdminDashboard
-          onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
-          currentUser={currentUser}
-        />
+        <Suspense fallback={
+          <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0F0906', color: '#D4AF37' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '40px', height: '40px', border: '3px solid #D4AF37', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem' }}>Loading Admin Portal...</p>
+            </div>
+          </div>
+        }>
+          <AdminDashboard
+            onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
+            currentUser={currentUser}
+          />
+        </Suspense>
       ) : currentPage === 'commercial-partnership' ? (
-        <CommercialPartnershipPage
-          onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
-        />
+        <Suspense fallback={
+          <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '32px', height: '32px', border: '3px solid #C88A3E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          </div>
+        }>
+          <CommercialPartnershipPage
+            onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
+          />
+        </Suspense>
       ) : ['privacy-policy', 'refund-policy', 'terms-conditions', 'shipping-policy'].includes(currentPage) ? (
-        <LegalPolicyPage
-          type={currentPage}
-          onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
-          onSelectPolicy={(policyId) => { setCurrentPage(policyId); window.location.hash = policyId; }}
-        />
+        <Suspense fallback={
+          <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '32px', height: '32px', border: '3px solid #C88A3E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          </div>
+        }>
+          <LegalPolicyPage
+            type={currentPage}
+            onBack={() => { setCurrentPage('home'); window.location.hash = ''; window.scrollTo(0, 0); }}
+            onSelectPolicy={(policyId) => { setCurrentPage(policyId); window.location.hash = policyId; }}
+          />
+        </Suspense>
       ) : (
         <>
           <Hero onOrderNow={() => { setCurrentPage('order'); window.scrollTo(0, 0); }} />
@@ -13010,12 +13046,18 @@ const App = () => {
 
               {/* Section Body: Custom Combo Studio vs Products Grid */}
               {activeCategory === 'combos' ? (
-                <CustomComboBuilder
-                  coffeeProducts={coffeeProducts}
-                  pepperProducts={pepperProducts}
-                  onAddToCart={handleAddToCart}
-                  onBuyNow={handleBuyNow}
-                />
+                <Suspense fallback={
+                  <div style={{ minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '32px', height: '32px', border: '3px solid #C88A3E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  </div>
+                }>
+                  <CustomComboBuilder
+                    coffeeProducts={coffeeProducts}
+                    pepperProducts={pepperProducts}
+                    onAddToCart={handleAddToCart}
+                    onBuyNow={handleBuyNow}
+                  />
+                </Suspense>
               ) : (() => {
                 const currentList = activeCategory === 'coffee'
                   ? coffeeProducts
@@ -13771,10 +13813,14 @@ const App = () => {
       )}
 
       {/* Device Messaging & Catalog Modal */}
-      <DeviceMessagingModal
-        isOpen={isCatalogModalOpen}
-        onClose={() => setIsCatalogModalOpen(false)}
-      />
+      {isCatalogModalOpen && (
+        <Suspense fallback={null}>
+          <DeviceMessagingModal
+            isOpen={isCatalogModalOpen}
+            onClose={() => setIsCatalogModalOpen(false)}
+          />
+        </Suspense>
+      )}
 
       {/* Floating Add to Cart Confirmation Toast (Non-intrusive) */}
       <AnimatePresence>
