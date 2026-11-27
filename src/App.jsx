@@ -11751,8 +11751,8 @@ const CoffeeInfoSection = ({ onImageClick }) => {
       alt: "Dense harvest of organic coffee cherries"
     },
     {
-      image: "/assets/images/plantation_cherry_tree.webp",
-      alt: "Abundant coffee tree harvest in Western Ghats soil"
+      image: "/assets/images/plantation_ripe_cherries_branch.webp",
+      alt: "Ripe artisanal coffee cherries ripening on branch in Chikkamagaluru estate"
     }
   ];
 
