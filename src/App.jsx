@@ -762,7 +762,6 @@ const Hero = ({ onOrderNow, onSelectCategory }) => {
                   transition: 'box-shadow 0.25s ease, transform 0.2s ease',
                 }}
               >
-                <Coffee size={17} strokeWidth={2.4} color="#18110C" />
                 <span>Shop Coffee</span>
               </motion.button>
 
@@ -800,7 +799,6 @@ const Hero = ({ onOrderNow, onSelectCategory }) => {
                   transition: 'all 0.25s ease',
                 }}
               >
-                <Leaf size={17} strokeWidth={2.2} color="#E8CA80" />
                 <span>Explore Spices</span>
               </motion.button>
             </motion.div>
