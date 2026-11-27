@@ -11731,8 +11731,8 @@ const CoffeeQuizSection = ({ coffeeProducts, onOpenDetails, onAddToCart, onBuyNo
 const CoffeeInfoSection = ({ onImageClick }) => {
   const plantationPhotos = [
     {
-      image: "/assets/images/plantation_cherries_wide.webp",
-      alt: "Ripe coffee cherries on branch in Chikkamagaluru estate"
+      image: "/assets/images/plantation_ripe_cherries_branch.webp",
+      alt: "Ripe artisanal coffee cherries ripening on branch in Chikkamagaluru estate"
     },
     {
       image: "/assets/images/plantation_tree_canopy.webp",
@@ -11751,8 +11751,8 @@ const CoffeeInfoSection = ({ onImageClick }) => {
       alt: "Dense harvest of organic coffee cherries"
     },
     {
-      image: "/assets/images/plantation_ripe_cherries_branch.webp",
-      alt: "Ripe artisanal coffee cherries ripening on branch in Chikkamagaluru estate"
+      image: "/assets/images/plantation_cherries_wide.webp",
+      alt: "Abundant ripe coffee cherries harvest in Western Ghats estate canopy"
     }
   ];
 
