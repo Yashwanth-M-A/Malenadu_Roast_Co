@@ -15863,6 +15863,7 @@ export const HOMEPAGE_STATIC_TESTIMONIALS = [
     productName: "Traditional Filter Coffee",
     date: "2026-10-20", 
     isTestimonial: true, 
+    verified: true,
     role: "Coffee Customer" 
   },
   { 
@@ -15874,6 +15875,7 @@ export const HOMEPAGE_STATIC_TESTIMONIALS = [
     productName: "Tellicherry Black Pepper",
     date: "2026-10-22", 
     isTestimonial: true, 
+    verified: true,
     role: "Pepper Customer" 
   },
   { 
@@ -15885,6 +15887,7 @@ export const HOMEPAGE_STATIC_TESTIMONIALS = [
     productName: "Peaberry Grand Cru",
     date: "2026-10-25", 
     isTestimonial: true, 
+    verified: true,
     role: "Coffee Customer" 
   },
   { 
@@ -15896,6 +15899,7 @@ export const HOMEPAGE_STATIC_TESTIMONIALS = [
     productName: "Estate Micro-Roast",
     date: "2026-10-28", 
     isTestimonial: true, 
+    verified: true,
     role: "Coffee Customer" 
   },
   { 
@@ -15907,6 +15911,7 @@ export const HOMEPAGE_STATIC_TESTIMONIALS = [
     productName: "Signature Morning Blend",
     date: "2026-10-30", 
     isTestimonial: true, 
+    verified: true,
     role: "Coffee Customer" 
   },
 ];

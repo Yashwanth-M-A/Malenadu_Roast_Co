@@ -606,10 +606,32 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     }
   };
 
-  const loadReviews = () => {
+  const loadReviews = async () => {
     try {
-      const all = getAllReviewsForAdmin();
-      setRealReviews(all);
+      let cloudReviews = [];
+      try {
+        const res = await fetch('/api/reviews');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.reviews)) {
+            cloudReviews = json.reviews.map(r => ({
+              ...r,
+              isReal: true,
+              isTestimonial: true,
+              verified: r.verified !== undefined ? Boolean(r.verified) : true,
+              date: r.date || new Date().toISOString()
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch cloud reviews:', err);
+      }
+
+      const local = getAllReviewsForAdmin();
+      const combinedMap = new Map();
+      local.forEach(r => combinedMap.set(r.id, r));
+      cloudReviews.forEach(r => combinedMap.set(r.id, { ...r, ...combinedMap.get(r.id) }));
+      setRealReviews(Array.from(combinedMap.values()));
     } catch (e) {
       console.error('Error loading reviews in Admin:', e);
     }
@@ -739,6 +761,15 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       : `Review from "${rev.name}" is now LIVE and visible on the storefront.`
     );
     setTimeout(() => setLocalNotice(''), 4500);
+
+    // Sync visibility state to cloud database
+    try {
+      fetch('/api/reviews', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: revId, hidden: newHidden })
+      }).catch(e => console.warn('Cloud review visibility sync warning:', e));
+    } catch (e) { }
   };
 
   const handleHideAllNegative = () => {
@@ -858,6 +889,15 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       setRealReviews(updated);
       setLocalNotice('Review removed from storefront.');
       setTimeout(() => setLocalNotice(''), 4000);
+
+      // Permanently remove from cloud database
+      try {
+        fetch('/api/reviews', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: revId, action: 'delete' })
+        }).catch(e => console.warn('Cloud review delete warning:', e));
+      } catch (e) { }
     }
   };
 
@@ -3657,10 +3697,16 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
                                   ))}
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  {rev.verified !== false && (
+                                    <span style={{ fontSize: '0.66rem', color: '#15803d', background: '#dcfce7', border: '1px solid #bbf7d0', padding: '2px 7px', borderRadius: '8px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                      <ShieldCheck size={11} color="#15803d" /> Verified User
+                                    </span>
+                                  )}
+
                                   {isUserSubmitted ? (
                                     <span style={{ fontSize: '0.66rem', color: '#0369a1', background: '#e0f2fe', border: '1px solid #bae6fd', padding: '2px 7px', borderRadius: '8px', fontWeight: 700 }}>
-                                      Feedback Form Submission
+                                      Customer Feedback
                                     </span>
                                   ) : (
                                     <span style={{ fontSize: '0.66rem', color: '#8c6239', background: '#FBF8F3', border: '1px solid #ebd9c8', padding: '2px 7px', borderRadius: '8px', fontWeight: 700 }}>

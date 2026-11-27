@@ -624,6 +624,72 @@ export const fetchAccountCart = async (email) => {
   return [];
 };
 
+/**
+ * Reviews API helpers
+ */
+export const fetchReviews = async () => {
+  try {
+    const res = await fetch('/api/reviews');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.reviews)) {
+        return data.reviews;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch reviews from cloud:', err);
+  }
+  return [];
+};
+
+export const submitReview = async (reviewData) => {
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reviewData)
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Failed to submit review to cloud:', err);
+  }
+  return { success: false };
+};
+
+export const updateReviewVisibility = async (id, hidden) => {
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, hidden })
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Failed to update review visibility:', err);
+  }
+  return { success: false };
+};
+
+export const deleteReview = async (id) => {
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: 'delete' })
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Failed to delete review:', err);
+  }
+  return { success: false };
+};
+
 const api = {
   registerUser,
   loginUser,
@@ -641,7 +707,11 @@ const api = {
   trackShiprocketShipment,
   checkPincodeServiceability,
   syncAccountCart,
-  fetchAccountCart
+  fetchAccountCart,
+  fetchReviews,
+  submitReview,
+  updateReviewVisibility,
+  deleteReview
 };
 
 export default api;

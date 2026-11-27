@@ -2449,41 +2449,63 @@ const FeedbackSection = ({ onAddReview, currentUser, onRequireLogin }) => {
 
     console.log('Sending exact parameters:', templateParams);
 
-    // ONLY publish to "What Our Customers Say" if user is logged into their real account
-    const isRealAccountUser = Boolean(currentUser && currentUser.email);
-    setWasPublishedLive(isRealAccountUser);
+    // Save and publish customer feedback as a verified user review
+    const reviewAuthorName = (currentUser?.name || formData.name || 'Valued Customer').trim();
+    const reviewAuthorEmail = (currentUser?.email || formData.email || '').trim();
+    const reviewText = formData.feedback.trim() || `Loved the authentic ${formData.product}! Freshness and aroma are outstanding.`;
+    setWasPublishedLive(true);
 
-    if (isRealAccountUser) {
-      const reviewText = formData.feedback.trim() || `Loved the authentic ${formData.product}! Freshness and aroma are outstanding.`;
-      const newReview = {
-        id: 'rev_' + Date.now(),
-        name: currentUser.name || formData.name.trim(),
-        email: currentUser.email || formData.email.trim(),
-        avatar: currentUser.avatar || '',
-        rating: formData.rating || 5,
-        product: formData.product || 'Coffee',
-        liked: formData.liked || 'Aroma',
-        text: reviewText,
-        buyAgain: formData.buyAgain || 'Yes',
-        date: new Date().toISOString(),
-        verified: true,
-        isReal: true,
-        hidden: false,
-        userAccount: currentUser.email
-      };
+    const newReview = {
+      id: 'rev_' + Date.now(),
+      name: reviewAuthorName,
+      email: reviewAuthorEmail,
+      avatar: currentUser?.avatar || '',
+      rating: Number(formData.rating) || 5,
+      product: formData.product || 'Coffee',
+      liked: formData.liked || 'Aroma & Freshness',
+      text: reviewText,
+      buyAgain: formData.buyAgain || 'Yes',
+      date: new Date().toISOString(),
+      verified: true,
+      isReal: true,
+      hidden: false,
+      userAccount: currentUser?.email || reviewAuthorEmail
+    };
 
-      try {
-        const existingReviews = JSON.parse(localStorage.getItem('malenadu_real_reviews') || '[]');
-        const updated = [newReview, ...existingReviews];
-        localStorage.setItem('malenadu_real_reviews', JSON.stringify(updated));
-        window.dispatchEvent(new Event('malenadu_reviews_updated'));
-        if (onAddReview) {
-          onAddReview(newReview);
-        }
-      } catch (err) {
-        console.error('Failed to store review locally:', err);
+    try {
+      const existingReviews = JSON.parse(localStorage.getItem('malenadu_real_reviews') || '[]');
+      const updatedReal = [newReview, ...existingReviews.filter(r => r.id !== newReview.id)];
+      localStorage.setItem('malenadu_real_reviews', JSON.stringify(updatedReal));
+
+      const existingUser = JSON.parse(localStorage.getItem('malenadu_user_reviews') || '[]');
+      const updatedUser = [newReview, ...existingUser.filter(r => r.id !== newReview.id)];
+      localStorage.setItem('malenadu_user_reviews', JSON.stringify(updatedUser));
+
+      window.dispatchEvent(new Event('malenadu_reviews_updated'));
+      if (onAddReview) {
+        onAddReview(newReview);
       }
+    } catch (err) {
+      console.error('Failed to store review locally:', err);
     }
+
+    // Persist directly to Neon PostgreSQL database via /api/reviews
+    try {
+      fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: newReview.id,
+          name: newReview.name,
+          email: newReview.email,
+          rating: newReview.rating,
+          product: newReview.product,
+          liked: newReview.liked,
+          buyAgain: newReview.buyAgain,
+          text: newReview.text
+        })
+      }).catch(e => console.warn('Cloud review save warning:', e));
+    } catch (e) {}
 
     try {
       // 1. Send feedback email to business owner
@@ -3108,6 +3130,24 @@ const ProductReviewModal = ({ activeReviewItem, onClose, currentUser }) => {
       const userReviews = JSON.parse(localStorage.getItem('malenadu_user_reviews') || '[]');
       const filteredUser = userReviews.filter(r => r.orderNumber !== order?.orderNumber || r.productName !== item?.name);
       localStorage.setItem('malenadu_user_reviews', JSON.stringify([newReview, ...filteredUser]));
+
+      // 4. Persist to Neon PostgreSQL Database
+      try {
+        fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: newReview.id,
+            name: newReview.name,
+            email: newReview.email,
+            rating: newReview.rating,
+            product: newReview.productName,
+            liked: newReview.liked,
+            buyAgain: newReview.recommend === 'yes' ? 'Yes' : 'No',
+            text: newReview.text
+          })
+        }).catch(e => console.warn('Order review cloud sync deferred:', e));
+      } catch (e) {}
 
       // Broadcast update event to all components
       window.dispatchEvent(new Event('malenadu_reviews_updated'));
@@ -3829,6 +3869,24 @@ const ProfileModal = ({ isOpen, onClose, currentUser, onLogout, onOpenAdmin, onA
       const userReviews = JSON.parse(localStorage.getItem('malenadu_user_reviews') || '[]');
       const filteredUser = userReviews.filter(r => r.orderNumber !== order.orderNumber || r.productName !== item.name);
       localStorage.setItem('malenadu_user_reviews', JSON.stringify([newReview, ...filteredUser]));
+
+      // 4. Persist to Neon PostgreSQL Database
+      try {
+        fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: newReview.id,
+            name: newReview.name,
+            email: newReview.email,
+            rating: newReview.rating,
+            product: newReview.productName,
+            liked: newReview.liked,
+            buyAgain: newReview.recommend === 'yes' ? 'Yes' : 'No',
+            text: newReview.text
+          })
+        }).catch(e => console.warn('Order review cloud sync deferred:', e));
+      } catch (e) {}
 
       // Broadcast update event to all components
       window.dispatchEvent(new Event('malenadu_reviews_updated'));
@@ -12439,20 +12497,33 @@ const App = () => {
   const [submittedReviews, setSubmittedReviews] = useState(() => {
     try {
       const stored = localStorage.getItem('malenadu_user_reviews');
-      return stored ? JSON.parse(stored) : [];
+      const storedReal = localStorage.getItem('malenadu_real_reviews');
+      const list1 = stored ? JSON.parse(stored) : [];
+      const list2 = storedReal ? JSON.parse(storedReal) : [];
+      const combined = new Map();
+      list1.forEach(r => combined.set(r.id, r));
+      list2.forEach(r => combined.set(r.id, r));
+      return Array.from(combined.values());
     } catch (e) {
       return [];
     }
   });
   const staticReviews = HOMEPAGE_STATIC_TESTIMONIALS;
 
+  // Sync reviews across tabs and listen for changes
   useEffect(() => {
     const handleSyncReviews = () => {
       try {
         setHiddenReviewIds(getHiddenReviewIds());
         const stored = localStorage.getItem('malenadu_user_reviews');
-        if (stored) {
-          setSubmittedReviews(JSON.parse(stored));
+        const storedReal = localStorage.getItem('malenadu_real_reviews');
+        const list1 = stored ? JSON.parse(stored) : [];
+        const list2 = storedReal ? JSON.parse(storedReal) : [];
+        const combined = new Map();
+        list1.forEach(r => combined.set(r.id, r));
+        list2.forEach(r => combined.set(r.id, r));
+        if (combined.size > 0) {
+          setSubmittedReviews(Array.from(combined.values()));
         }
       } catch (e) { }
     };
@@ -12464,17 +12535,74 @@ const App = () => {
     };
   }, []);
 
+  // Fetch live reviews from PostgreSQL database on boot
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCloudReviews = async () => {
+      try {
+        const res = await fetch('/api/reviews');
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data.success && Array.isArray(data.reviews)) {
+            const mapped = data.reviews.map(r => ({
+              id: r.id,
+              name: r.name,
+              email: r.email,
+              rating: Number(r.rating) || 5,
+              product: r.product || 'Coffee',
+              liked: r.liked || 'Aroma & Freshness',
+              buyAgain: r.buyAgain || 'Yes',
+              text: r.text,
+              verified: r.verified !== undefined ? Boolean(r.verified) : true,
+              isReal: true,
+              isTestimonial: true,
+              hidden: Boolean(r.hidden),
+              date: r.date || new Date().toISOString()
+            }));
+
+            setSubmittedReviews(prev => {
+              const cMap = new Map();
+              // Cloud reviews first
+              mapped.forEach(r => cMap.set(r.id, r));
+              // Local reviews keep any pending/immediate state
+              prev.forEach(r => cMap.set(r.id, r));
+              return Array.from(cMap.values());
+            });
+
+            try {
+              const existing = JSON.parse(localStorage.getItem('malenadu_user_reviews') || '[]');
+              const cMap = new Map();
+              mapped.forEach(r => cMap.set(r.id, r));
+              existing.forEach(r => cMap.set(r.id, r));
+              localStorage.setItem('malenadu_user_reviews', JSON.stringify(Array.from(cMap.values())));
+            } catch (e) { }
+          }
+        }
+      } catch (err) {
+        console.warn('Live reviews fetch note:', err);
+      }
+    };
+
+    fetchCloudReviews();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleAddNewReview = (newRev) => {
     setSubmittedReviews(prev => {
-      const updated = [newRev, ...prev];
+      const updated = [newRev, ...prev.filter(r => r.id !== newRev.id)];
       try {
         localStorage.setItem('malenadu_user_reviews', JSON.stringify(updated));
+        localStorage.setItem('malenadu_real_reviews', JSON.stringify(updated));
       } catch (e) { }
       return updated;
     });
   };
 
-  const customerReviews = [...submittedReviews, ...staticReviews];
+  // Merge static testimonials and real customer submitted reviews (real customer reviews appear at the front)
+  const combinedTestimonialsMap = new Map();
+  staticReviews.forEach(r => combinedTestimonialsMap.set(r.id, { ...r, verified: true }));
+  submittedReviews.forEach(r => combinedTestimonialsMap.set(r.id, { ...r, verified: r.verified !== false }));
+  const customerReviews = Array.from(combinedTestimonialsMap.values()).reverse();
   const visibleCustomerReviews = customerReviews.filter(r => !hiddenReviewIds.includes(r.id) && !r.hidden);
   const handleAddToCart = (product, weightOverride, qtyOverride) => {
     if (!product) return;
@@ -12988,12 +13116,31 @@ const App = () => {
                         boxShadow: '0 12px 30px rgba(0,0,0,0.45)'
                       }}
                     >
-                      <div className="review-stars-wrap" style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                      <div className="review-stars-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '6px' }}>
                         <div className="review-stars" style={{ display: 'flex', gap: '3px' }}>
                           {[...Array(review.rating || 5)].map((_, idx) => (
                             <Star key={idx} size={15} fill="#E8CA80" color="#E8CA80" />
                           ))}
                         </div>
+                        {review.verified !== false && (
+                          <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            background: 'rgba(22, 163, 74, 0.16)',
+                            border: '1px solid rgba(74, 222, 128, 0.45)',
+                            color: '#4ADE80',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            letterSpacing: '0.3px',
+                            fontFamily: 'Inter, sans-serif'
+                          }}>
+                            <ShieldCheck size={12} color="#4ADE80" strokeWidth={2.5} />
+                            <span>Verified User</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="review-quote-mark" style={{ color: '#C8935A', fontSize: '2.4rem', fontFamily: '"Georgia", serif', lineHeight: 0.5, marginBottom: '0.6rem', opacity: 0.85 }}>
@@ -13035,7 +13182,12 @@ const App = () => {
                             </div>
                           )}
                           <div>
-                            <h4 className="review-author-name" style={{ color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', fontWeight: 600, margin: '0 0 2px' }}>{review.name}</h4>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <h4 className="review-author-name" style={{ color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', fontWeight: 600, margin: '0 0 2px' }}>{review.name}</h4>
+                              {review.verified !== false && (
+                                <ShieldCheck size={13} color="#4ADE80" strokeWidth={2.5} title="Verified Customer" />
+                              )}
+                            </div>
                             {review.product && (
                               <span className="review-author-tag" style={{ fontSize: '0.72rem', color: '#D4A870', opacity: 0.85 }}>
                                 {review.product} Customer
