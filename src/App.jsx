@@ -97,7 +97,7 @@ const cleanPhoneDigits = (raw) => {
 const TOKENS = {
   images: {
     logo: '/assets/images/logo_final.webp',
-    hero: '/assets/images/coffee_estate_sunrise.webp',
+    hero: '/assets/images/filter_coffee_brass_hero.webp',
     coffeePack: '/assets/images/coffee_pack_new.webp',
     coffeeSide: '/assets/images/coffee_side_new.webp',
     coffeeBack: '/assets/images/coffee_back_new.webp',
@@ -593,9 +593,10 @@ const Hero = ({ onOrderNow }) => {
   return (
     <section id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      <img loading="lazy"
+      <img
+        fetchPriority="high"
         src={TOKENS.images.hero}
-        alt="Malenadu Coffee Estate Sunrise"
+        alt="Malenadu Filter Coffee Brass Davarah and Tumbler"
         style={{
           position: 'absolute',
           top: 0,
@@ -605,14 +606,14 @@ const Hero = ({ onOrderNow }) => {
           objectFit: 'cover',
           zIndex: 0,
           pointerEvents: 'none',
-          filter: 'brightness(0.65) saturate(1.15) contrast(1.05)',
+          filter: 'brightness(0.72) saturate(1.1) contrast(1.05)',
         }}
       />
 
       {/* Dark gradient overlay for text readability */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 1,
-        background: 'linear-gradient(105deg, rgba(8,12,6,0.7) 0%, rgba(8,12,6,0.4) 50%, rgba(8,12,6,0.1) 100%)',
+        background: 'linear-gradient(105deg, rgba(8,6,4,0.76) 0%, rgba(8,6,4,0.52) 48%, rgba(8,6,4,0.22) 100%)',
       }} />
 
       {/* Right-side warm glow */}
