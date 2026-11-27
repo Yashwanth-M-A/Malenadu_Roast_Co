@@ -1404,9 +1404,6 @@ const ProductCard = ({ product, onBuyNow, hideBuyNow, onAddToCart, onImageClick,
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedVariant(v);
-                          if (v.image && allImages.includes(v.image)) {
-                            setImgIndex(allImages.indexOf(v.image));
-                          }
                         }}
                         style={{
                           flex: 1,
