@@ -1416,7 +1416,7 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
       const reviewLinks = order.items.map(it => {
         const pName = it.name || it.title || 'Coffee Roast';
         const pUrl = `${origin}/?rateProduct=${encodeURIComponent(pName)}&order=${encodeURIComponent(orderNum)}`;
-        return `⭐ *Rate & Review ${pName}:*\n👉 ${pUrl}`;
+        return `*Rate & Review ${pName}:*\n${pUrl}`;
       }).join('\n\n');
 
       reviewSection = `*Rate & Review Your Purchased Product:*\n` +
@@ -1425,11 +1425,11 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     } else if (typeof order.itemsSummary === 'string' && order.itemsSummary.trim()) {
       itemsList = order.itemsSummary;
       const defaultUrl = `${origin}/?rateProduct=Malenadu%20Estate%20Reserve&order=${encodeURIComponent(orderNum)}`;
-      reviewSection = `*Rate & Review Your Purchased Coffee:*\n👉 ${defaultUrl}\n\n`;
+      reviewSection = `*Rate & Review Your Purchased Coffee:*\n${defaultUrl}\n\n`;
     } else {
       itemsList = '• Authentic Single-Estate Roast Pack';
       const defaultUrl = `${origin}/?rateProduct=Malenadu%20Estate%20Reserve&order=${encodeURIComponent(orderNum)}`;
-      reviewSection = `*Rate & Review Your Purchased Coffee:*\n👉 ${defaultUrl}\n\n`;
+      reviewSection = `*Rate & Review Your Purchased Coffee:*\n${defaultUrl}\n\n`;
     }
 
     const rawSt = String(newStatus || order.orderStatus || order.status || 'placed').toLowerCase().trim();
@@ -1439,68 +1439,68 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     const isCancelled = rawSt.includes('cancel');
 
     if (isShipped) {
-      return `🚚 *Order Dispatched & In Transit! | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName}! 📦\n` +
+      return `*Order Dispatched & In Transit | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName},\n\n` +
         `Great news! Your order #${orderNum} has been batch-roasted and dispatched from our Chikkamagaluru estate.\n\n` +
-        `📦 *Order ID:* #${orderNum}\n` +
-        (order.awbCode ? `🚀 *Tracking / AWB Number:* ${order.awbCode}\n` : '') +
-        `💰 *Total Amount:* ${total} (Paid Online)\n\n` +
-        `🛒 *Items Dispatched:*\n${itemsList}\n\n` +
-        (address ? `📍 *Shipping To:*\n${address}\n\n` : '') +
-        `🚚 *Courier & Delivery:* In transit with express courier. Expected arrival in 2–4 business days with tracking updates.\n\n` +
-        `📄 *Download Official GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
+        `*Order ID:* #${orderNum}\n` +
+        (order.awbCode ? `*Tracking / AWB Number:* ${order.awbCode}\n` : '') +
+        `*Total Amount:* ${total} (Paid Online)\n\n` +
+        `*Items Dispatched:*\n${itemsList}\n\n` +
+        (address ? `*Shipping To:*\n${address}\n\n` : '') +
+        `*Courier & Delivery:* In transit with express courier. Expected arrival in 2–4 business days with tracking updates.\n\n` +
+        `*Download Official GST Tax Invoice:*\n${invoiceUrl}\n\n` +
         `_Reply directly to this chat anytime if you have questions!_\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
     if (isDelivered) {
-      return `✨ *Order Delivered! | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName}! 🎉\n` +
+      return `*Order Delivered | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName},\n\n` +
         `Your artisanal coffee & spice parcel #${orderNum} has been delivered successfully to your doorstep!\n\n` +
-        `📦 *Order ID:* #${orderNum}\n` +
-        `🛒 *Items Delivered:*\n${itemsList}\n\n` +
-        `⭐ *Rate & Review Your Experience:*\n` +
+        `*Order ID:* #${orderNum}\n` +
+        `*Items Delivered:*\n${itemsList}\n\n` +
+        `*Rate & Review Your Experience:*\n` +
         reviewSection +
-        `📄 *Download GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
-        `We hope you enjoy every cup of fresh, shade-grown Malenadu roast! Need brewing tips or grind adjustments? Reply anytime right here on WhatsApp! ☕\n\n` +
+        `*Download GST Tax Invoice:*\n${invoiceUrl}\n\n` +
+        `We hope you enjoy every cup of fresh, shade-grown Malenadu roast! Need brewing tips or grind adjustments? Reply anytime right here on WhatsApp!\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
     if (isPacked) {
-      return `🌿 *Order Packed & Freshly Roasted! | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName}! 👋\n` +
+      return `*Order Packed & Freshly Roasted | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName},\n\n` +
         `Your order #${orderNum} has been freshly batch-roasted and sealed in our premium aroma-lock one-way valve pouches at our Chikkamagaluru estate. Staged for courier handover today!\n\n` +
-        `📦 *Order ID:* #${orderNum}\n` +
-        `💰 *Total Amount:* ${total}\n\n` +
-        `🛒 *Items Packed:*\n${itemsList}\n\n` +
-        (address ? `📍 *Shipping To:*\n${address}\n\n` : '') +
-        `🚚 *Status:* Packed and ready for dispatch.\n\n` +
-        `📄 *Download GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
+        `*Order ID:* #${orderNum}\n` +
+        `*Total Amount:* ${total}\n\n` +
+        `*Items Packed:*\n${itemsList}\n\n` +
+        (address ? `*Shipping To:*\n${address}\n\n` : '') +
+        `*Status:* Packed and ready for dispatch.\n\n` +
+        `*Download GST Tax Invoice:*\n${invoiceUrl}\n\n` +
         `_Need to customize grind size or delivery timing? Reply directly to this WhatsApp chat!_\n\n` +
         `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
     }
 
     if (isCancelled) {
-      return `❌ *Order Cancellation Notice | Malenadu Roast Co.*\n\n` +
-        `Hello ${customerName},\n` +
+      return `*Order Cancellation Notice | Malenadu Roast Co.*\n\n` +
+        `Hello ${customerName},\n\n` +
         `Your order #${orderNum} has been marked as CANCELLED as requested.\n\n` +
-        `📦 *Order ID:* #${orderNum}\n` +
-        `💰 *Total Amount:* ${total}\n\n` +
-        `💳 *Refund Details:* If prepaid, your refund has been processed to your original payment method and will reflect within 3–5 banking business days.\n\n` +
+        `*Order ID:* #${orderNum}\n` +
+        `*Total Amount:* ${total}\n\n` +
+        `*Refund Details:* If prepaid, your refund has been processed to your original payment method and will reflect within 3–5 banking business days.\n\n` +
         `If this was unexpected or if you have questions, please reply directly to this chat or call our estate team at +91 8217623335.\n\n` +
         `*Malenadu Roast Co.* — Chikkamagaluru, Karnataka.`;
     }
 
     // Default: Order Confirmed (Placed)
-    return `☕ *Order Confirmed! | Malenadu Roast Co.*\n\n` +
-      `Hello ${customerName}! 👋\n` +
+    return `*Order Confirmed | Malenadu Roast Co.*\n\n` +
+      `Hello ${customerName},\n\n` +
       `Thank you for your order from our Chikkamagaluru estate. Your order is confirmed and queued for fresh batch-roasting!\n\n` +
-      `📦 *Order ID:* #${orderNum}\n` +
-      `💰 *Total Amount:* ${total} (Paid Online)\n\n` +
-      `🛒 *Items Ordered:*\n${itemsList}\n\n` +
-      (address ? `📍 *Shipping Address:* \n${address}\n\n` : '') +
-      `🚚 *Courier & Delivery:* Pan-India express delivery within 2–4 business days with tracking updates.\n\n` +
-      `📄 *Download Official GST Tax Invoice:* 👇\n${invoiceUrl}\n\n` +
+      `*Order ID:* #${orderNum}\n` +
+      `*Total Amount:* ${total} (Paid Online)\n\n` +
+      `*Items Ordered:*\n${itemsList}\n\n` +
+      (address ? `*Shipping Address:*\n${address}\n\n` : '') +
+      `*Courier & Delivery:* Pan-India express delivery within 2–4 business days with tracking updates.\n\n` +
+      `*Download Official GST Tax Invoice:*\n${invoiceUrl}\n\n` +
       reviewSection +
       `_Need to customize grind size or delivery timing? Reply directly to this WhatsApp chat!_\n\n` +
       `*Malenadu Roast Co.* — Straight From the Estate to Your Cup.`;
@@ -1817,40 +1817,161 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
     handleSendStatusNotification(order, order.orderStatus || order.status || 'placed', true);
   };
 
+  const getStatusEmailDetails = (order, customStatus = null) => {
+    const customerName = order.shippingName || order.name || 'Valued Customer';
+    const rawSt = String(customStatus || order.orderStatus || order.status || 'placed').toLowerCase().trim();
+    const orderNum = order.orderNumber || order.id || order._id || '';
+    const total = order.totalAmount || order.total || '';
+    const invoiceUrl = `https://www.malenaduroastco.works/api/invoice?order=${orderNum}`;
+    const address = order.shippingAddress || '';
+    const origin = typeof window !== 'undefined' && window.location && window.location.origin && !window.location.origin.includes('localhost')
+      ? window.location.origin
+      : 'https://malenaduroastco.works';
+
+    let itemsList = '';
+    let reviewLinks = '';
+    if (Array.isArray(order.items) && order.items.length > 0) {
+      itemsList = order.items
+        .map(it => {
+          const weightStr = (it.selectedWeight || it.weight) ? ` (${it.selectedWeight || it.weight})` : '';
+          const qty = it.qty || it.quantity || 1;
+          return `- ${it.name || it.title || 'Malenadu Coffee Roast'}${weightStr} x ${qty}`;
+        })
+        .join('\n');
+
+      reviewLinks = order.items.map(it => {
+        const pName = it.name || it.title || 'Malenadu Estate Reserve';
+        const pUrl = `${origin}/?rateProduct=${encodeURIComponent(pName)}&order=${encodeURIComponent(orderNum)}`;
+        return `Rate & Review ${pName}:\n${pUrl}`;
+      }).join('\n\n');
+    } else if (typeof order.itemsSummary === 'string' && order.itemsSummary.trim()) {
+      itemsList = order.itemsSummary;
+      const defaultUrl = `${origin}/?rateProduct=Malenadu%20Estate%20Reserve&order=${encodeURIComponent(orderNum)}`;
+      reviewLinks = `Rate & Review Your Coffee:\n${defaultUrl}`;
+    } else {
+      itemsList = '- Authentic Single-Estate Roast Pack';
+      const defaultUrl = `${origin}/?rateProduct=Malenadu%20Estate%20Reserve&order=${encodeURIComponent(orderNum)}`;
+      reviewLinks = `Rate & Review Your Coffee:\n${defaultUrl}`;
+    }
+
+    const isShipped = rawSt.includes('ship') || rawSt.includes('transit') || rawSt.includes('dispatch');
+    const isDelivered = rawSt.includes('deliver') || rawSt.includes('complete');
+    const isPacked = rawSt.includes('pack') || rawSt.includes('roast');
+    const isCancelled = rawSt.includes('cancel');
+
+    if (isDelivered) {
+      const subject = `Order Delivered: Order #${orderNum} | Malenadu Roast Co.`;
+      const body = `Hello ${customerName},\n\n` +
+        `Great news! Your artisanal coffee order #${orderNum} from our Chikkamagaluru estate has been successfully delivered to your doorstep.\n\n` +
+        `Order ID: #${orderNum}\n` +
+        (total ? `Total Amount: ₹${total} (Paid Online)\n` : '') +
+        `\nItems Delivered:\n${itemsList}\n\n` +
+        (address ? `Delivery Address:\n${address}\n\n` : '') +
+        `Rate & Review Your Experience:\n` +
+        `How was the roast aroma, freshness, and decoction? Your feedback helps fellow coffee lovers and supports our estate artisans.\n` +
+        `Please take a moment to share your rating and review:\n\n` +
+        `${reviewLinks}\n\n` +
+        `Download Official GST Tax Invoice:\n${invoiceUrl}\n\n` +
+        `We hope you enjoy every cup of fresh, shade-grown Malenadu roast. If you need brewing tips or grind recommendations for your South Indian filter, French press, or moka pot, reply directly to this email or message us on WhatsApp at +91 8217623335.\n\n` +
+        `Warm regards,\n` +
+        `Malenadu Roast Co.\n` +
+        `Chikkamagaluru, Karnataka\n` +
+        `Email: malenaduroast@gmail.com\n` +
+        `Website: https://malenaduroastco.works`;
+      return { subject, body };
+    }
+
+    if (isShipped) {
+      const subject = `Order Dispatched: Order #${orderNum} | Malenadu Roast Co.`;
+      const awbLine = order.awbCode ? `Tracking / AWB Number: ${order.awbCode}\n` : '';
+      const body = `Hello ${customerName},\n\n` +
+        `Your coffee order #${orderNum} has been batch-roasted and dispatched from our Chikkamagaluru estate.\n\n` +
+        `Order ID: #${orderNum}\n` +
+        awbLine +
+        (total ? `Total Amount: ₹${total} (Paid Online)\n` : '') +
+        `\nItems Dispatched:\n${itemsList}\n\n` +
+        (address ? `Shipping To:\n${address}\n\n` : '') +
+        `Delivery Timeline:\n` +
+        `Your package is in transit with express courier and is scheduled to arrive in 2-4 business days with tracking updates.\n\n` +
+        `Download Official GST Tax Invoice:\n${invoiceUrl}\n\n` +
+        `If you have any questions about your shipment, reply directly to this email or message us on WhatsApp at +91 8217623335.\n\n` +
+        `Warm regards,\n` +
+        `Malenadu Roast Co.\n` +
+        `Chikkamagaluru, Karnataka\n` +
+        `Email: malenaduroast@gmail.com\n` +
+        `Website: https://malenaduroastco.works`;
+      return { subject, body };
+    }
+
+    if (isPacked) {
+      const subject = `Order Packed: Order #${orderNum} | Malenadu Roast Co.`;
+      const body = `Hello ${customerName},\n\n` +
+        `Your coffee order #${orderNum} has been freshly batch-roasted and packed in our aroma-lock one-way valve pouches at our Chikkamagaluru estate. It is staged for courier handover today.\n\n` +
+        `Order ID: #${orderNum}\n` +
+        (total ? `Total Amount: ₹${total}\n` : '') +
+        `\nItems Packed:\n${itemsList}\n\n` +
+        (address ? `Shipping To:\n${address}\n\n` : '') +
+        `Download Official GST Tax Invoice:\n${invoiceUrl}\n\n` +
+        `If you need any grind adjustments or delivery instructions, reply directly to this email or message us on WhatsApp at +91 8217623335.\n\n` +
+        `Warm regards,\n` +
+        `Malenadu Roast Co.\n` +
+        `Chikkamagaluru, Karnataka\n` +
+        `Email: malenaduroast@gmail.com\n` +
+        `Website: https://malenaduroastco.works`;
+      return { subject, body };
+    }
+
+    if (isCancelled) {
+      const subject = `Order Cancellation Notice: Order #${orderNum} | Malenadu Roast Co.`;
+      const body = `Hello ${customerName},\n\n` +
+        `Your coffee order #${orderNum} has been marked as CANCELLED as requested.\n\n` +
+        `Order ID: #${orderNum}\n` +
+        (total ? `Total Amount: ₹${total}\n` : '') +
+        `\nRefund Details:\nIf prepaid, your refund has been processed to your original payment method and will reflect within 3-5 banking business days.\n\n` +
+        `If you have any questions or this was unexpected, please reply directly to this email or reach us on WhatsApp at +91 8217623335.\n\n` +
+        `Warm regards,\n` +
+        `Malenadu Roast Co.\n` +
+        `Chikkamagaluru, Karnataka\n` +
+        `Email: malenaduroast@gmail.com\n` +
+        `Website: https://malenaduroastco.works`;
+      return { subject, body };
+    }
+
+    // Default: Order Confirmed
+    const subject = `Order Confirmed: Order #${orderNum} | Malenadu Roast Co.`;
+    const body = `Hello ${customerName},\n\n` +
+      `Thank you for your order from our Chikkamagaluru estate! Your order #${orderNum} is confirmed and queued for fresh batch-roasting.\n\n` +
+      `Order ID: #${orderNum}\n` +
+      (total ? `Total Amount: ₹${total} (Paid Online)\n` : '') +
+      `\nItems Ordered:\n${itemsList}\n\n` +
+      (address ? `Shipping Address:\n${address}\n\n` : '') +
+      `Delivery Timeline:\n` +
+      `Express delivery pan-India within 2-4 business days with tracking updates.\n\n` +
+      `Download Official GST Tax Invoice:\n${invoiceUrl}\n\n` +
+      `If you have questions or need to specify your preferred grind size, reply directly to this email or message us on WhatsApp at +91 8217623335.\n\n` +
+      `Warm regards,\n` +
+      `Malenadu Roast Co.\n` +
+      `Chikkamagaluru, Karnataka\n` +
+      `Email: malenaduroast@gmail.com\n` +
+      `Website: https://malenaduroastco.works`;
+    return { subject, body };
+  };
+
   const handleEmailCustomer = (order, customStatus = null) => {
-    const email = order.shippingEmail || order.email;
+    const freshOrder = orders.find(o => String(o.orderNumber) === String(order.orderNumber) || String(o._id) === String(order._id) || String(o.id) === String(order.id)) || order;
+    const email = freshOrder.shippingEmail || freshOrder.email;
     if (!email) {
-      alert('No customer email address on file for Order #' + (order.orderNumber || ''));
+      alert('No customer email address on file for Order #' + (freshOrder.orderNumber || ''));
       return;
     }
 
-    const customerName = order.shippingName || order.name || 'Valued Customer';
-    const status = (customStatus || order.orderStatus || order.status || 'placed').toUpperCase();
-    const orderNum = order.orderNumber || order.id || order._id || '';
-    const total = order.totalAmount || order.total || '';
-    const invoiceUrl = 'https://www.malenaduroastco.works/api/invoice?order=' + orderNum;
-
-    const subject = 'Order #' + orderNum + ' Status Update: ' + status + ' | Malenadu Roast Co.';
-    const emailBody = 'Hello ' + customerName + ',\n\n' +
-      'Greetings from Malenadu Roast Co. Chikkamagaluru estate!\n\n' +
-      'Your coffee order #' + orderNum + ' (₹' + total + ') status has been updated:\n' +
-      'Status: ' + status + '\n\n' +
-      'Delivery Timeline:\n' +
-      'Your freshly roasted coffee & spices will arrive in 2–4 business days with live tracking updates.\n\n' +
-      'Download Your Official GST Tax Invoice:\n' +
-      invoiceUrl + '\n\n' +
-      'If you have any questions or need brewing advice, feel free to reply directly to this email or message us on WhatsApp at +91 8217623335.\n\n' +
-      'Warm regards,\n' +
-      'Malenadu Roast Co. Roastery\n' +
-      'Chikkamagaluru, Karnataka\n' +
-      'Official Email: malenaduroast@gmail.com\n' +
-      'Website: https://malenaduroastco.works';
+    const { subject, body } = getStatusEmailDetails(freshOrder, customStatus);
 
     // Cross-platform compose: Opens native Gmail app on mobile, and Gmail web tab on desktop
     openCustomerEmailComposer({
       email,
       subject,
-      body: emailBody
+      body
     });
   };
 
@@ -4595,25 +4716,14 @@ export const AdminDashboard = ({ onBack, currentUser }) => {
           };
 
           const handleSendPackageEmail = (order) => {
-            const email = order.shippingEmail || order.email;
+            const freshOrder = orders.find(o => String(o.orderNumber) === String(order.orderNumber) || String(o._id) === String(order._id) || String(o.id) === String(order.id)) || order;
+            const email = freshOrder.shippingEmail || freshOrder.email;
             if (!email) {
               alert('Customer email address not available for this order.');
               return;
             }
-            const status = (order.orderStatus || order.status || 'placed').toUpperCase();
-            const orderNum = order.orderNumber || order._id || '';
-            const awbText = order.awbCode ? 'Tracking AWB: ' + order.awbCode : 'Your package will arrive in 2–4 business days with live tracking.';
-            const subject = '🚚 Package Update: Order #' + orderNum + ' is ' + status + ' | Malenadu Roast Co.';
-            const body = 'Hello ' + (order.shippingName || 'Valued Customer') + ',\n\n' +
-              'Your coffee order #' + orderNum + ' package status update:\n' +
-              'Status: ' + status + '\n' +
-              awbText + '\n\n' +
-              'Download Official GST Tax Invoice:\n' +
-              'https://www.malenaduroastco.works/api/invoice?order=' + orderNum + '\n\n' +
-              'Thank you for choosing Malenadu Roast Co. Chikkamagaluru estate!\n\n' +
-              'Warm regards,\n' +
-              'Malenadu Roast Co. Support\n' +
-              'Email: malenaduroast@gmail.com';
+            const status = freshOrder.orderStatus || freshOrder.status || 'placed';
+            const { subject, body } = getStatusEmailDetails(freshOrder, status);
 
             // Cross-platform compose: Opens native Gmail app on mobile, and Gmail web tab on desktop
             openCustomerEmailComposer({
